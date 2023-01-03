@@ -27,27 +27,13 @@ class NotificationService {
           ),
         ),
       ),
-      //backgroundColor: Colors.greenAccent[300],
-      /*  action: SnackBarAction(
-        label: 'Deshacer',
-        textColor: Colors.white,
-        onPressed: () {
-          // Algo de código para ¡deshacer el cambio!
-        },
-
-        //behavior: SnackBarBehavior.floating,
-      ), */
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
           Radius.circular(2.00),
         ),
       ),
-
-      //backgroundColor: Colors.greenAccent[300],
       duration: Duration(seconds: 3),
-      //behavior: SnackBarBehavior.floating,
     );
-
     messengerKey.currentState?.showSnackBar(snackbar);
   }
 }

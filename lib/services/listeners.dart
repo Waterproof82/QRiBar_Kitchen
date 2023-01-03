@@ -83,7 +83,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
     });
     // numElementos.valRecargaWidget = true;
 
-    print('Añadiendo nueva Categoría del Menú');
+   // print('Añadiendo nueva Categoría del Menú');
   }
 
   void childChangedCategoriaMenu(NavegacionModel numElementos, String idBar) {
@@ -114,7 +114,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
       numElementos.itemSeleccionadoMenu = 0;
       numElementos.valRecargaWidget = true;
     });
-    print('Cambio en Categoría del Menú');
+  //  print('Cambio en Categoría del Menú');
   }
 
   void childRemoveListenerMenuCategorias(String idBar, NavegacionModel numElementos) {
@@ -185,7 +185,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
       });
       // numElementos.valRecargaWidget = true;
     }
-    print('Estoy leyendo Gestión de pedidos');
+    //print('Estoy leyendo Gestión de pedidos');
   }
 
   void childChangedListenerPedidosMesasLocal(List<Pedidos> itemPedidos, String idBar, NavegacionModel numElementos, List<PedidosLocal> salasMesa) {
@@ -224,7 +224,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
         numElementos.valRecargaWidget = true;
       });
     }
-    print('Cambio Estado Línea Gestión de pedidos');
+   // print('Cambio Estado Línea Gestión de pedidos');
   }
 
   void childAddListenerPedidosMesas(String idBar, NavegacionModel numElementos) {
@@ -235,7 +235,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
 
       numElementos.mesasActivas = mesasActivas.length;
     });
-    print('Estoy leyendo número de Mesas del Local');
+   // print('Estoy leyendo número de Mesas del Local');
     //return mesasActivas;
   }
 

@@ -1,8 +1,6 @@
 import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
-import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,167 +14,6 @@ import 'package:qribar/provider/products_provider.dart';
 
 Future<void> salirApp({bool? animated}) async {
   await SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop', animated);
-}
-
-Future<void> deleteUser(String uidUsuario) async {
-  try {
-    HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('deleteUserById');
-    final resp = await callable.call(<String, dynamic>{
-      'usuarioId': '$uidUsuario',
-    });
-    print("result: ${resp.data}");
-  } catch (e) {
-    print(e);
-  }
-}
-
-Future<bool> onBorrarCategoriaMenu(BuildContext context) async {
-  final catProductos = Provider.of<ProductsService>(context, listen: false).categoriasProdLocal;
-  //final nav = Provider.of<NavegacionModel>(context, listen: false);
-  final productsService = Provider.of<ProductsService>(context, listen: false);
-  String idBar = productsService.idBar;
-
-  return await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Container(
-          child: new AlertDialog(
-            alignment: Alignment.center,
-            title: new Text('Borrando la Categoría del Menú...', textAlign: TextAlign.center),
-            content: new Text('¿Seguro que quieres eliminarlo? \n \n Comprueba antes que no haya Usuarios conectados \n \n *Se recomienda hacerlo cuando no haya clientes',
-                textAlign: TextAlign.center),
-            actions: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  new MaterialButton(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    disabledColor: Colors.grey,
-                    elevation: 1,
-                    color: Colors.black26,
-                    onPressed: () async {
-                      final nav = Provider.of<NavegacionModel>(context, listen: false);
-                      DatabaseReference _dataStreamNewCategory = new FirebaseDatabase().reference().child('ficha_local/$idBar/categoria_productos/');
-
-                      for (var i = 0; i < catProductos.length; i++) {
-                        if (catProductos[i].categoria == nav.categoriaSelected) await _dataStreamNewCategory.child(catProductos[i].id!).remove();
-                      }
-
-                      /*        catProductos.removeWhere((element) => element.categoria == nav.categoriaSelected);
-                      nav.itemSeleccionadoMenu = 0;
-                      nav.itemSeleccionado = 0;
-                      nav.categoriaSelected = 'Sugerencias'; */
-
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-                      child: Text(
-                        'Sí',
-                        style: TextStyle(color: Color.fromARGB(255, 255, 0, 0), fontSize: 18),
-                      ),
-                    ),
-                  ),
-                  new MaterialButton(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    disabledColor: Colors.grey,
-                    elevation: 1,
-                    color: Colors.black26,
-                    onPressed: () {
-                      Navigator.of(context).pop(false);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-                      child: Text(
-                        'No',
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ) ??
-      false;
-}
-
-Future<bool> onBorrarroducto(BuildContext context) async {
-  final productService = Provider.of<ProductsService>(context, listen: false);
-  //final navegacionModel = Provider.of<NavegacionModel>(context, listen: false);
-  String idBar = productService.idBar;
-  String idProd = '';
-
-  return await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Container(
-          child: new AlertDialog(
-            alignment: Alignment.center,
-            title: new Text(
-              'Borrando el Producto...',
-              textAlign: TextAlign.center,
-            ),
-            content: new Text(
-              '¿Seguro que quieres borrarlo?',
-              textAlign: TextAlign.center,
-            ),
-            actions: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  new MaterialButton(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    disabledColor: Colors.grey,
-                    elevation: 1,
-                    color: Colors.black26,
-                    onPressed: () async {
-                      final nav = Provider.of<NavegacionModel>(context, listen: false);
-                      DatabaseReference databaseReference = new FirebaseDatabase().reference().child('productos/$idBar/');
-
-                      if (productService.selectedProduct.id != null) {
-                        idProd = productService.selectedProduct.id!;
-                        productService.products.removeWhere((element) => element.id == idProd);
-                        await databaseReference.child('${productService.selectedProduct.id}').remove();
-
-                        nav.valRecargaWidget = true;
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-                      child: Text(
-                        'Sí',
-                        style: TextStyle(color: Color.fromARGB(255, 255, 0, 0), fontSize: 18),
-                      ),
-                    ),
-                  ),
-                  new MaterialButton(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    disabledColor: Colors.grey,
-                    elevation: 1,
-                    color: Colors.black26,
-                    onPressed: () {
-                      Navigator.of(context).pop(false);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-                      child: Text(
-                        'No',
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ) ??
-      false;
 }
 
 Future<bool> onBackPressed(BuildContext context) async {
@@ -238,12 +75,6 @@ Future<bool> onBackPressed(BuildContext context) async {
       ) ??
       false;
 }
-
-/* Future<String> readToken() async {
-  return FirebaseAuth.instance.currentUser?.uid ?? '';
-  //return await storage.read(key: 'token') ?? '';
-} */
-
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {

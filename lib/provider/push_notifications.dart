@@ -6,7 +6,7 @@ import 'package:qribar/provider/products_provider.dart';
 
 class PushNotificationProvider {
   // final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   static String? token;
   String idBar = ProductsService().idBar;
   //static StreamController<String> _messagestream = new StreamController.broadcast();
@@ -18,9 +18,9 @@ class PushNotificationProvider {
          options: DefaultFirebaseOptions.currentPlatform,
         ); */
 
-    FirebaseMessaging.instance.getInitialMessage().then((data) => null);
+    _firebaseMessaging.getInitialMessage().then((data) => null);
 
-    FirebaseMessaging.instance.subscribeToTopic(idBar);
+    _firebaseMessaging.subscribeToTopic(idBar);
 //Foreground
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
@@ -45,11 +45,11 @@ class PushNotificationProvider {
     });
 
     //Background
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+/*     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       final routeFromMessage = message.data['router'];
 
       print(routeFromMessage);
-    });
+    }); */
 
 /*     NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
@@ -62,10 +62,10 @@ class PushNotificationProvider {
     ); */
     // token = await _firebaseMessaging.getToken(
     //   vapidKey: "AAAA4rS8uVc:APA91bFXJmA0Mj9lCA3etssvfNvgmhayATJApk38n2tt13Ulj3Kh6hvhs81RsfGVna7DLy-7dmQJBWnIwjufRpuwh71bphGnKlVO9UE6iMOJ4xoBbhZZHFrtGHcLQ5zZWoeU_NtY24lx",
-    _firebaseMessaging.getToken().then((token) {
+/*     _firebaseMessaging.getToken().then((token) {
       print('FCM=======Token');
       print(token);
-    });
+    }); */
     //  );
     // print('FCM=======Token');
     //  print(token);

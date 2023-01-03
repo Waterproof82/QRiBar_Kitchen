@@ -15,17 +15,12 @@ class CuentaCocinaGeneralScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // = ProductsService.mesa;
-    //final ancho = MediaQuery.of(context).size.width;
+    final ancho = MediaQuery.of(context).size.width;
     final itemElemento = Provider.of<ProductsService>(context, listen: false).products;
     final itemPedidos = Provider.of<ProductsService>(context, listen: false).pedidosRealizados;
-
-    //final itemMesas = Provider.of<ProductsService>(context, listen: false).salasMesa;
     final navegacionModel = Provider.of<NavegacionModel>(context, listen: false);
-    //final idMesaActual = navegacionModel.mesaActual;
 
     final List<Pedidos> itemPedidosSelected = [];
-
     final productsService = Provider.of<ProductsService>(context, listen: false);
     String idBarSelected = productsService.idBar;
     //double totalLinea = 0;
@@ -56,27 +51,40 @@ class CuentaCocinaGeneralScreen extends StatelessWidget {
 
     return Stack(
       children: [
-/*         SizedBox(
-          height: 295,
-          child: Divider(thickness: 5, indent: 20, endIndent: 20, color: Colors.black54),
-        ), */
         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: (ancho > 420) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
           children: [
-            Container(width: 190, color: Color.fromARGB(255, 0, 0, 0), child: Text('  0-10 min', style: TextStyle(fontSize: 24, color: Color.fromARGB(255, 255, 254, 254)))),
-            SizedBox(width: 10),
-            Container(width: 190, color: Colors.amber, child: Text('  10-20 min', style: TextStyle(fontSize: 24, color: Colors.black))),
-            SizedBox(width: 10),
-            Container(width: 190, color: Color.fromRGBO(242, 132, 64, 1), child: Text('  20-30 min', style: TextStyle(fontSize: 24, color: Colors.black))),
+            Container(
+              width: (ancho > 420) ? 190 : 90,
+              height: 30,
+              color: Color.fromARGB(255, 0, 0, 0),
+              child: Text('0-10 min ', style: TextStyle(fontSize: (ancho > 420) ? 24 : 18, color: Color.fromARGB(255, 255, 254, 254))),
+              alignment: Alignment.topRight,
+            ),
             SizedBox(width: 10),
             Container(
-                width: 200,
-                color: Color.fromARGB(255, 255, 0, 0),
-                child: Text('  Más de 30 min',
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: Color.fromARGB(255, 0, 0, 0),
-                    )))
+              width: (ancho > 420) ? 190 : 90,
+              height: 30,
+              color: Colors.amber,
+              child: Text('10-20 min ', style: TextStyle(fontSize: (ancho > 420) ? 24 : 18, color: Colors.black)),
+              alignment: Alignment.topRight,
+            ),
+            SizedBox(width: 10),
+            Container(
+              width: (ancho > 420) ? 190 : 90,
+              height: 30,
+              color: Color.fromRGBO(242, 132, 64, 1),
+              child: Text('20-30 min ', style: TextStyle(fontSize: (ancho > 420) ? 24 : 18, color: Colors.black)),
+              alignment: Alignment.topRight,
+            ),
+            SizedBox(width: 10),
+            Container(
+              width: (ancho > 420) ? 190 : 90,
+              height: 30,
+              color: Color.fromARGB(255, 255, 0, 0),
+              child: Text((ancho > 420) ? 'Más de 30 min ' : '+ 30 min ', style: TextStyle(fontSize: (ancho > 420) ? 24 : 18, color: Color.fromARGB(255, 0, 0, 0))),
+              alignment: Alignment.topRight,
+            )
           ],
         ),
         ListaProductosPedidos(navegacionModel: navegacionModel, itemElemento: itemElemento, itemPedidos: itemPedidosSelected),
@@ -104,6 +112,7 @@ class ListaProductosPedidos extends StatefulWidget {
 class _ListaProductosPedidosState extends State<ListaProductosPedidos> {
   @override
   Widget build(BuildContext context) {
+    final providerGeneral = Provider.of<NavegacionModel>(context);
     // final catProductos = Provider.of<ProductsService>(context).categoriasProdLocal;
     //List<CategoriaProducto> unicaCategoriaFiltro = [];
     //ordenaCategorias(catProductos, unicaCategoriaFiltro, widget.itemPedidos);
@@ -114,7 +123,8 @@ class _ListaProductosPedidosState extends State<ListaProductosPedidos> {
     double resultPrecio = 0;
 
     return Container(
-      margin: EdgeInsets.only(top: 120, bottom: 10),
+      color: providerGeneral.colorTema,
+      margin: EdgeInsets.only(top: 80),
       child: ListView.builder(
         controller: widget.navegacionModel.pageController,
         physics: BouncingScrollPhysics(),
@@ -175,22 +185,6 @@ class _ListaProductosPedidosState extends State<ListaProductosPedidos> {
   }
 }
 
-/* void ordenaCategorias(List<CategoriaProducto> catProductos, List<CategoriaProducto> unicaCategoriaFiltro, List<Pedidos> itemPedidos) {
-  for (var i = 0; i < catProductos.length; i++) {
-    catProductos.sort((a, b) => a.orden.compareTo(b.orden));
-    unicaCategoriaFiltro = catProductos.toList();
-  }
-  for (var i = 0; i < itemPedidos.length; i++) {
-    for (var ind = 0; ind < unicaCategoriaFiltro.length; ind++) {
-      if (itemPedidos[i].categoriaProducto == unicaCategoriaFiltro[ind].categoria) {
-        itemPedidos[i].orden = unicaCategoriaFiltro[ind].orden;
-        itemPedidos[i].envio = unicaCategoriaFiltro[ind].envio;
-        //if (itemPedidos[i].envio == 'barra') itemPedidos.removeWhere((element) => element.envio == 'barra');
-      }
-    }
-  }
-} */
-
 class LineaProducto extends StatefulWidget {
   const LineaProducto({
     required this.itemElemento,
@@ -233,6 +227,7 @@ class _LineaProductoState extends State<LineaProducto> {
     bool rst = false;
     //Color colorLineaSinApuntar = Colors.white;
     Color colorLineaCocina = Colors.grey;
+    // ignore: unused_local_variable
     String categoriaProd = '';
     String envioProd = 'barra';
     String hora = '';
@@ -460,7 +455,7 @@ class _LineaProductoState extends State<LineaProducto> {
                       child: Row(
                         children: [
                           Text(
-                            ' ${hora} ',
+                            ' $hora ',
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             textAlign: TextAlign.left,
@@ -474,14 +469,14 @@ class _LineaProductoState extends State<LineaProducto> {
                             onTap: () {
                               nav.mesaActual = widget.itemPedidos[widget.index].mesa;
                               nav.idPedidoSelected = widget.itemPedidos[widget.index].numPedido;
-                              nav.categoriaSelected = 'Cocina Pedidos';
+                              nav.categoriaSelected = 'Cocina Pedidos Por Mesa';
                             },
                             child: Text(
-                              'P${pedidoNum}-M${int.parse(mesaVar)}',
+                              'P$pedidoNum-M${int.parse(mesaVar)}',
                               maxLines: 1,
                               textAlign: TextAlign.left,
-                              style:
-                                  GoogleFonts.poiretOne(color: Colors.white, fontSize: (ancho > 450) ? 26 : 20, fontWeight: FontWeight.bold, backgroundColor: Colors.transparent),
+                              style: GoogleFonts.poiretOne(
+                                  color: Color.fromARGB(255, 255, 136, 0), fontSize: (ancho > 450) ? 26 : 20, fontWeight: FontWeight.bold, backgroundColor: Colors.transparent),
                             ),
                           ),
                         ],

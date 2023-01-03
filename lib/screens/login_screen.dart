@@ -128,8 +128,8 @@ class _LoginForm extends StatelessWidget {
                         await FirebaseAuth.instance.signInWithEmailAndPassword(email: loginForm.email, password: loginForm.password);
                         // productsService.idBar = 'Test';
                         String result = loginForm.email.substring(0, loginForm.email.indexOf('@'));
-                        final capitalizeResult = '$result'.toTitleCase();
-                        print(capitalizeResult);
+                        String capitalizeResult = '$result'.toTitleCase();
+                        // print(capitalizeResult);
                         //  productsService.idBar = '$result';
                         await productsService.loadMesas('$capitalizeResult');
                         //productsService.idBar = 'Test';

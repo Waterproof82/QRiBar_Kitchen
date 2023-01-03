@@ -7,7 +7,7 @@ class LoadingScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Text(
-          'QR iBar',
+          'QR iBar Cocina',
           style: TextStyle(color: Colors.white),
         ),
       ),

@@ -54,18 +54,9 @@ class CuentaCocinaScreen extends StatelessWidget {
             //itemPedidos[i].mesaAbierta == true &&
             itemPedidos[i].numPedido == navegacionModel.idPedidoSelected) {
           itemPedidosSelected.add(itemPedidos[i]);
-          //mesasAct.add(itemPedidos[i].mesa);
         }
-/*         resultMesas = LinkedHashSet<int>.from(mesasAct).toList();
-        resultMesas.sort(); No hace falta */
       }
 
-/*       for (var i = 0; i < itemPedidosSelected.length; i++) {
-        final totalPedidos = itemPedidosSelected[i].cantidad * itemPedidosSelected[i].precioProducto;
-        double rst = totalLinea + totalPedidos;
-        totalLinea = rst;
-      } */
-//Precio de todos los pedidos de la mesa actual
       for (var i = 0; i < itemPedidos.length; i++) {
         if (itemPedidos[i].idBar == idBarSelected && itemPedidos[i].mesa == idMesaActual /* && itemPedidos[i].mesaAbierta == 'True' */) {
           //final totalLineaPedidos = itemPedidos[i].cantidad * itemPedidos[i].precioProducto;
@@ -175,7 +166,7 @@ class PedidosListMenu extends StatelessWidget {
     //print(count);
 
     return Container(
-      margin: EdgeInsets.only(top: 180),
+      margin: EdgeInsets.only(top: 140),
       height: 50,
       child: ListView.builder(
         itemCount: count,
@@ -229,7 +220,7 @@ class PedidosMesasListMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 120),
+      margin: EdgeInsets.only(top: 70),
       height: 50,
       child: ListView.builder(
         itemCount: resultMesas.length,
@@ -293,6 +284,7 @@ class ListaProductosPedidos extends StatefulWidget {
 class _ListaProductosPedidosState extends State<ListaProductosPedidos> {
   @override
   Widget build(BuildContext context) {
+    final providerGeneral = Provider.of<NavegacionModel>(context);
     //final catProductos = Provider.of<ProductsService>(context).categoriasProdLocal;
     // List<CategoriaProducto> unicaCategoriaFiltro = [];
     //ordenaCategorias(catProductos, unicaCategoriaFiltro, widget.itemPedidos);
@@ -303,7 +295,8 @@ class _ListaProductosPedidosState extends State<ListaProductosPedidos> {
     double resultPrecio = 0;
 
     return Container(
-      margin: EdgeInsets.only(top: 250, bottom: 10),
+      color: providerGeneral.colorTema,
+      margin: EdgeInsets.only(top: 200),
       child: ListView.builder(
         controller: widget.navegacionModel.pageController,
         physics: BouncingScrollPhysics(),

@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class NavegacionModel with ChangeNotifier {
   PageController _pageController = new PageController();
   late AnimationController _bounceController;
-  // GlobalKey<FormState> iconKey = new GlobalKey<FormState>();
-  // late AnimationController _bounceController;
-/*   String idBar=ProductsService.idBar ; //Viene de URL
-  String idMesa=ProductsService.idBar ;  */
+
   int _paginaActual = 0;
   int _numero = 0;
   String _categoriaSelected = "Cocina Estado Pedidos";
@@ -40,7 +37,7 @@ class NavegacionModel with ChangeNotifier {
   bool _mediaRacion = false;
   bool _cancelado = false;
   Color _colorPed = Color.fromARGB(255, 0, 0, 0);
-  Color _colorTema = Color.fromARGB(255, 255, 255, 255);
+  Color _colorTema = Color.fromARGB(255, 0, 0, 0);
   String _nombreCliente = '';
   String _nombreSala = '';
   bool _dialogNota = false;
@@ -77,12 +74,6 @@ class NavegacionModel with ChangeNotifier {
     notifyListeners();
   }
 
-/*   bool get disponible => this._disponible;
-  set disponible(bool valor) {
-    this._disponible = valor;
-    notifyListeners();
-  }
- */
   int get avisoSala => this._avisoSala;
   set avisoSala(int index) {
     this._avisoSala = index;

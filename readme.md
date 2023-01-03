@@ -1,4 +1,4 @@
-# card_item
+# QR iBar Cocina
 
 Tu Carta Digital y Gestor de Sala.
 

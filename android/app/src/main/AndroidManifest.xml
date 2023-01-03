@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.qribar.bar">
    <application
-        android:label="QRiBar"
+        android:label="QRiBar Cocina"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
         <activity
@@ -13,6 +13,7 @@
             android:windowSoftInputMode="adjustResize"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
+            android:exported="true"
             >
             
             <!-- Specifies an Android theme to apply to this Activity as soon as

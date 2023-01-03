@@ -9,15 +9,8 @@ class CheckAuthScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final List<Product> products = [];
-    //late Product selectedProduct;
-    //final idBar = ReadData().idBar;
-    //final idMesa = ReadData().mesa; //Viene de URL
-    //final int mesa = 1;
     final authService = Provider.of<AuthService>(context, listen: false);
-    //Provider.of<ReadData>(context, listen: false).childAddListenerProductos(products, idBar);
 
-//final userInitService = Provider.of<AuthService>(context, listen: false);
     return Scaffold(
       body: Center(
         child: FutureBuilder(

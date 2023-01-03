@@ -1,6 +1,6 @@
 {
-    "name": "card_item",
-    "short_name": "card_item",
+    "name": "QRiBar_cocina",
+    "short_name": "QRiBar_cocina",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
