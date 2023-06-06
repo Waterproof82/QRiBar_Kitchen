@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:qribar/models/models.dart';
 import 'package:qribar/provider/products_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:qribar/widgets/botones_info_sup.dart';
 
 class CuentaCocinaGeneralScreen extends StatelessWidget {
   static final String routeName = 'cuentasCocinaGeneral';
@@ -45,48 +46,13 @@ class CuentaCocinaGeneralScreen extends StatelessWidget {
         // List resultMesas = LinkedHashSet<String>.from(mesasAct).toList();
       }
       for (var i = 0; i < itemPedidos.length; i++) {
-        itemPedidosSelected.add(itemPedidos[i]);
+        if (itemPedidos[i].estadoLinea != 'bloqueado') itemPedidosSelected.add(itemPedidos[i]);
       }
     }
 
     return Stack(
       children: [
-        Row(
-          mainAxisAlignment: (ancho > 420) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              width: (ancho > 420) ? 190 : 90,
-              height: 30,
-              color: Color.fromARGB(255, 0, 0, 0),
-              child: Text('0-10 min ', style: TextStyle(fontSize: (ancho > 420) ? 24 : 18, color: Color.fromARGB(255, 255, 254, 254))),
-              alignment: Alignment.topRight,
-            ),
-            SizedBox(width: 10),
-            Container(
-              width: (ancho > 420) ? 190 : 90,
-              height: 30,
-              color: Colors.amber,
-              child: Text('10-20 min ', style: TextStyle(fontSize: (ancho > 420) ? 24 : 18, color: Colors.black)),
-              alignment: Alignment.topRight,
-            ),
-            SizedBox(width: 10),
-            Container(
-              width: (ancho > 420) ? 190 : 90,
-              height: 30,
-              color: Color.fromRGBO(242, 132, 64, 1),
-              child: Text('20-30 min ', style: TextStyle(fontSize: (ancho > 420) ? 24 : 18, color: Colors.black)),
-              alignment: Alignment.topRight,
-            ),
-            SizedBox(width: 10),
-            Container(
-              width: (ancho > 420) ? 190 : 90,
-              height: 30,
-              color: Color.fromARGB(255, 255, 0, 0),
-              child: Text((ancho > 420) ? 'Más de 30 min ' : '+ 30 min ', style: TextStyle(fontSize: (ancho > 420) ? 24 : 18, color: Color.fromARGB(255, 0, 0, 0))),
-              alignment: Alignment.topRight,
-            )
-          ],
-        ),
+        BarraSupTiempo(ancho: ancho),
         ListaProductosPedidos(navegacionModel: navegacionModel, itemElemento: itemElemento, itemPedidos: itemPedidosSelected),
       ],
     );
@@ -124,7 +90,7 @@ class _ListaProductosPedidosState extends State<ListaProductosPedidos> {
 
     return Container(
       color: providerGeneral.colorTema,
-      margin: EdgeInsets.only(top: 80),
+      margin: EdgeInsets.only(top: 60),
       child: ListView.builder(
         controller: widget.navegacionModel.pageController,
         physics: BouncingScrollPhysics(),
@@ -476,7 +442,10 @@ class _LineaProductoState extends State<LineaProducto> {
                               maxLines: 1,
                               textAlign: TextAlign.left,
                               style: GoogleFonts.poiretOne(
-                                  color: Color.fromARGB(255, 255, 136, 0), fontSize: (ancho > 450) ? 26 : 20, fontWeight: FontWeight.bold, backgroundColor: Colors.transparent),
+                                  color: (colorLineaCocina != Color.fromARGB(255, 0, 0, 0)) ? Color.fromARGB(255, 0, 0, 0) : Color.fromARGB(255, 255, 94, 1),
+                                  fontSize: (ancho > 450) ? 26 : 20,
+                                  fontWeight: FontWeight.bold,
+                                  backgroundColor: Colors.transparent),
                             ),
                           ),
                         ],

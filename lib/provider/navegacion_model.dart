@@ -56,6 +56,14 @@ class NavegacionModel with ChangeNotifier {
   String _clave = '';
   double _precioTotalPedidosSala = 0;
 
+  bool _bloqueoPedidos = false;
+
+  bool get bloqueoPedidos => this._bloqueoPedidos;
+  set bloqueoPedidos(bool valor) {
+    this._bloqueoPedidos = valor;
+    notifyListeners();
+  }
+
   double get precioTotalPedidosSala => this._precioTotalPedidosSala;
   set precioTotalPedidosSala(double valor) {
     this._precioTotalPedidosSala = valor;

@@ -166,7 +166,7 @@ class PedidosListMenu extends StatelessWidget {
     //print(count);
 
     return Container(
-      margin: EdgeInsets.only(top: 140),
+      margin: EdgeInsets.only(top: 70),
       height: 50,
       child: ListView.builder(
         itemCount: count,
@@ -220,7 +220,7 @@ class PedidosMesasListMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 70),
+      margin: EdgeInsets.only(top: 5),
       height: 50,
       child: ListView.builder(
         itemCount: resultMesas.length,
@@ -296,7 +296,7 @@ class _ListaProductosPedidosState extends State<ListaProductosPedidos> {
 
     return Container(
       color: providerGeneral.colorTema,
-      margin: EdgeInsets.only(top: 200),
+      margin: EdgeInsets.only(top: 140),
       child: ListView.builder(
         controller: widget.navegacionModel.pageController,
         physics: BouncingScrollPhysics(),
@@ -438,20 +438,6 @@ class LineaProducto extends StatelessWidget {
       pedidoNum = itemPedidos[index].numPedido;
       mesaVar = itemPedidos[index].mesa;
     }
-/*     DateTime now = DateTime.now();
-    var horaActual = new DateFormat.Hms(Intl.defaultLocale = 'es_ES');
-    //String horaFormateada = horaActual.format(now);
-    final DateFormat formatter = DateFormat('yyyy-MM-dd');
-    final String formatted = formatter.format(now); */
-
-    //DateTime rstHora = DateTime.parse('$formatted ${itemPedidos[index].hora}');
-    // Duration diff = now.difference(rstHora);
-/*     print('$formatted $horaFormateada');
-    print(diff.inMinutes);
-    print(rstHora); */
-    // if (diff.inMinutes > 0) nav.colorPed = Colors.amber;
-    //if (diff.inMinutes > 0) nav.colorPed = Colors.amber;
-    //print(horaFormateada);
     return Container(
       width: ancho * 0.95,
       //height: alto * 0.9,
@@ -468,20 +454,8 @@ class LineaProducto extends StatelessWidget {
         ],
       ),
       child: Dismissible(
-/*         onTap: () {
-          /*      _dataStreamPedidos.update(
-            {'mesaAbierta': false},
-          ); */
-          itemPedidos[index].mesaAbierta = false;
-        }, */
         key: UniqueKey(),
-        onDismissed: (direction) {
-          // Remove the item from the data source.
-
-          // itemPedidos.removeAt(index);
-
-          //Modificar BBDD estado
-        },
+        onDismissed: (direction) {},
         confirmDismiss: (direction) async {
           if (direction == DismissDirection.startToEnd) {
             return false;
@@ -593,7 +567,7 @@ class LineaProducto extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     textAlign: TextAlign.left,
-                    style: GoogleFonts.notoSans(color: Colors.black, fontSize: 26, fontWeight: FontWeight.w500, backgroundColor: Colors.red[200]),
+                    style: GoogleFonts.notoSans(color: Colors.black, fontSize: (ancho > 450) ? 26 : 20, fontWeight: FontWeight.w500, backgroundColor: Colors.red[200]),
                   )),
                 ),
 /*                 Container(
@@ -609,7 +583,10 @@ class LineaProducto extends StatelessWidget {
                       maxLines: 1,
                       textAlign: TextAlign.left,
                       style: GoogleFonts.poiretOne(
-                          color: (envioProd == 'barra') ? Colors.black : Colors.white, fontSize: 26, fontWeight: FontWeight.bold, backgroundColor: Colors.transparent),
+                          color: (envioProd == 'barra') ? Colors.black : Colors.white,
+                          fontSize: (ancho > 450) ? 26 : 20,
+                          fontWeight: FontWeight.bold,
+                          backgroundColor: Colors.transparent),
                     ),
                   ),
                 ),
@@ -629,7 +606,8 @@ class LineaProducto extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             textAlign: TextAlign.left,
-                            style: GoogleFonts.poiretOne(color: Colors.orange, fontSize: 26, fontWeight: FontWeight.bold, backgroundColor: Colors.transparent),
+                            style: GoogleFonts.poiretOne(
+                                color: Color.fromARGB(255, 255, 94, 1), fontSize: (ancho > 450) ? 26 : 20, fontWeight: FontWeight.w600, backgroundColor: Colors.transparent),
                           ),
                           /*                         GestureDetector(
                             onTap: () {
