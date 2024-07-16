@@ -1,9 +1,4 @@
-// To parse this JSON data, do
-//
-//     final fichaLocal = fichaLocalFromMap(jsonString);
-
 import 'dart:convert';
-
 class FichaLocal {
   FichaLocal({
     this.categoriaProductos,

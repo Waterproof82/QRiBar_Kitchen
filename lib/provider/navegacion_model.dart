@@ -55,8 +55,21 @@ class NavegacionModel with ChangeNotifier {
   int _avisoSala = 0;
   String _clave = '';
   double _precioTotalPedidosSala = 0;
-
   bool _bloqueoPedidos = false;
+  int _pedAnterior = 99;
+  String _mesaAnt = '99';
+
+  String get mesaAnt => this._mesaAnt;
+  set mesaAnt(String index) {
+    this._mesaAnt = index;
+    notifyListeners();
+  }
+
+  int get pedAnterior => this._pedAnterior;
+  set pedAnterior(int index) {
+    this._pedAnterior = index;
+    notifyListeners();
+  }
 
   bool get bloqueoPedidos => this._bloqueoPedidos;
   set bloqueoPedidos(bool valor) {

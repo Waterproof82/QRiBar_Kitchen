@@ -21,21 +21,12 @@ class PrinterestScreen extends StatelessWidget {
     final productsService = Provider.of<ProductsService>(context, listen: true);
 
     final itemPedidos = Provider.of<ProductsService>(context, listen: false).pedidosRealizados;
-    final catProductos = Provider.of<ProductsService>(context).categoriasProdLocal;
+    final catProductos = productsService.categoriasProdLocal;
     final double screenWidthSize = MediaQuery.of(context).size.width;
+
     List<CategoriaProducto> unicaCategoriaFiltro = [];
 
-    // ignore: unused_local_variable
-    int cont = 0;
-    // ignore: unused_local_variable
-    int contBarra = 0;
-
     ordenaCategorias(catProductos, unicaCategoriaFiltro, itemPedidos);
-
-    for (var i = 0; i < itemPedidos.length; i++) {
-      if (itemPedidos[i].estadoLinea == 'cocinado') cont++;
-      if (itemPedidos[i].envio == 'barra') contBarra++;
-    }
 
     if (productsService.isLoading) return LoadingScreen();
     return WillPopScope(

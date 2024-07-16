@@ -4,7 +4,6 @@ import 'package:qribar/provider/login_form_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar/provider/products_provider.dart';
 import 'package:qribar/widgets/card_container.dart';
-
 import 'package:qribar/widgets/widgets.dart';
 import 'package:qribar/ui/input_decoration.dart';
 
@@ -25,8 +24,6 @@ class LoginScreen extends StatelessWidget {
                     SizedBox(height: 10),
                     Text('Login', style: Theme.of(context).textTheme.headline4),
                     SizedBox(height: 30),
-//Crea instancia de LoginForm y puede redibujar los widgets
-//Solo que esta en LoginForm tendra acceso al Provider
                     ChangeNotifierProvider(
                       create: (_) => LoginFormProvider(),
                       child: _LoginForm(),
@@ -34,12 +31,6 @@ class LoginScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(height: 50),
-/*               TextButton(
-                onPressed: () => Navigator.pushReplacementNamed(context, 'register'),
-                style: ButtonStyle(overlayColor: MaterialStateProperty.all(Colors.indigo.withOpacity(0.1)), shape: MaterialStateProperty.all(StadiumBorder())),
-                child: Text('Crear una nueva cuenta', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
-              ), */
               SizedBox(height: 50),
             ],
           ),
@@ -54,8 +45,7 @@ class _LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final loginForm = Provider.of<LoginFormProvider>(context);
     final productsService = Provider.of<ProductsService>(context, listen: false);
-    //final navegacionModel = Provider.of<NavegacionModel>(context, listen: false);
-    //final authService = Provider.of<AuthService>(context, listen: false);
+
     return Container(
       child: Form(
         //Para coger argumento GlobalKey y vincularlo
@@ -110,10 +100,7 @@ class _LoginForm extends StatelessWidget {
               color: Colors.black26,
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 80, vertical: 15),
-                child: Text(
-                  loginForm.isLoading ? 'Espere...' : 'Ingresar',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
+                child: Text(loginForm.isLoading ? 'Espere...' : 'Ingresar', style: TextStyle(color: Colors.white, fontSize: 20)),
               ),
               //Para desactivar boton el onPressed tiene que ser null
               onPressed: loginForm.isLoading
@@ -126,36 +113,16 @@ class _LoginForm extends StatelessWidget {
                       loginForm.isLoading = true;
                       try {
                         await FirebaseAuth.instance.signInWithEmailAndPassword(email: loginForm.email, password: loginForm.password);
-                        // productsService.idBar = 'Test';
+
                         String result = loginForm.email.substring(0, loginForm.email.indexOf('@'));
                         String capitalizeResult = '$result'.toTitleCase();
-                        // print(capitalizeResult);
-                        //  productsService.idBar = '$result';
+
                         await productsService.loadMesas('$capitalizeResult');
-                        //productsService.idBar = 'Test';
-                        //loginForm.email;
+
                         Navigator.pushReplacementNamed(context, 'home');
                       } on FirebaseAuthException /* catch (e) */ {
-                        //print('Failed with error code: ${e.code}');
-                        // ignore: deprecated_member_use
-                        /*         Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                            e.code,
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        )); */
-                        //print(e.message);
                         loginForm.isLoading = false;
                       }
-
-                      //UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: loginForm.email, password: loginForm.password);
-
-                      //final String? errorMessage = await authService.login(loginForm.email, loginForm.password);
-                      //?email=${loginForm.email}&pass=${loginForm.password}
-                      //if (errorMessage) {
-
-                      // NotificationService.showSnackbar(errorMessage);
-                      //loginForm.isLoading = false;
                     },
             )
           ],

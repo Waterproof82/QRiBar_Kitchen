@@ -1,8 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:qribar/provider/products_provider.dart';
-import 'package:qribar/provider/push_notifications.dart';
 import 'package:qribar/screens/cuenta_cocina_general.dart';
 import 'package:qribar/screens/cuenta_cocina_screen.dart';
 import 'package:qribar/provider/navegacion_model.dart';
@@ -13,9 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar/screens/screens.dart';
 import 'package:wakelock/wakelock.dart';
-
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-final pushProvider = PushNotificationProvider();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,32 +62,4 @@ class _MyAppState extends State<MyApp> {
       },
     );
   }
-}
-
-Future<void> showNotification(int? numPedido, String? mesaSnap, bool? camarero, bool? avisoPago, bool? pedidoBackground) async {
-  final notificationId = UniqueKey().hashCode;
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-  const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    'notificationId',
-    'notificationId',
-    channelDescription: 'Canal Notificación',
-    importance: Importance.max,
-    priority: Priority.high,
-    icon: 'logo_cut',
-    sound: RawResourceAndroidNotificationSound('chimes'),
-    largeIcon: DrawableResourceAndroidBitmap('logo_cut') /* ticker: 'ticker' */,
-    playSound: true,
-    enableLights: true,
-    color: Color.fromARGB(255, 255, 255, 255),
-    ledColor: Color.fromARGB(255, 255, 255, 255),
-    ledOnMs: 1000,
-    ledOffMs: 500,
-  );
-  const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-
-  if (numPedido != 0 && camarero == false && avisoPago == false && pedidoBackground == false)
-    await flutterLocalNotificationsPlugin.show(notificationId, 'Mesa ${int.parse(mesaSnap!)}', 'Nuevo Pedido nº $numPedido', platformChannelSpecifics, payload: 'item x');
-  if (camarero == false && avisoPago == false && numPedido == 0 && pedidoBackground == true)
-    await flutterLocalNotificationsPlugin.show(notificationId, 'Nuevo Pedido en Mesa ${int.parse(mesaSnap!)}', '', platformChannelSpecifics);
 }

@@ -1,26 +1,28 @@
 import 'dart:convert';
 
 class Pedidos {
-  Pedidos(
-      {required this.cantidad,
-      required this.categoriaProducto,
-      required this.fecha,
-      required this.hora,
-      required this.titulo,
-      this.tituloOriginal,
-      required this.precioProducto,
-      required this.idBar,
-      required this.mesa,
-      required this.mesaAbierta,
-      required this.numPedido,
-      required this.idProducto,
-      required this.estadoLinea,
-      this.nota,
-      this.orden = 1,
-      this.envio = 'barra',
-      this.fechaHora,
-      this.id,
-      this.enMarcha});
+  Pedidos({
+    required this.cantidad,
+    required this.categoriaProducto,
+    required this.fecha,
+    required this.hora,
+    required this.titulo,
+    this.tituloOriginal,
+    required this.precioProducto,
+    required this.idBar,
+    required this.mesa,
+    required this.mesaAbierta,
+    required this.numPedido,
+    required this.idProducto,
+    required this.estadoLinea,
+    this.nota,
+    this.orden = 1,
+    this.envio = 'barra',
+    this.fechaHora,
+    this.id,
+    this.enMarcha,
+    this.notaExtra,
+  });
 
   int cantidad;
   String categoriaProducto;
@@ -41,6 +43,7 @@ class Pedidos {
   String? fechaHora;
   String? tituloOriginal;
   bool? enMarcha;
+  List<String>? notaExtra;
 
   factory Pedidos.fromJson(String str) => Pedidos.fromMap(json.decode(str));
 
