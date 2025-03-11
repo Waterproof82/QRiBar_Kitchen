@@ -320,7 +320,7 @@ class LineaProducto extends StatelessWidget {
     // categoriaProd = itemPedidos[index].categoriaProducto;
     envioProd = itemPedidos[index].envio!;
     estadoLinea = itemPedidos[index].estadoLinea ?? '';
-    hora = itemPedidos[index].hora;
+    hora = (itemPedidos[index].hora.isNotEmpty) ? itemPedidos[index].hora.split(':').sublist(0, 2).join(':') : "--:--";
     pedidoNum = itemPedidos[index].numPedido;
     mesaVar = itemPedidos[index].mesa;
 
@@ -351,7 +351,7 @@ class LineaProducto extends StatelessWidget {
               //'mesaAbierta': itemPedidos[index].mesaAbierta,
               'numPedido': itemPedidos[index].numPedido,
               //'precio_producto': itemPedidos[index].precioProducto,
-             // 'titulo': itemPedidos[index].titulo,
+              // 'titulo': itemPedidos[index].titulo,
               'estado_linea': 'cocinado'
             });
           }

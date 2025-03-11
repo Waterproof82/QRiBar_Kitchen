@@ -36,6 +36,7 @@ class PrinterestScreen extends StatelessWidget {
         appBar: AppBar(
           toolbarHeight: 60,
           backgroundColor: Colors.black,
+          iconTheme: IconThemeData(color: Colors.white),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

@@ -226,10 +226,10 @@ class _ListenFirebaseState extends State<ListenFirebase> {
     final mesaSnap = dataMesas['mesa'] as String;
     final numPed = dataMesas['numPedido'] as int;
 
-    //final productService = Provider.of<ProductsService>(context, listen: false);
+    final productService = Provider.of<ProductsService>(context, listen: false);
 
-    // final catProductos = productService.categoriasProdLocal;
-    //  List<CategoriaProducto> unicaCategoriaFiltro = [];
+    final catProductos = productService.categoriasProdLocal;
+    List<CategoriaProducto> unicaCategoriaFiltro = [];
     List<Modifier> modifiers = [];
     String envio = '';
 
@@ -280,7 +280,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
         id: dataMesas['id'],
       ),
     );
-    //  ordenaCategorias(catProductos, unicaCategoriaFiltro, itemPedidos, productService);
+    ordenaCategorias(catProductos, unicaCategoriaFiltro, itemPedidos, productService);
     for (var element in itemPedidos) {
       if (element.idProducto == idProd) envio = element.envio ?? '';
     }
