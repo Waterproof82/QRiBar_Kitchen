@@ -31,8 +31,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.qribar.bar"
-    compileSdkVersion = 34
-    ndkVersion = flutter.ndkVersion
+    compileSdkVersion = 35
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -46,7 +46,7 @@ android {
     defaultConfig {
         applicationId "com.qribar.bar"
         minSdk = 23
-        targetSdk = 34
+        targetSdk = 35
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
         multiDexEnabled = true
