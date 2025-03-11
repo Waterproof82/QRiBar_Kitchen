@@ -24,7 +24,9 @@ class ProductsService extends ChangeNotifier {
   static int cantSnap = 0;
   final List mesasActivas = [];
   final List<CategoriaProducto> categoriasProdLocal = [];
-
+  final database = FirebaseDatabase.instance;
+    String estado = '';
+    
   static List<String> alergias = [];
   LinearGradient bgGradient = const LinearGradient(
     colors: <Color>[Color(0xFF262B2F), Color(0xFF1D2125), Color(0xFF16191D)],
@@ -57,46 +59,46 @@ class ProductsService extends ChangeNotifier {
   Future<List<PedidosLocal>> loadMesas(idBarEmail) async {
     this.isLoading = true;
     notifyListeners();
-    DatabaseReference _dataStreamFicha = new FirebaseDatabase().reference().child('cuentas/$idBarEmail');
+    DatabaseReference _dataStreamFicha = database.ref('cuentas/$idBarEmail');
     await _dataStreamFicha.once().then((value) {
       idBar = idBarEmail;
 
-      final data = new Map<String, dynamic>.from(value.value);
+      final data = new Map<dynamic, dynamic>.from(value.snapshot.value as Map);
       data.forEach((k, v) {
         if (k == 'nom_local') nombreBar = v;
+        if (k == 'estado') estado = v;
       });
     });
 
-    DatabaseReference _readCarpetaCloudinary = new FirebaseDatabase().reference().child('cuentas/$idBar');
+    DatabaseReference _readCarpetaCloudinary = database.ref('cuentas/$idBar');
     _readCarpetaCloudinary.once().then((value) {
-      final data = new Map<String, dynamic>.from(value.value);
-      //print('Estoy leyendo carpeta cloudinary');
+      final data = new Map<dynamic, dynamic>.from(value.snapshot.value as Map);
       data.forEach((k, v) {
         if (k == 'carpeta_cloudinary') cloudinaryName = v;
       });
     });
 
-    DatabaseReference _dataStreamProd = new FirebaseDatabase().reference().child('gestion_local/$idBar/');
+ DatabaseReference _dataStreamProd = database.ref('gestion_local/$idBar/');
 
     await _dataStreamProd.once().then((value) {
-      final data = new Map<String, dynamic>.from(value.value);
-      //print('Estoy leyendo Numero de Mesas');
+      final data = new Map<dynamic, dynamic>.from(value.snapshot.value as Map);
+
       data.forEach((k, v) {
         final List<PedidosLocal> listaSalasMesa = [
           PedidosLocal(
-              mesa: k,
-              sala: v['sala'],
-              estado: v['estado'],
-              hora: v['hora'],
-              horaUltimaActiva: v['horaUltimaActiva'],
-              horaUltimoPedido: v['horaUltimoPedido'],
-              horaUltimoPago: v['horaUltimoPago'],
-              personas: v['personas'] ?? 0,
-              callCamarero: v['callCamarero'],
-              callPago: v['callPago'],
-              nombre: v['nombre'] ?? '',
-              positionMap: v['positionMap'],
-              qrLink: v['qr_link'] ?? '')
+            mesa: k,
+            sala: v['sala'],
+            estado: v['estado'],
+            hora: v['hora'],
+            horaUltimoPedido: v['horaUltimoPedido'],
+            //horaUltimoPago: v['horaUltimoPago'],
+            personas: v['personas'] ?? 0,
+            callCamarero: v['callCamarero'],
+            //callPago: v['callPago'],
+            nombre: v['nombre'] ?? '',
+            positionMap: v['positionMap'],
+            qrLink: v['qr_link'] ?? '',
+          )
         ];
         salasMesa.add(listaSalasMesa[0]);
         notifyListeners();

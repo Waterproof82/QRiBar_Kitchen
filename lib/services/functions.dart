@@ -1,8 +1,10 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:qribar/models/ficha_local.dart';
 import 'package:qribar/models/pedidos.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:qribar/provider/products_provider.dart';
 
 void timbre() async {
   final player = AudioPlayer();
@@ -67,6 +69,24 @@ Future<bool> onBackPressed(BuildContext context) async {
       false;
 }
 
+String obtenerNombreProducto(BuildContext context, String idProducto, bool racion) {
+  final itemElemento = Provider.of<ProductsService>(context, listen: false).products;
+
+  final producto = itemElemento.firstWhere((item) => item.id == idProducto);
+
+  String nombreProducto = racion ? producto.nombreProducto : '${producto.nombreProducto} (${producto.nombreRacionMedia})';
+
+  return nombreProducto;
+}
+
+String obtenerCategoriaProducto(ProductsService productsService, String idProducto) {
+  final itemElemento = productsService.products;
+
+  final producto = itemElemento.firstWhere((item) => item.id == idProducto);
+
+  return producto.categoriaProducto;
+}
+
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
@@ -82,17 +102,18 @@ String capitalize(String value) {
   return "${value[0].toUpperCase()}${value.substring(1).toLowerCase()}";
 }
 
-void ordenaCategorias(List<CategoriaProducto> catProductos, List<CategoriaProducto> unicaCategoriaFiltro, List<Pedidos> itemPedidos) {
-  for (var i = 0; i < catProductos.length; i++) {
-    catProductos.sort((a, b) => a.orden.compareTo(b.orden));
-    unicaCategoriaFiltro = catProductos.toList();
-  }
-  for (var i = 0; i < itemPedidos.length; i++) {
-    for (var ind = 0; ind < unicaCategoriaFiltro.length; ind++) {
-      if (itemPedidos[i].categoriaProducto == unicaCategoriaFiltro[ind].categoria) {
-        itemPedidos[i].orden = unicaCategoriaFiltro[ind].orden;
-        itemPedidos[i].envio = unicaCategoriaFiltro[ind].envio;
-      }
+Future<void> ordenaCategorias(List<CategoriaProducto> catProductos, List<CategoriaProducto> unicaCategoriaFiltro, List<Pedidos> itemPedidos, ProductsService productService) async {
+  catProductos.sort((a, b) => a.orden.compareTo(b.orden));
+  unicaCategoriaFiltro.clear();
+  unicaCategoriaFiltro.addAll(catProductos);
+
+  final categoriaMap = {for (var categoria in unicaCategoriaFiltro) categoria.categoria: categoria};
+
+  for (var pedido in itemPedidos) {
+    final categoria = categoriaMap[obtenerCategoriaProducto(productService, pedido.idProducto!)];
+    if (categoria != null) {
+      pedido.orden = categoria.orden;
+      pedido.envio = categoria.envio;
     }
   }
 }

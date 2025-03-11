@@ -1,13 +1,14 @@
 import 'dart:collection';
 import 'dart:math';
-import 'package:qribar/models/pedidos.dart';
-import 'package:qribar/provider/navegacion_model.dart';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:qribar/provider/products_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:provider/provider.dart';
+import 'package:qribar/models/pedidos.dart';
+import 'package:qribar/provider/navegacion_model.dart';
+import 'package:qribar/provider/products_provider.dart';
+import 'package:qribar/services/functions.dart';
 
 class CuentaCocinaScreen extends StatelessWidget {
   static final String routeName = 'cuentasCocina';
@@ -15,11 +16,11 @@ class CuentaCocinaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final itemPedidos = Provider.of<ProductsService>(context, listen: false).pedidosRealizados;
-    final productsService = Provider.of<ProductsService>(context, listen: false);
+    //  final productsService = Provider.of<ProductsService>(context, listen: false);
     final navegacionModel = Provider.of<NavegacionModel>(context, listen: false);
     final idMesaActual = navegacionModel.mesaActual;
     final List<Pedidos> itemPedidosSelected = [];
-    String idBarSelected = productsService.idBar;
+    // String idBarSelected = productsService.idBar;
 
     List<int> countMenuPedido = [];
     int contadorNumPedido = 0;
@@ -28,19 +29,18 @@ class CuentaCocinaScreen extends StatelessWidget {
 
     if (itemPedidos.length != 0) {
       for (var i = 0; i < itemPedidos.length; i++) {
-        if (itemPedidos[i].idBar == idBarSelected) {
-          mesasAct.add(itemPedidos[i].mesa);
-        }
+        mesasAct.add(itemPedidos[i].mesa);
+
         resultMesas = LinkedHashSet<String>.from(mesasAct).toList();
       }
       for (var i = 0; i < itemPedidos.length; i++) {
-        if (itemPedidos[i].idBar == idBarSelected && itemPedidos[i].mesa == idMesaActual && itemPedidos[i].numPedido == navegacionModel.idPedidoSelected) {
+        if (itemPedidos[i].mesa == idMesaActual && itemPedidos[i].numPedido == navegacionModel.idPedidoSelected) {
           itemPedidosSelected.add(itemPedidos[i]);
         }
       }
 
       for (var i = 0; i < itemPedidos.length; i++) {
-        if (itemPedidos[i].idBar == idBarSelected && itemPedidos[i].mesa == idMesaActual) {
+        if (itemPedidos[i].mesa == idMesaActual) {
           countMenuPedido.add(itemPedidos[i].numPedido);
         }
       }
@@ -301,10 +301,11 @@ class LineaProducto extends StatelessWidget {
   Widget build(BuildContext context) {
     final nav = Provider.of<NavegacionModel>(context);
     final productsService = Provider.of<ProductsService>(context, listen: false);
+    final database = FirebaseDatabase.instance;
     String idBar = productsService.idBar;
     String mesa = nav.mesaActual;
 
-    DatabaseReference _dataStreamGestionPedidos = new FirebaseDatabase().reference().child('gestion_pedidos/$idBar/$mesa/${itemPedidos[index].id}');
+    DatabaseReference _dataStreamGestionPedidos = database.ref('gestion_pedidos/$idBar/$mesa/${itemPedidos[index].id}');
     final ancho = MediaQuery.of(context).size.width;
     final alto = MediaQuery.of(context).size.height;
     final int listSelCant;
@@ -314,9 +315,9 @@ class LineaProducto extends StatelessWidget {
     bool rst = false;
 
     listSelCant = itemPedidos[index].cantidad;
-    listSelName = itemPedidos[index].titulo;
-    colorLineaSinApuntar = (itemPedidos[index].mesaAbierta == true) ? Colors.white : Colors.white;
-    categoriaProd = itemPedidos[index].categoriaProducto;
+    listSelName = obtenerNombreProducto(context, itemPedidos[index].idProducto!, itemPedidos[index].racion!);
+//colorLineaSinApuntar = (itemPedidos[index].mesaAbierta == true) ? Colors.white : Colors.white;
+    // categoriaProd = itemPedidos[index].categoriaProducto;
     envioProd = itemPedidos[index].envio!;
     estadoLinea = itemPedidos[index].estadoLinea ?? '';
     hora = itemPedidos[index].hora;
@@ -341,16 +342,16 @@ class LineaProducto extends StatelessWidget {
             itemPedidos[index].estadoLinea = 'cocinado';
             await _dataStreamGestionPedidos.update({
               'cantidad': itemPedidos[index].cantidad,
-              'categoria_producto': itemPedidos[index].categoriaProducto,
+              //'categoria_producto': itemPedidos[index].categoriaProducto,
               'fecha': itemPedidos[index].fecha,
               'hora': itemPedidos[index].hora,
               'idProducto': itemPedidos[index].idProducto,
-              'id_bar': itemPedidos[index].idBar,
+              //  'id_bar': itemPedidos[index].idBar,
               'mesa': itemPedidos[index].mesa,
-              'mesaAbierta': itemPedidos[index].mesaAbierta,
+              //'mesaAbierta': itemPedidos[index].mesaAbierta,
               'numPedido': itemPedidos[index].numPedido,
-              'precio_producto': itemPedidos[index].precioProducto,
-              'titulo': itemPedidos[index].titulo,
+              //'precio_producto': itemPedidos[index].precioProducto,
+             // 'titulo': itemPedidos[index].titulo,
               'estado_linea': 'cocinado'
             });
           }

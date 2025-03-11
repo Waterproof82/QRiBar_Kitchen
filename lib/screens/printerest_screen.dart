@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:qribar/provider/navegacion_model.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:qribar/models/ficha_local.dart';
+import 'package:qribar/provider/navegacion_model.dart';
 import 'package:qribar/provider/products_provider.dart';
 import 'package:qribar/screens/cuenta_cocina_general.dart';
 import 'package:qribar/screens/cuenta_cocina_screen.dart';
+import 'package:qribar/screens/screens.dart';
 import 'package:qribar/services/functions.dart';
 import 'package:qribar/services/listeners.dart';
 import 'package:qribar/widgets/menu_widgets.dart';
-import 'package:qribar/screens/screens.dart';
 import 'package:qribar/widgets/widgets.dart';
 
 class PrinterestScreen extends StatelessWidget {
@@ -26,7 +26,7 @@ class PrinterestScreen extends StatelessWidget {
 
     List<CategoriaProducto> unicaCategoriaFiltro = [];
 
-    ordenaCategorias(catProductos, unicaCategoriaFiltro, itemPedidos);
+    ordenaCategorias(catProductos, unicaCategoriaFiltro, itemPedidos, productsService);
 
     if (productsService.isLoading) return LoadingScreen();
     return WillPopScope(

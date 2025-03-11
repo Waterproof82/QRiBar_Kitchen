@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:qribar/models/modifier.dart';
+
 class Product {
   String categoriaProducto;
   double? costeProducto;
@@ -16,7 +18,7 @@ class Product {
   double? precioProducto;
   double? precioProducto2;
   List<String>? alergogenos;
-  String idBar;
+  // String idBar;
   String? id;
   int cantidad;
   String? nota;
@@ -30,6 +32,7 @@ class Product {
   String? nombreRacionMediaEn;
   String? nombreRacionMediaDe;
   List<Complemento>? complementos;
+  List<Modifier>? modifiers;
 
   Product({
     required this.categoriaProducto,
@@ -47,7 +50,7 @@ class Product {
     this.precioProducto,
     this.precioProducto2 = 0,
     this.alergogenos,
-    required this.idBar,
+    // required this.idBar,
     this.cantidad = 0,
     this.nota,
     this.racion,
@@ -61,6 +64,7 @@ class Product {
     this.nombreRacionMediaEn,
     this.nombreRacionMediaDe,
     this.complementos,
+    this.modifiers,
   });
 
   factory Product.fromJson(String str) => Product.fromMap(json.decode(str));
@@ -85,7 +89,7 @@ class Product {
         precioProducto2: json["precio_producto2"].toDouble(),
         nota: json["nota"],
         racion: json["racion"],
-        idBar: json["id_bar"],
+        // idBar: json["id_bar"],
         nombreRacion: json["nombre_racion"],
         nombreRacionMedia: json["nombre_racion_media"],
         nombreRacionEn: json["nombre_racion_en"],
@@ -93,6 +97,7 @@ class Product {
         nombreRacionDe: json["nombre_racion_de"],
         nombreRacionMediaDe: json["nombre_racion_media_de"],
         complementos: List<Complemento>.from(json["complementos"]).toList(),
+        modifiers: List<Modifier>.from(json["modifiers"]).toList(),
       );
 
   Map<String, dynamic> toMap() => {
@@ -110,7 +115,7 @@ class Product {
         "nombre_producto_de": nombreProductoDe,
         "precio_producto": precioProducto,
         "precio_producto2": precioProducto2,
-        "id_bar": idBar,
+        // "id_bar": idBar,
         "nota": nota,
         //"racion": racion,
         "nombre_racion": nombreRacion,
@@ -120,6 +125,7 @@ class Product {
         "nombre_racion_de": nombreRacionDe,
         "nombre_racion_media_de": nombreRacionMediaDe,
         "complementos": complementos,
+        "modifiers": modifiers,
         "id": id,
       };
 
@@ -140,7 +146,7 @@ class Product {
       nombreProductoDe: this.nombreProductoDe,
       precioProducto: this.precioProducto,
       precioProducto2: this.precioProducto2 ?? 0,
-      idBar: this.idBar,
+      // idBar: this.idBar,
       nota: this.nota,
       //racion: this.racion,
       nombreRacion: this.nombreRacion,
@@ -150,6 +156,7 @@ class Product {
       nombreRacionDe: this.nombreRacionDe,
       nombreRacionMediaDe: this.nombreRacionMediaDe,
       complementos: this.complementos,
+      modifiers: this.modifiers,
       id: this.id);
 }
 
