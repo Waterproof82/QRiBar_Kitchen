@@ -29,17 +29,8 @@ class AppState extends StatelessWidget {
   }
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
+class MyApp extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {

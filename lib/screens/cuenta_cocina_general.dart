@@ -37,7 +37,7 @@ class CuentaCocinaGeneralScreen extends StatelessWidget {
   }
 }
 
-class ListaProductosPedidos extends StatefulWidget {
+class ListaProductosPedidos extends StatelessWidget {
   ListaProductosPedidos({
     Key? key,
     required this.navegacionModel,
@@ -48,41 +48,31 @@ class ListaProductosPedidos extends StatefulWidget {
   final List<Pedidos> itemPedidos;
 
   @override
-  State<ListaProductosPedidos> createState() => _ListaProductosPedidosState();
-}
-
-class _ListaProductosPedidosState extends State<ListaProductosPedidos> {
-  @override
   Widget build(BuildContext context) {
-    final providerGeneral = Provider.of<NavegacionModel>(context);
+    final providerGeneral = Provider.of<NavegacionModel>(context, listen: false);
     final ancho = MediaQuery.of(context).size.width;
-    // ignore: unused_local_variable
     bool notaBar = false;
-/*     String notaOpciones = '';
-    List<String> notasMultiOption = [];
-    int type = 1; */
 
     return Container(
       color: providerGeneral.colorTema,
       margin: EdgeInsets.only(top: 60),
       child: ListView.builder(
-        controller: widget.navegacionModel.pageController,
+        controller: navegacionModel.pageController,
         physics: BouncingScrollPhysics(),
-        itemCount: widget.itemPedidos.length,
+        itemCount: itemPedidos.length,
         itemBuilder: (_, int index) {
-          widget.itemPedidos.sort((a, b) => a.hora.compareTo(b.hora));
-          if (widget.itemPedidos[index].nota != null) notaBar = true;
-          return (widget.navegacionModel.numero == 0 && widget.itemPedidos[index].envio == 'cocina' && widget.itemPedidos[index].estadoLinea != 'cocinado')
+          itemPedidos.sort((a, b) => a.hora.compareTo(b.hora));
+          if (itemPedidos[index].nota != null) notaBar = true;
+          return (navegacionModel.numero == 0 && itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != 'cocinado')
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: Column(
                     children: [
-                      LineaProducto(itemPedidos: widget.itemPedidos, index: index),
-                      if (widget.itemPedidos[index].nota != null && widget.itemPedidos[index].nota != '')
+                      LineaProducto(itemPedidos: itemPedidos, index: index),
+                      if (itemPedidos[index].nota != null && itemPedidos[index].nota != '')
                         Container(
                           width: ancho * 0.95,
                           height: 30,
-                          //padding: EdgeInsets.all(5),
                           decoration: BoxDecoration(
                             color: Color.fromARGB(255, 230, 145, 145),
                             borderRadius: BorderRadius.all(Radius.circular(100)),
@@ -90,18 +80,18 @@ class _ListaProductosPedidosState extends State<ListaProductosPedidos> {
                           ),
                           child: SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
-                              child: Text('${widget.itemPedidos[index].nota}',
+                              child: Text('${itemPedidos[index].nota}',
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   textAlign: TextAlign.left,
                                   style: GoogleFonts.notoSans(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 18, fontWeight: FontWeight.w500))),
                           alignment: Alignment.center,
                         ),
-                      Extras(ancho: ancho, widget: widget, ind: index),
+                      Extras(ancho: ancho, item: itemPedidos[index]),
                     ],
                   ),
                 )
-              : Container();
+              : SizedBox.shrink();
         },
       ),
     );
@@ -112,18 +102,16 @@ class Extras extends StatelessWidget {
   const Extras({
     Key? key,
     required this.ancho,
-    required this.widget,
-    required this.ind,
+    required this.item,
   }) : super(key: key);
 
   final double ancho;
-  final ListaProductosPedidos widget;
-  final int ind;
+  final Pedidos item;
 
   @override
   Widget build(BuildContext context) {
     List<String> nuevaListaCorregida = [];
-    widget.itemPedidos[ind].notaExtra!.forEach((cadena) {
+    item.notaExtra!.forEach((cadena) {
       nuevaListaCorregida.add(cadena);
     });
 
@@ -143,7 +131,7 @@ class Extras extends StatelessWidget {
                   style: GoogleFonts.notoSans(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500)),
             ),
           )
-        : Container();
+        : SizedBox.shrink();
   }
 }
 
@@ -161,8 +149,8 @@ class LineaProducto extends StatefulWidget {
 
 class _LineaProductoState extends State<LineaProducto> {
   late DateTime now;
-
   late Timer timer = Timer(Duration(), () {});
+  final database = FirebaseDatabase.instance;
 
   @override
   void initState() {
@@ -187,7 +175,6 @@ class _LineaProductoState extends State<LineaProducto> {
   Widget build(BuildContext context) {
     final nav = Provider.of<NavegacionModel>(context);
     DateTime now = DateTime.now();
-    final database = FirebaseDatabase.instance;
 
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
     final String formatted = formatter.format(now);
@@ -214,7 +201,6 @@ class _LineaProductoState extends State<LineaProducto> {
     listSelCant = widget.itemPedidos[widget.index].cantidad;
     listSelName = obtenerNombreProducto(context, widget.itemPedidos[widget.index].idProducto!, widget.itemPedidos[widget.index].racion!);
 
-    // categoriaProd = widget.itemPedidos[widget.index].categoriaProducto;
     envioProd = widget.itemPedidos[widget.index].envio!;
     estadoLinea = widget.itemPedidos[widget.index].estadoLinea ?? '';
     hora = (widget.itemPedidos[widget.index].hora.isNotEmpty) ? widget.itemPedidos[widget.index].hora.split(':').sublist(0, 2).join(':') : "--:--";
@@ -270,14 +256,11 @@ class _LineaProductoState extends State<LineaProducto> {
                   if (widget.itemPedidos[widget.index].estadoLinea != 'cocinado')
                     await _dataStreamGestionPedidos.update({
                       'cantidad': widget.itemPedidos[widget.index].cantidad,
-                      //'categoria_producto': widget.itemPedidos[widget.index].categoriaProducto,
                       'fecha': widget.itemPedidos[widget.index].fecha,
                       'hora': widget.itemPedidos[widget.index].hora,
                       'idProducto': widget.itemPedidos[widget.index].idProducto,
                       'mesa': widget.itemPedidos[widget.index].mesa,
                       'numPedido': widget.itemPedidos[widget.index].numPedido,
-                      // 'precio_producto': widget.itemPedidos[widget.index].precioProducto,
-                      //'titulo': widget.itemPedidos[widget.index].titulo,
                       'estado_linea': 'cocinado'
                     });
                 }
@@ -403,20 +386,13 @@ class NotaMultiRadio extends StatelessWidget {
     Key? key,
     required this.ancho,
     required this.modifiers,
-    //required this.quantity,
-    // required this.nav,
   }) : super(key: key);
 
   final double ancho;
   final List<Modifier> modifiers;
-  // final int quantity;
-  // final NavegacionModel nav;
 
   @override
   Widget build(BuildContext context) {
-    //final fuente = Provider.of<ProductsService>(context, listen: false).fuenteLocal;
-    //final catSelected = Provider.of<NavegacionModel>(context, listen: false).categoriaSelected;
-//navegacionModel.categoriaSelected == 'Cuenta'
     return Column(
       children: List.generate(modifiers.length, (index) {
         final opcion = modifiers[index];
@@ -469,24 +445,6 @@ class NotaMultiRadio extends StatelessWidget {
                   ),
                 ),
               ),
-              // Incremento al final en negrita
-              // (catSelected == 'Cuenta')
-              //     ? SizedBox(
-              //         child: Padding(
-              //           padding: const EdgeInsets.symmetric(horizontal: 2),
-              //           child: Text(
-              //             opcion.increment.toStringAsFixed(2),
-              //             style: GoogleFonts.getFont(
-              //               'Oswald',
-              //               color: Colors.black,
-              //               fontSize: 15,
-              //               fontWeight: FontWeight.w300,
-              //             ),
-              //             textAlign: TextAlign.right,
-              //           ),
-              //         ),
-              //       )
-              //     : SizedBox.shrink(),
             ],
           ),
         );
@@ -494,54 +452,3 @@ class NotaMultiRadio extends StatelessWidget {
     );
   }
 }
-
-// Future<bool> onDismiss(BuildContext context, List<Pedidos> itemPedidos, int index) async {
-//   return await showDialog(
-//         context: context,
-//         barrierDismissible: false,
-//         builder: (context) => Container(
-//           child: new AlertDialog(
-//             alignment: Alignment.center,
-//             title: new Text(
-//               'Eliminando pedido...',
-//               textAlign: TextAlign.center,
-//             ),
-//             content: Text("¿Cancelar la línea  x${itemPedidos[index].cantidad}  ${itemPedidos[index].titulo}?"),
-//             actions: <Widget>[
-//               Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   new MaterialButton(
-//                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-//                     disabledColor: Colors.grey,
-//                     elevation: 1,
-//                     color: Colors.black26,
-//                     onPressed: () {
-//                       Navigator.pop(context);
-//                     },
-//                     child: Container(
-//                       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-//                       child: Text('Sí', style: TextStyle(color: Colors.white, fontSize: 18)),
-//                     ),
-//                   ),
-//                   new MaterialButton(
-//                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-//                     disabledColor: Colors.grey,
-//                     elevation: 1,
-//                     color: Colors.black26,
-//                     onPressed: () {
-//                       Navigator.of(context).pop(false);
-//                     },
-//                     child: Container(
-//                       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-//                       child: Text('No', style: TextStyle(color: Colors.white, fontSize: 18)),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ],
-//           ),
-//         ),
-//       ) ??
-//       true;
-// }

@@ -29,9 +29,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
   @override
   void initState() {
     super.initState();
-    //  WidgetsBinding.instance.addPostFrameCallback((_) {
     final productService = Provider.of<ProductsService>(context, listen: false);
-    // final itemElemento = Provider.of<ProductsService>(context, listen: false);
     final numElementos = Provider.of<NavegacionModel>(context, listen: false);
     String idBar = productService.idBar;
 
@@ -49,8 +47,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
     String idBar,
     ProductsService productServices,
   ) async {
-    // _dataStreamProductos = database.ref('productos/$idBar/');
-    // Listas para complementar el producto
+
     List<Complemento> listaComplements = [];
     List<String> alergias = [];
     List<Modifier> modifiers = [];
@@ -188,7 +185,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
     _dataStreamNewCategory.onChildChanged.listen((event) {
       final dataMesas = Map<String, dynamic>.from(event.snapshot.value as Map);
 
-      var producto = catProductos.firstWhere((producto) => producto.id == event.snapshot.key, orElse: () => CategoriaProducto(categoria: ''));
+      CategoriaProducto producto = catProductos.firstWhere((producto) => producto.id == event.snapshot.key, orElse: () => CategoriaProducto(categoria: ''));
       producto.categoria = dataMesas['categoria'];
       producto.categoriaEn = dataMesas['categoria_en'];
       producto.categoriaDe = dataMesas['categoria_de'];
@@ -298,7 +295,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
 
   Future<void> childRemoveListenerPedidos(List<Pedidos> itemPedidos, String idBar, NavegacionModel navModel, List<PedidosLocal> salasMesa) async {
     for (var sala in salasMesa) {
-      _dataStreamGestionPedidos = database.ref('gestion_pedidos/$idBar/${sala.mesa}').onChildRemoved.listen((event) {
+      _dataStreamPedidosRemovidos = database.ref('gestion_pedidos/$idBar/${sala.mesa}').onChildRemoved.listen((event) {
         try {
           String? pedidoId = event.snapshot.key;
           itemPedidos.removeWhere((pedido) => pedido.id == pedidoId);

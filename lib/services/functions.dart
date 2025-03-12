@@ -8,7 +8,11 @@ import 'package:qribar_cocina/provider/products_provider.dart';
 
 void timbre() async {
   final player = AudioPlayer();
-  await player.play(AssetSource('Bell.mp3'));
+  try {
+    await player.play(AssetSource('Bell.mp3'));
+  } catch (e) {
+    print(e);
+  }
 }
 
 Future<void> salirApp({bool? animated}) async {
