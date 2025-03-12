@@ -2,9 +2,9 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar/models/ficha_local.dart';
-import 'package:qribar/models/pedidos.dart';
-import 'package:qribar/provider/products_provider.dart';
+import 'package:qribar_cocina/models/ficha_local.dart';
+import 'package:qribar_cocina/models/pedidos.dart';
+import 'package:qribar_cocina/provider/products_provider.dart';
 
 void timbre() async {
   final player = AudioPlayer();

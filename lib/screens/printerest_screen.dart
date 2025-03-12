@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar/models/ficha_local.dart';
-import 'package:qribar/provider/navegacion_model.dart';
-import 'package:qribar/provider/products_provider.dart';
-import 'package:qribar/screens/cuenta_cocina_general.dart';
-import 'package:qribar/screens/cuenta_cocina_screen.dart';
-import 'package:qribar/screens/screens.dart';
-import 'package:qribar/services/functions.dart';
-import 'package:qribar/services/listeners.dart';
-import 'package:qribar/widgets/menu_widgets.dart';
-import 'package:qribar/widgets/widgets.dart';
+import 'package:qribar_cocina/models/ficha_local.dart';
+import 'package:qribar_cocina/provider/navegacion_model.dart';
+import 'package:qribar_cocina/provider/products_provider.dart';
+import 'package:qribar_cocina/screens/cuenta_cocina_general.dart';
+import 'package:qribar_cocina/screens/cuenta_cocina_screen.dart';
+import 'package:qribar_cocina/screens/screens.dart';
+import 'package:qribar_cocina/services/functions.dart';
+import 'package:qribar_cocina/services/listeners.dart';
+import 'package:qribar_cocina/widgets/menu_widgets.dart';
+import 'package:qribar_cocina/widgets/widgets.dart';
 
 class PrinterestScreen extends StatelessWidget {
   static final String routeName = 'home';

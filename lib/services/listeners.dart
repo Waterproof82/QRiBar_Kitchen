@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar/models/ficha_local.dart';
-import 'package:qribar/models/modifier.dart';
-import 'package:qribar/models/pedidos.dart';
-import 'package:qribar/models/pedidosLocal.dart';
-import 'package:qribar/models/product.dart';
-import 'package:qribar/provider/navegacion_model.dart';
-import 'package:qribar/provider/products_provider.dart';
-import 'package:qribar/services/functions.dart';
+import 'package:qribar_cocina/models/ficha_local.dart';
+import 'package:qribar_cocina/models/modifier.dart';
+import 'package:qribar_cocina/models/pedidos.dart';
+import 'package:qribar_cocina/models/pedidosLocal.dart';
+import 'package:qribar_cocina/models/product.dart';
+import 'package:qribar_cocina/provider/navegacion_model.dart';
+import 'package:qribar_cocina/provider/products_provider.dart';
+import 'package:qribar_cocina/services/functions.dart';
 
 class ListenFirebase extends StatefulWidget {
   static final String routeName = 'listenFirebase';

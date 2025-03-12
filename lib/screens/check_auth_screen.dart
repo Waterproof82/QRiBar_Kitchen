@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
-import 'package:qribar/screens/screens.dart';
-import 'package:qribar/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/screens/screens.dart';
+import 'package:qribar_cocina/services/auth_service.dart';
 
 class CheckAuthScreen extends StatelessWidget {
   static final String routeName = 'checking';

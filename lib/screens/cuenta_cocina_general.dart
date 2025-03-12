@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar/models/modifier.dart';
-import 'package:qribar/models/pedidos.dart';
-import 'package:qribar/provider/navegacion_model.dart';
-import 'package:qribar/provider/products_provider.dart';
-import 'package:qribar/services/functions.dart';
-import 'package:qribar/widgets/botones_info_sup.dart';
+import 'package:qribar_cocina/models/modifier.dart';
+import 'package:qribar_cocina/models/pedidos.dart';
+import 'package:qribar_cocina/provider/navegacion_model.dart';
+import 'package:qribar_cocina/provider/products_provider.dart';
+import 'package:qribar_cocina/services/functions.dart';
+import 'package:qribar_cocina/widgets/botones_info_sup.dart';
 
 class CuentaCocinaGeneralScreen extends StatelessWidget {
   static final String routeName = 'cuentasCocinaGeneral';
