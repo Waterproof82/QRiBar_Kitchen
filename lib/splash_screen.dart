@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:qribar/screens/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:qribar_cocina/screens/login_screen.dart';
 
 class Splash extends StatefulWidget {
   static final String routeName = 'splash';

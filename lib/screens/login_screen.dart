@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:qribar/provider/login_form_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar/provider/products_provider.dart';
-import 'package:qribar/widgets/card_container.dart';
-import 'package:qribar/widgets/widgets.dart';
-import 'package:qribar/ui/input_decoration.dart';
+import 'package:qribar_cocina/provider/login_form_provider.dart';
+import 'package:qribar_cocina/provider/products_provider.dart';
+import 'package:qribar_cocina/ui/input_decoration.dart';
+import 'package:qribar_cocina/widgets/card_container.dart';
+import 'package:qribar_cocina/widgets/widgets.dart';
 
 class LoginScreen extends StatelessWidget {
   static final String routeName = 'login';

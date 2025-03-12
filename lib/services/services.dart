@@ -1,1 +1,1 @@
-export 'package:qribar/services/auth_service.dart';
+export 'package:qribar_cocina/services/auth_service.dart';

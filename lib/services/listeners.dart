@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar/models/ficha_local.dart';
-import 'package:qribar/models/modifier.dart';
-import 'package:qribar/models/pedidos.dart';
-import 'package:qribar/models/pedidosLocal.dart';
-import 'package:qribar/models/product.dart';
-import 'package:qribar/provider/navegacion_model.dart';
-import 'package:qribar/provider/products_provider.dart';
-import 'package:qribar/services/functions.dart';
+import 'package:qribar_cocina/models/ficha_local.dart';
+import 'package:qribar_cocina/models/modifier.dart';
+import 'package:qribar_cocina/models/pedidos.dart';
+import 'package:qribar_cocina/models/pedidosLocal.dart';
+import 'package:qribar_cocina/models/product.dart';
+import 'package:qribar_cocina/provider/navegacion_model.dart';
+import 'package:qribar_cocina/provider/products_provider.dart';
+import 'package:qribar_cocina/services/functions.dart';
 
 class ListenFirebase extends StatefulWidget {
   static final String routeName = 'listenFirebase';
@@ -29,9 +29,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
   @override
   void initState() {
     super.initState();
-    //  WidgetsBinding.instance.addPostFrameCallback((_) {
     final productService = Provider.of<ProductsService>(context, listen: false);
-    // final itemElemento = Provider.of<ProductsService>(context, listen: false);
     final numElementos = Provider.of<NavegacionModel>(context, listen: false);
     String idBar = productService.idBar;
 
@@ -49,8 +47,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
     String idBar,
     ProductsService productServices,
   ) async {
-    // _dataStreamProductos = database.ref('productos/$idBar/');
-    // Listas para complementar el producto
+
     List<Complemento> listaComplements = [];
     List<String> alergias = [];
     List<Modifier> modifiers = [];
@@ -188,7 +185,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
     _dataStreamNewCategory.onChildChanged.listen((event) {
       final dataMesas = Map<String, dynamic>.from(event.snapshot.value as Map);
 
-      var producto = catProductos.firstWhere((producto) => producto.id == event.snapshot.key, orElse: () => CategoriaProducto(categoria: ''));
+      CategoriaProducto producto = catProductos.firstWhere((producto) => producto.id == event.snapshot.key, orElse: () => CategoriaProducto(categoria: ''));
       producto.categoria = dataMesas['categoria'];
       producto.categoriaEn = dataMesas['categoria_en'];
       producto.categoriaDe = dataMesas['categoria_de'];
@@ -226,10 +223,10 @@ class _ListenFirebaseState extends State<ListenFirebase> {
     final mesaSnap = dataMesas['mesa'] as String;
     final numPed = dataMesas['numPedido'] as int;
 
-    //final productService = Provider.of<ProductsService>(context, listen: false);
+    final productService = Provider.of<ProductsService>(context, listen: false);
 
-    // final catProductos = productService.categoriasProdLocal;
-    //  List<CategoriaProducto> unicaCategoriaFiltro = [];
+    final catProductos = productService.categoriasProdLocal;
+    List<CategoriaProducto> unicaCategoriaFiltro = [];
     List<Modifier> modifiers = [];
     String envio = '';
 
@@ -280,7 +277,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
         id: dataMesas['id'],
       ),
     );
-    //  ordenaCategorias(catProductos, unicaCategoriaFiltro, itemPedidos, productService);
+    ordenaCategorias(catProductos, unicaCategoriaFiltro, itemPedidos, productService);
     for (var element in itemPedidos) {
       if (element.idProducto == idProd) envio = element.envio ?? '';
     }
@@ -298,7 +295,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
 
   Future<void> childRemoveListenerPedidos(List<Pedidos> itemPedidos, String idBar, NavegacionModel navModel, List<PedidosLocal> salasMesa) async {
     for (var sala in salasMesa) {
-      _dataStreamGestionPedidos = database.ref('gestion_pedidos/$idBar/${sala.mesa}').onChildRemoved.listen((event) {
+      _dataStreamPedidosRemovidos = database.ref('gestion_pedidos/$idBar/${sala.mesa}').onChildRemoved.listen((event) {
         try {
           String? pedidoId = event.snapshot.key;
           itemPedidos.removeWhere((pedido) => pedido.id == pedidoId);

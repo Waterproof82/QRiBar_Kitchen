@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar/provider/navegacion_model.dart';
-import 'package:qribar/services/functions.dart';
+import 'package:qribar_cocina/provider/navegacion_model.dart';
+import 'package:qribar_cocina/services/functions.dart';
 
 class MenuWidget extends StatelessWidget {
   @override

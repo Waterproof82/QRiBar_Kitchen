@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar/provider/navegacion_model.dart';
-import 'package:qribar/provider/products_provider.dart';
-import 'package:qribar/screens/cuenta_cocina_general.dart';
-import 'package:qribar/screens/cuenta_cocina_screen.dart';
-import 'package:qribar/screens/screens.dart';
-import 'package:qribar/splash_screen.dart';
+import 'package:qribar_cocina/provider/navegacion_model.dart';
+import 'package:qribar_cocina/provider/products_provider.dart';
+import 'package:qribar_cocina/screens/cuenta_cocina_general.dart';
+import 'package:qribar_cocina/screens/cuenta_cocina_screen.dart';
+import 'package:qribar_cocina/screens/screens.dart';
+import 'package:qribar_cocina/splash_screen.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
@@ -29,17 +29,8 @@ class AppState extends StatelessWidget {
   }
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
+class MyApp extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -5,10 +5,10 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar/models/pedidos.dart';
-import 'package:qribar/provider/navegacion_model.dart';
-import 'package:qribar/provider/products_provider.dart';
-import 'package:qribar/services/functions.dart';
+import 'package:qribar_cocina/models/pedidos.dart';
+import 'package:qribar_cocina/provider/navegacion_model.dart';
+import 'package:qribar_cocina/provider/products_provider.dart';
+import 'package:qribar_cocina/services/functions.dart';
 
 class CuentaCocinaScreen extends StatelessWidget {
   static final String routeName = 'cuentasCocina';
@@ -170,7 +170,7 @@ class PedidosMesasListMenu extends StatelessWidget {
   }
 }
 
-class ListaProductosPedidos extends StatefulWidget {
+class ListaProductosPedidos extends StatelessWidget {
   ListaProductosPedidos({
     Key? key,
     required this.navegacionModel,
@@ -181,11 +181,6 @@ class ListaProductosPedidos extends StatefulWidget {
 
   final List<Pedidos> itemPedidos;
 
-  @override
-  State<ListaProductosPedidos> createState() => _ListaProductosPedidosState();
-}
-
-class _ListaProductosPedidosState extends State<ListaProductosPedidos> {
   @override
   Widget build(BuildContext context) {
     final providerGeneral = Provider.of<NavegacionModel>(context);
@@ -199,20 +194,20 @@ class _ListaProductosPedidosState extends State<ListaProductosPedidos> {
       color: providerGeneral.colorTema,
       margin: EdgeInsets.only(top: 140),
       child: ListView.builder(
-        controller: widget.navegacionModel.pageController,
+        controller: navegacionModel.pageController,
         physics: BouncingScrollPhysics(),
-        itemCount: widget.itemPedidos.length,
+        itemCount: itemPedidos.length,
         itemBuilder: (_, int index) {
-          widget.itemPedidos.sort((a, b) => a.orden.compareTo(b.orden));
+          itemPedidos.sort((a, b) => a.orden.compareTo(b.orden));
 
-          if (widget.itemPedidos[index].nota != null) notaBar = true;
-          return (widget.navegacionModel.numero == 0 && widget.itemPedidos[index].envio == 'cocina' && widget.itemPedidos[index].estadoLinea != 'cocinado')
+          if (itemPedidos[index].nota != null) notaBar = true;
+          return (navegacionModel.numero == 0 && itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != 'cocinado')
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: Column(
                     children: [
-                      LineaProducto(itemPedidos: widget.itemPedidos, index: index, resultPrecio: resultPrecio),
-                      if (widget.itemPedidos[index].nota != null && widget.itemPedidos[index].nota != '')
+                      LineaProducto(itemPedidos: itemPedidos, index: index, resultPrecio: resultPrecio),
+                      if (itemPedidos[index].nota != null && itemPedidos[index].nota != '')
                         Container(
                           width: ancho * 0.85,
                           padding: EdgeInsets.all(5),
@@ -222,14 +217,14 @@ class _ListaProductosPedidosState extends State<ListaProductosPedidos> {
                               boxShadow: <BoxShadow>[BoxShadow(color: Colors.black, blurRadius: 5, spreadRadius: 0)]),
                           child: SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
-                              child: Text('${widget.itemPedidos[index].nota}',
+                              child: Text('${itemPedidos[index].nota}',
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   textAlign: TextAlign.left,
                                   style: GoogleFonts.notoSans(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500))),
                           alignment: Alignment.center,
                         ),
-                      Extras(ancho: ancho, widget: widget, ind: index),
+                      Extras(ancho: ancho, item: itemPedidos[index]),
                     ],
                   ),
                 )
@@ -244,18 +239,16 @@ class Extras extends StatelessWidget {
   const Extras({
     Key? key,
     required this.ancho,
-    required this.widget,
-    required this.ind,
+    required this.item,
   }) : super(key: key);
 
   final double ancho;
-  final ListaProductosPedidos widget;
-  final int ind;
+  final Pedidos item;
 
   @override
   Widget build(BuildContext context) {
     List<String> nuevaListaCorregida = [];
-    widget.itemPedidos[ind].notaExtra!.forEach((cadena) {
+    item.notaExtra!.forEach((cadena) {
       nuevaListaCorregida.add(cadena);
     });
 
@@ -275,7 +268,7 @@ class Extras extends StatelessWidget {
                   style: GoogleFonts.notoSans(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500)),
             ),
           )
-        : Container();
+        : SizedBox.shrink();
   }
 }
 
@@ -320,7 +313,7 @@ class LineaProducto extends StatelessWidget {
     // categoriaProd = itemPedidos[index].categoriaProducto;
     envioProd = itemPedidos[index].envio!;
     estadoLinea = itemPedidos[index].estadoLinea ?? '';
-    hora = itemPedidos[index].hora;
+    hora = (itemPedidos[index].hora.isNotEmpty) ? itemPedidos[index].hora.split(':').sublist(0, 2).join(':') : "--:--";
     pedidoNum = itemPedidos[index].numPedido;
     mesaVar = itemPedidos[index].mesa;
 
@@ -351,7 +344,7 @@ class LineaProducto extends StatelessWidget {
               //'mesaAbierta': itemPedidos[index].mesaAbierta,
               'numPedido': itemPedidos[index].numPedido,
               //'precio_producto': itemPedidos[index].precioProducto,
-             // 'titulo': itemPedidos[index].titulo,
+              // 'titulo': itemPedidos[index].titulo,
               'estado_linea': 'cocinado'
             });
           }

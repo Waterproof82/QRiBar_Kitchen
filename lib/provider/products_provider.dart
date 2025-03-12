@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:qribar/models/ficha_local.dart';
-import 'package:qribar/models/models.dart';
-import 'package:qribar/models/pedidos.dart';
-import 'package:qribar/models/pedidosLocal.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-class ProductsService extends ChangeNotifier {
+import 'package:qribar_cocina/models/ficha_local.dart';
+import 'package:qribar_cocina/models/models.dart';
+import 'package:qribar_cocina/models/pedidos.dart';
+import 'package:qribar_cocina/models/pedidosLocal.dart';
 
+class ProductsService extends ChangeNotifier {
   final List<Product> products = [];
   final List<Pedidos> pedidosRealizados = [];
   final List<Pedidos> pedidosRealizadosMesaUsuario = [];
@@ -25,8 +25,8 @@ class ProductsService extends ChangeNotifier {
   final List mesasActivas = [];
   final List<CategoriaProducto> categoriasProdLocal = [];
   final database = FirebaseDatabase.instance;
-    String estado = '';
-    
+  String estado = '';
+
   static List<String> alergias = [];
   LinearGradient bgGradient = const LinearGradient(
     colors: <Color>[Color(0xFF262B2F), Color(0xFF1D2125), Color(0xFF16191D)],
@@ -78,7 +78,7 @@ class ProductsService extends ChangeNotifier {
       });
     });
 
- DatabaseReference _dataStreamProd = database.ref('gestion_local/$idBar/');
+    DatabaseReference _dataStreamProd = database.ref('gestion_local/$idBar/');
 
     await _dataStreamProd.once().then((value) {
       final data = new Map<dynamic, dynamic>.from(value.snapshot.value as Map);
