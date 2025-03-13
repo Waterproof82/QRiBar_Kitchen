@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/provider/navegacion_model.dart';
-import 'package:qribar_cocina/provider/products_provider.dart';
-import 'package:qribar_cocina/screens/cuenta_cocina_general.dart';
-import 'package:qribar_cocina/screens/cuenta_cocina_screen.dart';
-import 'package:qribar_cocina/screens/screens.dart';
-import 'package:qribar_cocina/splash_screen.dart';
+import 'package:qribar_cocina/presentation/splash/splash_screen.dart';
+import 'package:qribar_cocina/presentation/cocina/cocina_general_screen.dart';
+import 'package:qribar_cocina/presentation/cocina/cocina_pedidos_screen.dart';
+import 'package:qribar_cocina/presentation/home/home_screen.dart';
+import 'package:qribar_cocina/presentation/login/login_screen.dart';
+import 'package:qribar_cocina/providers/listeners_provider.dart';
+import 'package:qribar_cocina/presentation/login/provider/login_form_provider.dart';
+import 'package:qribar_cocina/providers/navegacion_model.dart';
+import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
@@ -23,13 +26,15 @@ class AppState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
+      ChangeNotifierProvider(create: (_) => LoginFormProvider()),
       ChangeNotifierProvider(create: (_) => ProductsService()),
       ChangeNotifierProvider(create: (_) => NavegacionModel()),
-    ], child: MyApp());
+      ChangeNotifierProvider(create: (_) => ListenersProvider()),
+    ], child: App());
   }
 }
 
-class MyApp extends StatelessWidget {
+class App extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
   @override
@@ -41,14 +46,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'QRiBar Cocina',
       initialRoute: 'splash',
-      //scaffoldMessengerKey: NotificationService.messengerKey,
       navigatorKey: navigatorKey,
       routes: {
-        LoginScreen.routeName: (_) => LoginScreen(),
         Splash.routeName: (_) => Splash(),
-        PrinterestScreen.routeName: (_) => PrinterestScreen(),
-        CuentaCocinaScreen.routeName: (_) => CuentaCocinaScreen(),
-        CuentaCocinaGeneralScreen.routeName: (_) => CuentaCocinaGeneralScreen(),
+        LoginScreen.routeName: (_) => LoginScreen(),
+        HomeScreen.routeName: (_) => HomeScreen(),
+        CocinaPedidosScreen.routeName: (_) => CocinaPedidosScreen(),
+        CocinaGeneralScreen.routeName: (_) => CocinaGeneralScreen(),
       },
     );
   }
