@@ -42,8 +42,13 @@ class _HomeScreenState extends State<HomeScreen> {
     ordenaCategorias(catProductos, unicaCategoriaFiltro, itemPedidos, productsService);
 
     if (productsService.isLoading) return LoadingScreen();
-    return WillPopScope(
-      onWillPop: () => onBackPressed(context),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          onBackPressed(context);
+        }
+      },
       child: Scaffold(
         drawer: (providerGeneral.numero == 0) ? MenuLateral() : Container(),
         appBar: AppBar(
