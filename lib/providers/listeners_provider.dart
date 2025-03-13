@@ -276,7 +276,9 @@ class ListenersProvider with ChangeNotifier {
     for (var element in itemPedidos) {
       if (element.idProducto == idProd) envio = element.envio ?? '';
     }
-    if ((numPed != numElementos.pedAnterior || numElementos.mesaAnt != mesaSnap) && dataMesas['estado_linea'] == EstadosLiterals.pendiente && envio == 'cocina') {
+
+    //(numPed != numElementos.pedAnterior || numElementos.mesaAnt != mesaSnap) &&
+    if ( dataMesas['estado_linea'] == EstadosLiterals.pendiente && envio == 'cocina') {
       timbre();
 
       numElementos.pedAnterior = numPed;
