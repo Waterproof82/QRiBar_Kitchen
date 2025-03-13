@@ -3,56 +3,47 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/models/ficha_local.dart';
-import 'package:qribar_cocina/models/modifier.dart';
-import 'package:qribar_cocina/models/pedidos.dart';
-import 'package:qribar_cocina/models/pedidosLocal.dart';
-import 'package:qribar_cocina/models/product.dart';
-import 'package:qribar_cocina/provider/navegacion_model.dart';
-import 'package:qribar_cocina/provider/products_provider.dart';
+import 'package:qribar_cocina/data/const/estados_literals.dart';
+import 'package:qribar_cocina/data/models/ficha_local.dart';
+import 'package:qribar_cocina/data/models/modifier.dart';
+import 'package:qribar_cocina/data/models/pedidos.dart';
+import 'package:qribar_cocina/data/models/pedidosLocal.dart';
+import 'package:qribar_cocina/data/models/product.dart';
+import 'package:qribar_cocina/providers/navegacion_model.dart';
+import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
 
-class ListenFirebase extends StatefulWidget {
-  static final String routeName = 'listenFirebase';
-  @override
-  _ListenFirebaseState createState() => _ListenFirebaseState();
-}
-
-class _ListenFirebaseState extends State<ListenFirebase> {
-  final database = FirebaseDatabase.instance;
+class ListenersProvider with ChangeNotifier {
+  final database = FirebaseDatabase.instance.ref();
 
   StreamSubscription? _dataStreamProductos;
   StreamSubscription? _dataStreamCategoria;
   StreamSubscription? _dataStreamGestionPedidos;
   StreamSubscription? _dataStreamPedidosRemovidos;
 
-  @override
-  void initState() {
-    super.initState();
+  void initializeListeners(BuildContext context) {
     final productService = Provider.of<ProductsService>(context, listen: false);
     final numElementos = Provider.of<NavegacionModel>(context, listen: false);
     String idBar = productService.idBar;
 
-    _childListenerAddProductNew(productService.products, numElementos, idBar, productService);
-    childAddCategoriaNuevaMenu(numElementos, idBar);
-    childChangedCategoriaMenu(numElementos, idBar);
-    addAndChangedListenerPedidosMesasLocal(productService.pedidosRealizados, idBar, numElementos, productService.salasMesa);
-    childRemoveListenerPedidos(productService.pedidosRealizados, idBar, numElementos, productService.salasMesa);
-    //   });
+    _childListenerAddProductNew(numElementos, idBar, productService);
+    _childAddCategoriaNuevaMenu(numElementos, idBar, productService.categoriasProdLocal);
+    _childChangedCategoriaMenu(numElementos, idBar, productService.categoriasProdLocal);
+    _addAndChangedListenerPedidosMesasLocal(idBar, numElementos, productService);
+    _childRemoveListenerPedidos(productService.pedidosRealizados, idBar, numElementos, productService.salasMesa);
   }
 
   Future<void> _childListenerAddProductNew(
-    List<Product> productService,
     NavegacionModel navModelNotify,
     String idBar,
     ProductsService productServices,
   ) async {
-
     List<Complemento> listaComplements = [];
     List<String> alergias = [];
     List<Modifier> modifiers = [];
+    List<Product> product = productServices.products;
 
-    _dataStreamProductos = database.ref('productos/$idBar/').onChildAdded.listen(
+    _dataStreamProductos = database.child('productos/$idBar/').onChildAdded.listen(
       (event) {
         final DataSnapshot snapshot = event.snapshot;
         final dynamic value = snapshot.value;
@@ -89,7 +80,7 @@ class _ListenFirebaseState extends State<ListenFirebase> {
           });
         }
 
-// Extraer modificadores
+        // Extraer modificadores
         if (data['modifiers'] != null) {
           data['modifiers'].forEach((k, v) {
             modifiers.add(Modifier(
@@ -103,10 +94,9 @@ class _ListenFirebaseState extends State<ListenFirebase> {
         double coste = (data["coste_producto"] is num) ? (data["coste_producto"] as num).toDouble() : 0.0;
         double precio2 = (data["precio_producto2"] is num) ? (data["precio_producto2"] as num).toDouble() : 0.0;
 
-        // Crear producto con copias de listas
         List<Product> listaProductos = [
           Product(
-            alergogenos: alergias, // Copia de lista
+            alergogenos: alergias,
             categoriaProducto: data["categoria_producto"] as String? ?? '',
             costeProducto: coste,
             disponible: disponibleSnap,
@@ -126,20 +116,16 @@ class _ListenFirebaseState extends State<ListenFirebase> {
             nombreRacionDe: data["nombre_racion_de"] as String? ?? '',
             nombreRacionMediaDe: data["nombre_racion_media_de"] as String? ?? '',
             precioProducto: (data["precio_producto"] is num) ? (data["precio_producto"] as num).toDouble() : 0.0,
-            //  precioProductoRacion: (data["precio_producto"] is num) ? (data["precio_producto"] as num).toDouble() : 0.0,
-            //  precioProductoMediaRacion: precio2,
             precioProducto2: precio2,
-            complementos: listaComplements, // Copia de lista
-            // primerPlato: data["primer_plato"] as bool? ?? null,
-            // tipo: (data["tipo"] is int) ? data["tipo"] as int : 1,
-            modifiers: modifiers, // Copia de lista
+            complementos: listaComplements,
+            modifiers: modifiers,
             id: key,
           )
         ];
 
         // Agregar producto si no existe ya en la lista
-        final index = productService.indexWhere((element) => element.nombreProducto == data["nombre_producto"]);
-        if (index == -1) productService.add(listaProductos[0]);
+        final index = product.indexWhere((element) => element.nombreProducto == data["nombre_producto"]);
+        if (index == -1) product.add(listaProductos[0]);
 
         // Limpiar listas para el próximo producto
         listaComplements = [];
@@ -155,10 +141,12 @@ class _ListenFirebaseState extends State<ListenFirebase> {
     );
   }
 
-  Future<void> childAddCategoriaNuevaMenu(NavegacionModel numElementos, String idBar) async {
-    final catProductos = Provider.of<ProductsService>(context, listen: false).categoriasProdLocal;
-
-    _dataStreamCategoria = database.ref('ficha_local/$idBar/categoria_productos').onChildAdded.listen((event) {
+  Future<void> _childAddCategoriaNuevaMenu(
+    NavegacionModel numElementos,
+    String idBar,
+    List<CategoriaProducto> catProductos,
+  ) async {
+    _dataStreamCategoria = database.child('ficha_local/$idBar/categoria_productos').onChildAdded.listen((event) {
       final dataMesas = Map<String, dynamic>.from(event.snapshot.value as Map);
 
       final nuevaCategoria = CategoriaProducto(
@@ -177,10 +165,12 @@ class _ListenFirebaseState extends State<ListenFirebase> {
     });
   }
 
-  Future<void> childChangedCategoriaMenu(NavegacionModel numElementos, String idBar) async {
-    final catProductos = Provider.of<ProductsService>(context, listen: false).categoriasProdLocal;
-
-    DatabaseReference _dataStreamNewCategory = FirebaseDatabase.instance.ref('ficha_local/$idBar/categoria_productos');
+  Future<void> _childChangedCategoriaMenu(
+    NavegacionModel numElementos,
+    String idBar,
+    List<CategoriaProducto> catProductos,
+  ) async {
+    DatabaseReference _dataStreamNewCategory = database.child('ficha_local/$idBar/categoria_productos');
 
     _dataStreamNewCategory.onChildChanged.listen((event) {
       final dataMesas = Map<String, dynamic>.from(event.snapshot.value as Map);
@@ -194,36 +184,46 @@ class _ListenFirebaseState extends State<ListenFirebase> {
       producto.orden = dataMesas['orden'];
       producto.icono = dataMesas['icono'];
       producto.imgVertical = dataMesas['img_vertical'];
-/*       numElementos.categoriaSelected = 'Sugerencias';
-      numElementos.itemSeleccionado = 0;
-      numElementos.itemSeleccionadoMenu = 0; */
+
       numElementos.valRecargaWidget = true;
     });
   }
 
-  Future<void> addAndChangedListenerPedidosMesasLocal(List<Pedidos> itemPedidos, String idBar, NavegacionModel numElementos, List<PedidosLocal> salasMesa) async {
+  Future<void> _addAndChangedListenerPedidosMesasLocal(
+    String idBar,
+    NavegacionModel numElementos,
+    ProductsService productService,
+  ) async {
+    final itemPedidos = productService.pedidosRealizados;
+    final salasMesa = productService.salasMesa;
+
     for (var salas in salasMesa) {
       final path = 'gestion_pedidos/$idBar/${salas.mesa}';
 
-      _dataStreamGestionPedidos = database.ref(path).onChildAdded.listen((event) {
-        _handleDataChange(itemPedidos, idBar, numElementos, event.snapshot.value, '');
+      _dataStreamGestionPedidos = database.child(path).onChildAdded.listen((event) {
+        _handleDataChange(itemPedidos, idBar, numElementos, event.snapshot.value, '', productService);
       });
 
-      _dataStreamGestionPedidos = database.ref(path).onChildChanged.listen((event) {
+      _dataStreamGestionPedidos = database.child(path).onChildChanged.listen((event) {
         String? pedidoId = event.snapshot.key;
-        _handleDataChange(itemPedidos, idBar, numElementos, event.snapshot.value, pedidoId);
+        _handleDataChange(itemPedidos, idBar, numElementos, event.snapshot.value, pedidoId, productService);
       });
     }
   }
 
-  void _handleDataChange(List<Pedidos> itemPedidos, String idBar, NavegacionModel numElementos, dynamic data, String? pedidoId) {
+  void _handleDataChange(
+    List<Pedidos> itemPedidos,
+    String idBar,
+    NavegacionModel numElementos,
+    dynamic data,
+    String? pedidoId,
+    ProductsService productService,
+  ) {
     final dataMesas = Map<String, dynamic>.from(data);
 
     final idProd = dataMesas['idProducto'] as String;
     final mesaSnap = dataMesas['mesa'] as String;
     final numPed = dataMesas['numPedido'] as int;
-
-    final productService = Provider.of<ProductsService>(context, listen: false);
 
     final catProductos = productService.categoriasProdLocal;
     List<CategoriaProducto> unicaCategoriaFiltro = [];
@@ -241,13 +241,13 @@ class _ListenFirebaseState extends State<ListenFirebase> {
     //
 
     if (dataMesas['modifiers'] != null && dataMesas['modifiers'] is List) {
-      final modifiersList = List.from(dataMesas['modifiers']); // Convierte a una lista genérica
+      final modifiersList = List.from(dataMesas['modifiers']);
       modifiers = modifiersList.map((modifier) {
         if (modifier is Map) {
           final modifierMap = Map<String, dynamic>.from(modifier);
           return Modifier(
-            name: modifierMap['name'] ?? '', // Valor por defecto si falta
-            increment: (modifierMap['increment'] ?? 0).toDouble(), // Conversión a double
+            name: modifierMap['name'] ?? '',
+            increment: (modifierMap['increment'] ?? 0).toDouble(),
           );
         } else {
           return Modifier();
@@ -258,15 +258,10 @@ class _ListenFirebaseState extends State<ListenFirebase> {
     itemPedidos.add(
       Pedidos(
         cantidad: dataMesas['cantidad'],
-        //categoriaProducto: dataMesas['categoria_producto'],
         fecha: dataMesas['fecha'],
         hora: dataMesas['hora'],
-        //idBar: idBar,
         mesa: mesaSnap.toString(),
-        //mesaAbierta: dataMesas['mesaAbierta'] ?? false,
         numPedido: numPed,
-        // precioProducto: dataMesas['precio_producto'].toDouble(),
-        // titulo: dataMesas['titulo'],
         nota: dataMesas['nota'],
         estadoLinea: dataMesas['estado_linea'],
         idProducto: idProd,
@@ -281,21 +276,26 @@ class _ListenFirebaseState extends State<ListenFirebase> {
     for (var element in itemPedidos) {
       if (element.idProducto == idProd) envio = element.envio ?? '';
     }
-    if ((numPed != numElementos.pedAnterior || numElementos.mesaAnt != mesaSnap) && dataMesas['estado_linea'] == 'pendiente' && envio == 'cocina') {
+    if ((numPed != numElementos.pedAnterior || numElementos.mesaAnt != mesaSnap) && dataMesas['estado_linea'] == EstadosLiterals.pendiente && envio == 'cocina') {
       timbre();
 
       numElementos.pedAnterior = numPed;
       numElementos.mesaAnt = mesaSnap;
-    } else if (dataMesas['estado_linea'] == 'cocinado' || dataMesas['estado_linea'] == 'bloqueado') {
+    } else if (dataMesas['estado_linea'] == EstadosLiterals.cocinado || dataMesas['estado_linea'] == EstadosLiterals.bloqueado) {
       itemPedidos.removeWhere((pedido) => pedido.id == pedidoId);
     }
 
     numElementos.valRecargaWidget = true;
   }
 
-  Future<void> childRemoveListenerPedidos(List<Pedidos> itemPedidos, String idBar, NavegacionModel navModel, List<PedidosLocal> salasMesa) async {
+  Future<void> _childRemoveListenerPedidos(
+    List<Pedidos> itemPedidos,
+    String idBar,
+    NavegacionModel navModel,
+    List<PedidosLocal> salasMesa,
+  ) async {
     for (var sala in salasMesa) {
-      _dataStreamPedidosRemovidos = database.ref('gestion_pedidos/$idBar/${sala.mesa}').onChildRemoved.listen((event) {
+      _dataStreamPedidosRemovidos = database.child('gestion_pedidos/$idBar/${sala.mesa}').onChildRemoved.listen((event) {
         try {
           String? pedidoId = event.snapshot.key;
           itemPedidos.removeWhere((pedido) => pedido.id == pedidoId);
@@ -305,11 +305,6 @@ class _ListenFirebaseState extends State<ListenFirebase> {
         }
       });
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 
   @override
