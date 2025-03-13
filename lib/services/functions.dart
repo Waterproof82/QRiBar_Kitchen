@@ -1,15 +1,16 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/models/ficha_local.dart';
-import 'package:qribar_cocina/models/pedidos.dart';
-import 'package:qribar_cocina/provider/products_provider.dart';
+import 'package:qribar_cocina/data/models/ficha_local.dart';
+import 'package:qribar_cocina/data/models/pedidos.dart';
+import 'package:qribar_cocina/providers/products_provider.dart';
+import 'package:qribar_cocina/services/audio_manager.dart';
+
+final AudioManager _audioManager = AudioManager();
 
 void timbre() async {
-  final player = AudioPlayer();
   try {
-    await player.play(AssetSource('Bell.mp3'));
+    await _audioManager.play('Bell.mp3');
   } catch (e) {
     print(e);
   }
