@@ -5,7 +5,7 @@ import 'package:qribar_cocina/data/enums/assets_type.dart';
 import 'package:qribar_cocina/presentation/login/login_screen.dart';
 
 class Splash extends StatefulWidget {
-  static final String routeName = 'splash';
+
   @override
   VideoState createState() => VideoState();
 }

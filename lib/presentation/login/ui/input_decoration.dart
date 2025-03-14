@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 
 class InputDecorations {
-  //static - No necesitamos crear instancias de la clase para usarlas
-  //Solo hacemos referencia a InputDecoration.auth...
+
   static InputDecoration authInputDecoration({
-    //argumentos que recibimos
     required String hintText,
     required String labelText,
     IconData? prefixIcon,

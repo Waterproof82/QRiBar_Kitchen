@@ -25,7 +25,6 @@ class LoginContainer extends StatelessWidget {
           BoxShadow(
             color: Colors.black12,
             blurRadius: 15,
-            //Posición sombra
             offset: Offset(0, 10),
           ),
         ],

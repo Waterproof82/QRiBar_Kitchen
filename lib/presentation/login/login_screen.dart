@@ -1,17 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/data/const/const.dart';
+import 'package:qribar_cocina/data/extensions/string_extension.dart';
 import 'package:qribar_cocina/presentation/login/provider/login_form_provider.dart';
-import 'package:qribar_cocina/providers/products_provider.dart';
-import 'package:qribar_cocina/presentation/login/ui/input_decoration.dart';
 import 'package:qribar_cocina/presentation/login/ui/auth_background.dart';
+import 'package:qribar_cocina/presentation/login/ui/input_decoration.dart';
 import 'package:qribar_cocina/presentation/login/ui/login_container.dart';
+import 'package:qribar_cocina/providers/products_provider.dart';
 
 class LoginScreen extends StatelessWidget {
-  static final String routeName = 'login';
-  static const String emailPattern =
-      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,13 +54,13 @@ class _LoginForm extends StatelessWidget {
               autocorrect: false,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecorations.authInputDecoration(
-                hintText: 'example@domain.es',
+                hintText: 'ejemplo@dominio.es',
                 labelText: 'Correo electrónico',
                 prefixIcon: Icons.alternate_email_rounded,
               ),
               onChanged: (value) => loginForm.email = value,
               validator: (value) {
-                final regExp = RegExp(LoginScreen.emailPattern);
+                final regExp = RegExp(Const.emailPattern);
                 return regExp.hasMatch(value ?? '') ? null : 'El correo no es correcto';
               },
               style: TextStyle(fontSize: 22),
@@ -128,7 +126,4 @@ class _LoginForm extends StatelessWidget {
   }
 }
 
-extension StringCasingExtension on String {
-  String toCapitalized() => length > 0 ? '${this[0].toUpperCase()}${substring(1).toLowerCase()}' : '';
-  String toTitleCase() => replaceAll(RegExp(' +'), ' ').split(' ').map((str) => str.toCapitalized()).join(' ');
-}
+

@@ -15,7 +15,6 @@ import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
 
 class CocinaGeneralScreen extends StatelessWidget {
-  static final String routeName = 'cuentasCocinaGeneral';
 
   @override
   Widget build(BuildContext context) {

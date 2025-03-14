@@ -15,7 +15,6 @@ import 'package:qribar_cocina/widgets/loading_screen.dart';
 import 'package:qribar_cocina/widgets/widgets_exports.dart';
 
 class HomeScreen extends StatefulWidget {
-  static final String routeName = 'home';
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -50,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
       child: Scaffold(
-        drawer: (providerGeneral.numero == 0) ? MenuLateral() : Container(),
+        drawer:  MenuLateral(),
         appBar: AppBar(
           toolbarHeight: 60,
           backgroundColor: Colors.black,

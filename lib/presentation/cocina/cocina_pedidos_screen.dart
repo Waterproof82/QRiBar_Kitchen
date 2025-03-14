@@ -12,7 +12,6 @@ import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
 
 class CocinaPedidosScreen extends StatelessWidget {
-  static final String routeName = 'cuentasCocina';
 
   @override
   Widget build(BuildContext context) {
