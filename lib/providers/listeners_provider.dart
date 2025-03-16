@@ -3,11 +3,10 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/data/const/estados_literals.dart';
+import 'package:qribar_cocina/data/const/estado_pedido.dart';
 import 'package:qribar_cocina/data/models/ficha_local.dart';
 import 'package:qribar_cocina/data/models/modifier.dart';
 import 'package:qribar_cocina/data/models/pedidos.dart';
-import 'package:qribar_cocina/data/models/pedidosLocal.dart';
 import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/providers/navegacion_model.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
@@ -15,6 +14,9 @@ import 'package:qribar_cocina/services/functions.dart';
 
 class ListenersProvider with ChangeNotifier {
   final database = FirebaseDatabase.instance.ref();
+  late ProductsService productService;
+  late NavegacionModel nav;
+  late String idBar;
 
   StreamSubscription? _dataStreamProductos;
   StreamSubscription? _dataStreamCategoria;
@@ -22,26 +24,22 @@ class ListenersProvider with ChangeNotifier {
   StreamSubscription? _dataStreamPedidosRemovidos;
 
   void initializeListeners(BuildContext context) {
-    final productService = Provider.of<ProductsService>(context, listen: false);
-    final numElementos = Provider.of<NavegacionModel>(context, listen: false);
-    String idBar = productService.idBar;
+    productService = Provider.of<ProductsService>(context, listen: false);
+    nav = Provider.of<NavegacionModel>(context, listen: false);
+    idBar = productService.idBar;
 
-    _childListenerAddProductNew(numElementos, idBar, productService);
-    _childAddCategoriaNuevaMenu(numElementos, idBar, productService.categoriasProdLocal);
-    _childChangedCategoriaMenu(numElementos, idBar, productService.categoriasProdLocal);
-    _addAndChangedListenerPedidosMesasLocal(idBar, numElementos, productService);
-    _childRemoveListenerPedidos(productService.pedidosRealizados, idBar, numElementos, productService.salasMesa);
+    _childListenerAddProductNew();
+    _childAddCategoriaNuevaMenu();
+    _childChangedCategoriaMenu();
+    _addAndChangedListenerPedidosMesasLocal();
+    _childRemoveListenerPedidos();
   }
 
-  Future<void> _childListenerAddProductNew(
-    NavegacionModel navModelNotify,
-    String idBar,
-    ProductsService productServices,
-  ) async {
+  Future<void> _childListenerAddProductNew() async {
     List<Complemento> listaComplements = [];
     List<String> alergias = [];
     List<Modifier> modifiers = [];
-    List<Product> product = productServices.products;
+    List<Product> product = productService.products;
 
     _dataStreamProductos = database.child('productos/$idBar/').onChildAdded.listen(
       (event) {
@@ -132,8 +130,7 @@ class ListenersProvider with ChangeNotifier {
         alergias = [];
         modifiers = [];
 
-        // Notificar cambio de estado
-        navModelNotify.cambioEstadoProducto = true;
+        notifyListeners();
       },
       onError: (error) {
         print('Error occurred: $error');
@@ -141,11 +138,9 @@ class ListenersProvider with ChangeNotifier {
     );
   }
 
-  Future<void> _childAddCategoriaNuevaMenu(
-    NavegacionModel numElementos,
-    String idBar,
-    List<CategoriaProducto> catProductos,
-  ) async {
+  Future<void> _childAddCategoriaNuevaMenu() async {
+    final catProductos = productService.categoriasProdLocal;
+
     _dataStreamCategoria = database.child('ficha_local/$idBar/categoria_productos').onChildAdded.listen((event) {
       final dataMesas = Map<String, dynamic>.from(event.snapshot.value as Map);
 
@@ -159,20 +154,16 @@ class ListenersProvider with ChangeNotifier {
         orden: dataMesas['orden'],
         id: event.snapshot.key!,
       );
-
       catProductos.add(nuevaCategoria);
-      numElementos.valRecargaWidget = true;
+
+      notifyListeners();
     });
   }
 
-  Future<void> _childChangedCategoriaMenu(
-    NavegacionModel numElementos,
-    String idBar,
-    List<CategoriaProducto> catProductos,
-  ) async {
-    DatabaseReference _dataStreamNewCategory = database.child('ficha_local/$idBar/categoria_productos');
+  Future<void> _childChangedCategoriaMenu() async {
+    final catProductos = productService.categoriasProdLocal;
 
-    _dataStreamNewCategory.onChildChanged.listen((event) {
+    _dataStreamCategoria = database.child('ficha_local/$idBar/categoria_productos').onChildChanged.listen((event) {
       final dataMesas = Map<String, dynamic>.from(event.snapshot.value as Map);
 
       CategoriaProducto producto = catProductos.firstWhere((producto) => producto.id == event.snapshot.key, orElse: () => CategoriaProducto(categoria: ''));
@@ -185,15 +176,11 @@ class ListenersProvider with ChangeNotifier {
       producto.icono = dataMesas['icono'];
       producto.imgVertical = dataMesas['img_vertical'];
 
-      numElementos.valRecargaWidget = true;
+      notifyListeners();
     });
   }
 
-  Future<void> _addAndChangedListenerPedidosMesasLocal(
-    String idBar,
-    NavegacionModel numElementos,
-    ProductsService productService,
-  ) async {
+  Future<void> _addAndChangedListenerPedidosMesasLocal() async {
     final itemPedidos = productService.pedidosRealizados;
     final salasMesa = productService.salasMesa;
 
@@ -201,12 +188,12 @@ class ListenersProvider with ChangeNotifier {
       final path = 'gestion_pedidos/$idBar/${salas.mesa}';
 
       _dataStreamGestionPedidos = database.child(path).onChildAdded.listen((event) {
-        _handleDataChange(itemPedidos, idBar, numElementos, event.snapshot.value, '', productService);
+        _handleDataChange(itemPedidos, idBar, nav, event.snapshot.value, '', productService);
       });
 
       _dataStreamGestionPedidos = database.child(path).onChildChanged.listen((event) {
         String? pedidoId = event.snapshot.key;
-        _handleDataChange(itemPedidos, idBar, numElementos, event.snapshot.value, pedidoId, productService);
+        _handleDataChange(itemPedidos, idBar, nav, event.snapshot.value, pedidoId, productService);
       });
     }
   }
@@ -214,7 +201,7 @@ class ListenersProvider with ChangeNotifier {
   void _handleDataChange(
     List<Pedidos> itemPedidos,
     String idBar,
-    NavegacionModel numElementos,
+    NavegacionModel nav,
     dynamic data,
     String? pedidoId,
     ProductsService productService,
@@ -225,8 +212,6 @@ class ListenersProvider with ChangeNotifier {
     final mesaSnap = dataMesas['mesa'] as String;
     final numPed = dataMesas['numPedido'] as int;
 
-    final catProductos = productService.categoriasProdLocal;
-    List<CategoriaProducto> unicaCategoriaFiltro = [];
     List<Modifier> modifiers = [];
     String envio = '';
 
@@ -269,39 +254,38 @@ class ListenersProvider with ChangeNotifier {
         notaExtra: extras,
         racion: dataMesas['racion'],
         modifiers: modifiers,
+        envio: dataMesas['envio'],
         id: dataMesas['id'],
       ),
     );
-    ordenaCategorias(catProductos, unicaCategoriaFiltro, itemPedidos, productService);
+
     for (var element in itemPedidos) {
       if (element.idProducto == idProd) envio = element.envio ?? '';
     }
 
-    //(numPed != numElementos.pedAnterior || numElementos.mesaAnt != mesaSnap) &&
-    if ( dataMesas['estado_linea'] == EstadosLiterals.pendiente && envio == 'cocina') {
+    //(numPed != nav.pedAnterior || nav.mesaAnt != mesaSnap) &&
+    if (dataMesas['estado_linea'] == EstadoPedido.pendiente && envio == 'cocina') {
       timbre();
 
-      numElementos.pedAnterior = numPed;
-      numElementos.mesaAnt = mesaSnap;
-    } else if (dataMesas['estado_linea'] == EstadosLiterals.cocinado || dataMesas['estado_linea'] == EstadosLiterals.bloqueado) {
+      //nav.pedAnterior = numPed;
+      //nav.mesaAnt = mesaSnap;
+    } else if (dataMesas['estado_linea'] == EstadoPedido.cocinado || dataMesas['estado_linea'] == EstadoPedido.bloqueado) {
       itemPedidos.removeWhere((pedido) => pedido.id == pedidoId);
     }
 
-    numElementos.valRecargaWidget = true;
+    notifyListeners();
   }
 
-  Future<void> _childRemoveListenerPedidos(
-    List<Pedidos> itemPedidos,
-    String idBar,
-    NavegacionModel navModel,
-    List<PedidosLocal> salasMesa,
-  ) async {
+  Future<void> _childRemoveListenerPedidos() async {
+    final itemPedidos = productService.pedidosRealizados;
+    final salasMesa = productService.salasMesa;
+
     for (var sala in salasMesa) {
       _dataStreamPedidosRemovidos = database.child('gestion_pedidos/$idBar/${sala.mesa}').onChildRemoved.listen((event) {
         try {
           String? pedidoId = event.snapshot.key;
           itemPedidos.removeWhere((pedido) => pedido.id == pedidoId);
-          navModel.valRecargaWidget = true;
+          notifyListeners();
         } catch (e) {
           print("Error handling removed pedido: $e");
         }
