@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/data/models/ficha_local.dart';
 import 'package:qribar_cocina/data/models/pedidos.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/audio_manager.dart';
@@ -107,18 +106,20 @@ String capitalize(String value) {
   return "${value[0].toUpperCase()}${value.substring(1).toLowerCase()}";
 }
 
-Future<void> ordenaCategorias(List<CategoriaProducto> catProductos, List<CategoriaProducto> unicaCategoriaFiltro, List<Pedidos> itemPedidos, ProductsService productService) async {
+Future<void> ordenaCategorias(BuildContext context, List<Pedidos> itemPedidos) async {
+  final productsService = Provider.of<ProductsService>(context, listen: false);
+  final catProductos = productsService.categoriasProdLocal;
+
   catProductos.sort((a, b) => a.orden.compareTo(b.orden));
-  unicaCategoriaFiltro.clear();
-  unicaCategoriaFiltro.addAll(catProductos);
 
-  final categoriaMap = {for (var categoria in unicaCategoriaFiltro) categoria.categoria: categoria};
+  final categoriaMap = {for (var categoria in catProductos) categoria.categoria: categoria};
 
-  for (var pedido in itemPedidos) {
-    final categoria = categoriaMap[obtenerCategoriaProducto(productService, pedido.idProducto!)];
+  itemPedidos.forEach((pedido) {
+    final categoria = categoriaMap[obtenerCategoriaProducto(productsService, pedido.idProducto!)];
     if (categoria != null) {
-      pedido.orden = categoria.orden;
-      pedido.envio = categoria.envio;
+      pedido
+        ..orden = categoria.orden
+        ..envio = categoria.envio;
     }
-  }
+  });
 }

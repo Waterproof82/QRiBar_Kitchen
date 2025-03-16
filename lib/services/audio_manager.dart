@@ -9,7 +9,7 @@ class AudioManager {
   AudioManager() {
     _player.onPlayerComplete.listen((event) {
       _completer?.complete();
-      _completer = null; // Reset the completer after completion
+      _completer = null;
     });
   }
 
@@ -27,7 +27,7 @@ class AudioManager {
       if (!_completer!.isCompleted) {
         _completer?.completeError(e);
       }
-      _completer = null; // Reset the completer on error
+      _completer = null;
     }
   }
 }
