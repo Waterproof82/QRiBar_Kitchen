@@ -5,28 +5,32 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/data/const/estado_pedido.dart';
 import 'package:qribar_cocina/data/enums/selection_type.dart';
 import 'package:qribar_cocina/data/extensions/build_context_extension.dart';
-import 'package:qribar_cocina/data/models/modifier.dart';
 import 'package:qribar_cocina/data/models/pedidos.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/barra_superior_tiempo.dart';
+import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_items.dart';
+import 'package:qribar_cocina/providers/listeners_provider.dart';
 import 'package:qribar_cocina/providers/navegacion_model.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
 
 class CocinaGeneralScreen extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
-    final ancho = context.width;
+    Provider.of<ListenersProvider>(context, listen: true); //Actualiza el estado de los pedidos
 
     final itemPedidos = Provider.of<ProductsService>(context, listen: false).pedidosRealizados;
     final navegacionModel = Provider.of<NavegacionModel>(context, listen: false);
+    final ancho = context.width;
+
+    ordenaCategorias(context, itemPedidos);
 
     final List<Pedidos> itemPedidosSelected = [];
 
     if (itemPedidos.isNotEmpty) {
-      itemPedidosSelected.addAll(itemPedidos.where((item) => item.estadoLinea != 'bloqueado'));
+      itemPedidosSelected.addAll(itemPedidos.where((item) => item.estadoLinea != EstadoPedido.bloqueado));
     }
     return Stack(
       children: [
@@ -49,13 +53,12 @@ class ListaProductosPedidos extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final providerGeneral = Provider.of<NavegacionModel>(context, listen: false);
     final ancho = context.width;
     // ignore: unused_local_variable
     bool notaBar = false;
 
     return Container(
-      color: providerGeneral.colorTema,
+      color: Colors.black,
       margin: EdgeInsets.only(top: 60),
       child: ListView.builder(
         controller: navegacionModel.pageController,
@@ -64,7 +67,7 @@ class ListaProductosPedidos extends StatelessWidget {
         itemBuilder: (_, int index) {
           itemPedidos.sort((a, b) => a.hora.compareTo(b.hora));
           if (itemPedidos[index].nota != null) notaBar = true;
-          return (navegacionModel.numero == 0 && itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != 'cocinado')
+          return (navegacionModel.numero == 0 && itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != EstadoPedido.cocinado)
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: Column(
@@ -88,7 +91,7 @@ class ListaProductosPedidos extends StatelessWidget {
                                   style: GoogleFonts.notoSans(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 18, fontWeight: FontWeight.w500))),
                           alignment: Alignment.center,
                         ),
-                      Extras(ancho: ancho, item: itemPedidos[index]),
+                      // Extras(ancho: ancho, item: itemPedidos[index]),
                     ],
                   ),
                 )
@@ -174,13 +177,13 @@ class _LineaProductoState extends State<LineaProducto> {
 
   @override
   Widget build(BuildContext context) {
-    final nav = Provider.of<NavegacionModel>(context);
+    final nav = Provider.of<NavegacionModel>(context, listen: false);
+    final String idBar = Provider.of<ProductsService>(context, listen: false).idBar;
+
     DateTime now = DateTime.now();
 
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
     final String formatted = formatter.format(now);
-    final productsService = Provider.of<ProductsService>(context, listen: false);
-    String idBar = productsService.idBar;
 
     final ancho = context.width;
     final alto = context.height;
@@ -240,7 +243,7 @@ class _LineaProductoState extends State<LineaProducto> {
           Container(
             width: ancho * 0.95,
             decoration: BoxDecoration(
-              color: (estadoLinea != 'cocinado') ? Color.fromARGB(255, 255, 255, 255) : Color.fromARGB(255, 23, 82, 47),
+              color: (estadoLinea != EstadoPedido.cocinado) ? Color.fromARGB(255, 255, 255, 255) : Color.fromARGB(255, 23, 82, 47),
               borderRadius: BorderRadius.all(Radius.circular(100)),
               boxShadow: <BoxShadow>[BoxShadow(color: Colors.black54, blurRadius: 5, spreadRadius: -5)],
             ),
@@ -252,7 +255,7 @@ class _LineaProductoState extends State<LineaProducto> {
                     return false;
                   }
                   if (direction == DismissDirection.endToStart) {
-                    await _dataStreamGestionPedidos.update({'estado_linea': 'cocinado'});
+                    await _dataStreamGestionPedidos.update({'estado_linea': EstadoPedido.cocinado});
                   }
                   return rst;
                 },
@@ -286,7 +289,7 @@ class _LineaProductoState extends State<LineaProducto> {
                   borderRadius: BorderRadius.all(Radius.circular(15)),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: (envioProd == 'barra') ? Color.fromARGB(0, 255, 255, 255) : colorLineaCocina, //nav.colorPed,
+                      color: (envioProd == 'barra') ? Color.fromARGB(0, 255, 255, 255) : colorLineaCocina,
                       border: Border.all(width: (varMarchando == false) ? 2 : 4, color: marchando),
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: <BoxShadow>[BoxShadow(blurRadius: 5, spreadRadius: -5)],
@@ -363,81 +366,9 @@ class _LineaProductoState extends State<LineaProducto> {
                   ),
                 )),
           ),
-          NotaMultiRadio(ancho: ancho, modifiers: widget.itemPedidos[widget.index].modifiers ?? []),
+          ModifiersItems(ancho: ancho, modifiers: widget.itemPedidos[widget.index].modifiers ?? []),
         ],
       ),
-    );
-  }
-}
-
-class NotaMultiRadio extends StatelessWidget {
-  const NotaMultiRadio({
-    Key? key,
-    required this.ancho,
-    required this.modifiers,
-  }) : super(key: key);
-
-  final double ancho;
-  final List<Modifier> modifiers;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: List.generate(modifiers.length, (index) {
-        final opcion = modifiers[index];
-        return Container(
-          width: ancho * 0.95,
-          height: 30,
-          padding: const EdgeInsets.symmetric(horizontal: 2),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: const BorderRadius.all(Radius.circular(100)),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black54,
-                blurRadius: 5,
-                spreadRadius: -5,
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  bottomLeft: Radius.circular(10),
-                ),
-                child: FittedBox(
-                  fit: BoxFit.fitWidth,
-                  child: const Icon(
-                    Icons.navigate_next,
-                    size: 20,
-                    color: Colors.red,
-                  ),
-                ),
-              ),
-              // Texto principal con scroll horizontal si es necesario
-              Flexible(
-                fit: FlexFit.tight,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      Text(
-                        opcion.name,
-                        maxLines: 1,
-                        textAlign: TextAlign.left,
-                        style: GoogleFonts.poiretOne(color: Colors.black, fontSize: (ancho > 450) ? 22 : 16, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }),
     );
   }
 }

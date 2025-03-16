@@ -5,46 +5,42 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/data/const/estado_pedido.dart';
+import 'package:qribar_cocina/data/enums/selection_type.dart';
 import 'package:qribar_cocina/data/extensions/build_context_extension.dart';
 import 'package:qribar_cocina/data/models/pedidos.dart';
+import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_items.dart';
+import 'package:qribar_cocina/providers/listeners_provider.dart';
 import 'package:qribar_cocina/providers/navegacion_model.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
 
 class CocinaPedidosScreen extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
+    Provider.of<ListenersProvider>(context, listen: true); //Actualiza el estado de los pedidos
+
     final itemPedidos = Provider.of<ProductsService>(context, listen: false).pedidosRealizados;
-    //  final productsService = Provider.of<ProductsService>(context, listen: false);
     final navegacionModel = Provider.of<NavegacionModel>(context, listen: false);
+
     final idMesaActual = navegacionModel.mesaActual;
     final List<Pedidos> itemPedidosSelected = [];
-    // String idBarSelected = productsService.idBar;
+
+    ordenaCategorias(context, itemPedidos);
 
     List<int> countMenuPedido = [];
     int contadorNumPedido = 0;
     List mesasAct = [];
     List resultMesas = [];
+    if (itemPedidos.isNotEmpty) {
+      mesasAct = itemPedidos.map((pedido) => pedido.mesa).toList();
+      resultMesas = LinkedHashSet<String>.from(mesasAct).toList();
 
-    if (itemPedidos.length != 0) {
-      for (var i = 0; i < itemPedidos.length; i++) {
-        mesasAct.add(itemPedidos[i].mesa);
+      itemPedidosSelected.addAll(itemPedidos.where((pedido) => pedido.mesa == idMesaActual && pedido.numPedido == navegacionModel.idPedidoSelected));
 
-        resultMesas = LinkedHashSet<String>.from(mesasAct).toList();
-      }
-      for (var i = 0; i < itemPedidos.length; i++) {
-        if (itemPedidos[i].mesa == idMesaActual && itemPedidos[i].numPedido == navegacionModel.idPedidoSelected) {
-          itemPedidosSelected.add(itemPedidos[i]);
-        }
-      }
+      countMenuPedido = itemPedidos.where((pedido) => pedido.mesa == idMesaActual).map((pedido) => pedido.numPedido).toList();
 
-      for (var i = 0; i < itemPedidos.length; i++) {
-        if (itemPedidos[i].mesa == idMesaActual) {
-          countMenuPedido.add(itemPedidos[i].numPedido);
-        }
-      }
-      if (countMenuPedido.length != 0) {
+      if (countMenuPedido.isNotEmpty) {
         contadorNumPedido = countMenuPedido.reduce(max);
       }
     }
@@ -67,15 +63,11 @@ class PedidosListMenu extends StatelessWidget {
   final ScrollController _controller = new ScrollController();
 
   void _goToElemento(int index) {
-    _controller.animateTo((100.0 * index), // 100 is the height of container and index of 6th element is 5
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeIn);
+    _controller.animateTo((100.0 * index), duration: const Duration(milliseconds: 100), curve: Curves.easeIn);
   }
 
   @override
   Widget build(BuildContext context) {
-    //print(count);
-
     return Container(
       margin: EdgeInsets.only(top: 70),
       height: 50,
@@ -123,9 +115,7 @@ class PedidosMesasListMenu extends StatelessWidget {
   final ScrollController _controller = new ScrollController();
 
   void _goToElement(int index) {
-    _controller.animateTo((100.0), // 100 is the height of container and index of 6th element is 5
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInCubic);
+    _controller.animateTo((100.0), duration: const Duration(milliseconds: 200), curve: Curves.easeInCubic);
   }
 
   @override
@@ -154,7 +144,11 @@ class PedidosMesasListMenu extends StatelessWidget {
               heroTag: 'ListPedidoMesas$index',
               child: Text(
                 'Mesa ${int.parse(resultMesas[index])}',
-                style: GoogleFonts.notoSans(color: (navegacionModel.idPedidoSelectedMesas == index + 1) ? Colors.black : Colors.black, fontSize: 17, fontWeight: FontWeight.w500),
+                style: GoogleFonts.notoSans(
+                  color: (navegacionModel.idPedidoSelectedMesas == index + 1) ? Colors.black : Colors.black,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               onPressed: () async {
                 if (navegacionModel.numero == 0) navegacionModel.idPedidoSelectedMesas = (index + 1).toString();
@@ -183,15 +177,14 @@ class ListaProductosPedidos extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final providerGeneral = Provider.of<NavegacionModel>(context);
-
+    
     final ancho = context.width;
     // ignore: unused_local_variable
     bool notaBar = false;
     double resultPrecio = 0;
 
     return Container(
-      color: providerGeneral.colorTema,
+      color: navegacionModel.colorTema,
       margin: EdgeInsets.only(top: 140),
       child: ListView.builder(
         controller: navegacionModel.pageController,
@@ -201,7 +194,7 @@ class ListaProductosPedidos extends StatelessWidget {
           itemPedidos.sort((a, b) => a.orden.compareTo(b.orden));
 
           if (itemPedidos[index].nota != null) notaBar = true;
-          return (navegacionModel.numero == 0 && itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != 'cocinado')
+          return (navegacionModel.numero == 0 && itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != EstadoPedido.cocinado)
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: Column(
@@ -228,7 +221,7 @@ class ListaProductosPedidos extends StatelessWidget {
                     ],
                   ),
                 )
-              : Container();
+              : SizedBox.shrink();
         },
       ),
     );
@@ -292,7 +285,7 @@ class LineaProducto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nav = Provider.of<NavegacionModel>(context);
+    final nav = Provider.of<NavegacionModel>(context,listen: false);
     final productsService = Provider.of<ProductsService>(context, listen: false);
     final database = FirebaseDatabase.instance;
     String idBar = productsService.idBar;
@@ -309,143 +302,133 @@ class LineaProducto extends StatelessWidget {
 
     listSelCant = itemPedidos[index].cantidad;
     listSelName = obtenerNombreProducto(context, itemPedidos[index].idProducto!, itemPedidos[index].racion!);
-//colorLineaSinApuntar = (itemPedidos[index].mesaAbierta == true) ? Colors.white : Colors.white;
-    // categoriaProd = itemPedidos[index].categoriaProducto;
     envioProd = itemPedidos[index].envio!;
     estadoLinea = itemPedidos[index].estadoLinea ?? '';
     hora = (itemPedidos[index].hora.isNotEmpty) ? itemPedidos[index].hora.split(':').sublist(0, 2).join(':') : "--:--";
     pedidoNum = itemPedidos[index].numPedido;
     mesaVar = itemPedidos[index].mesa;
 
-    return Container(
-      width: ancho * 0.95,
-      decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(100)), boxShadow: <BoxShadow>[BoxShadow(color: Colors.black54, blurRadius: 5, spreadRadius: -5)]),
-      child: Dismissible(
-        key: UniqueKey(),
-        onDismissed: (direction) {},
-        confirmDismiss: (direction) async {
-          if (direction == DismissDirection.startToEnd) {
-            return false;
-          }
-          if (direction == DismissDirection.endToStart) {
-            hora = itemPedidos[index].hora;
-            pedidoNum = itemPedidos[index].numPedido;
-            mesaVar = itemPedidos[index].mesa;
-
-            itemPedidos[index].estadoLinea = 'cocinado';
-            await _dataStreamGestionPedidos.update({
-              'cantidad': itemPedidos[index].cantidad,
-              //'categoria_producto': itemPedidos[index].categoriaProducto,
-              'fecha': itemPedidos[index].fecha,
-              'hora': itemPedidos[index].hora,
-              'idProducto': itemPedidos[index].idProducto,
-              //  'id_bar': itemPedidos[index].idBar,
-              'mesa': itemPedidos[index].mesa,
-              //'mesaAbierta': itemPedidos[index].mesaAbierta,
-              'numPedido': itemPedidos[index].numPedido,
-              //'precio_producto': itemPedidos[index].precioProducto,
-              // 'titulo': itemPedidos[index].titulo,
-              'estado_linea': 'cocinado'
-            });
-          }
-
-          nav.valRecargaWidget = false;
-
-          return rst;
-        },
-        background: Container(
-          color: Colors.redAccent,
-          child: Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Icon(Icons.cancel_outlined, color: Colors.white, size: 22),
-                SizedBox(width: 10),
-                Text('SE CANCELA EN BARRA', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500)),
-              ],
-            ),
+    return Column(
+      children: [
+        Container(
+          width: ancho * 0.95,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(100)),
+            boxShadow: <BoxShadow>[BoxShadow(color: Colors.black54, blurRadius: 5, spreadRadius: -5)],
           ),
-        ),
-        secondaryBackground: Container(
-          color: Colors.green,
-          child: Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text('SERVIDO', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500)),
-                SizedBox(width: 10),
-                Icon(Icons.check_sharp, color: Colors.white, size: 22)
-              ],
-            ),
-          ),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(15)),
-          child: Container(
-            decoration: BoxDecoration(
-                color: (envioProd == 'barra') ? Color.fromARGB(0, 255, 255, 255) : nav.colorPed,
-                border: Border.all(width: 2, color: Colors.white38),
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: <BoxShadow>[BoxShadow(blurRadius: 5, spreadRadius: -5)]),
-            height: alto * 0.06,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
-                  child: Container(
-                      child: Text(
-                    ' x$listSelCant ',
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    textAlign: TextAlign.left,
-                    style: GoogleFonts.notoSans(color: Colors.black, fontSize: (ancho > 450) ? 26 : 20, fontWeight: FontWeight.w500, backgroundColor: Colors.red[200]),
-                  )),
+          child: Dismissible(
+            key: UniqueKey(),
+            onDismissed: (direction) {},
+            confirmDismiss: (direction) async {
+              if (direction == DismissDirection.startToEnd) {
+                return false;
+              }
+              if (direction == DismissDirection.endToStart) {
+                await _dataStreamGestionPedidos.update({'estado_linea': EstadoPedido.cocinado});
+              }
+
+              return rst;
+            },
+            background: Container(
+              color: Colors.redAccent,
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.cancel_outlined, color: Colors.white, size: 22),
+                    SizedBox(width: 10),
+                    Text('SE CANCELA EN BARRA', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500)),
+                  ],
                 ),
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Text(' $listSelName',
+              ),
+            ),
+            secondaryBackground: Container(
+              color: Colors.green,
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('SERVIDO', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500)),
+                    SizedBox(width: 10),
+                    Icon(Icons.check_sharp, color: Colors.white, size: 22)
+                  ],
+                ),
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.all(Radius.circular(15)),
+              child: Container(
+                decoration: BoxDecoration(
+                    color: (envioProd == 'barra') ? Color.fromARGB(0, 255, 255, 255) : nav.colorPed,
+                    border: Border.all(width: 2, color: Colors.white38),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: <BoxShadow>[BoxShadow(blurRadius: 5, spreadRadius: -5)]),
+                height: alto * 0.06,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                      child: Container(
+                          child: Text(
+                        ' x$listSelCant ',
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         textAlign: TextAlign.left,
-                        style: GoogleFonts.poiretOne(
-                            color: (envioProd == 'barra') ? Colors.black : Colors.white,
-                            fontSize: (ancho > 450) ? 26 : 20,
-                            fontWeight: FontWeight.bold,
-                            backgroundColor: Colors.transparent)),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    nav.mesaActual = itemPedidos[index].mesa;
-                    nav.idPedidoSelected = itemPedidos[index].numPedido;
-                    nav.categoriaSelected = 'Cocina Estado Pedidos';
-                  },
-                  child: SizedBox(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Row(
-                        children: [
-                          Text(
-                            ' $hora ',
+                        style: GoogleFonts.notoSans(color: Colors.black, fontSize: (ancho > 450) ? 26 : 20, fontWeight: FontWeight.w500, backgroundColor: Colors.red[200]),
+                      )),
+                    ),
+                    Flexible(
+                      fit: FlexFit.tight,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(' $listSelName',
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             textAlign: TextAlign.left,
                             style: GoogleFonts.poiretOne(
-                                color: Color.fromARGB(255, 255, 94, 1), fontSize: (ancho > 450) ? 26 : 20, fontWeight: FontWeight.w600, backgroundColor: Colors.transparent),
-                          )
-                        ],
+                                color: (envioProd == 'barra') ? Colors.black : Colors.white,
+                                fontSize: (ancho > 450) ? 26 : 20,
+                                fontWeight: FontWeight.bold,
+                                backgroundColor: Colors.transparent)),
                       ),
                     ),
-                  ),
+                    GestureDetector(
+                      onTap: () {
+                        nav.mesaActual = itemPedidos[index].mesa;
+                        nav.idPedidoSelected = itemPedidos[index].numPedido;
+                        nav.categoriaSelected = SelectionType.generalScreen.path;
+                      },
+                      child: SizedBox(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(
+                            children: [
+                              Text(
+                                ' $hora ',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                textAlign: TextAlign.left,
+                                style: GoogleFonts.poiretOne(
+                                  color: Color.fromARGB(255, 255, 94, 1),
+                                  fontSize: (ancho > 450) ? 26 : 20,
+                                  fontWeight: FontWeight.w600,
+                                  backgroundColor: Colors.transparent,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
-      ),
+        ModifiersItems(ancho: ancho, modifiers: itemPedidos[index].modifiers ?? []),
+      ],
     );
   }
 }
@@ -455,9 +438,9 @@ Future<bool> onDismiss(BuildContext context, List<Pedidos> itemPedidos, int inde
         context: context,
         barrierDismissible: false,
         builder: (context) => Container(
-          child: new AlertDialog(
+          child: AlertDialog(
             alignment: Alignment.center,
-            title: new Text(
+            title: Text(
               'Eliminando pedido...',
               textAlign: TextAlign.center,
             ),
@@ -466,7 +449,7 @@ Future<bool> onDismiss(BuildContext context, List<Pedidos> itemPedidos, int inde
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  new MaterialButton(
+                  MaterialButton(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     disabledColor: Colors.grey,
                     elevation: 1,
@@ -474,9 +457,12 @@ Future<bool> onDismiss(BuildContext context, List<Pedidos> itemPedidos, int inde
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Container(padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8), child: Text('Sí', style: TextStyle(color: Colors.white, fontSize: 18))),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                      child: Text('Sí', style: TextStyle(color: Colors.white, fontSize: 18)),
+                    ),
                   ),
-                  new MaterialButton(
+                  MaterialButton(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     disabledColor: Colors.grey,
                     elevation: 1,
@@ -484,7 +470,10 @@ Future<bool> onDismiss(BuildContext context, List<Pedidos> itemPedidos, int inde
                     onPressed: () {
                       Navigator.of(context).pop(false);
                     },
-                    child: Container(padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8), child: Text('No', style: TextStyle(color: Colors.white, fontSize: 18))),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                      child: Text('No', style: TextStyle(color: Colors.white, fontSize: 18)),
+                    ),
                   ),
                 ],
               ),
