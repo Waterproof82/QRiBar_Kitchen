@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/data/const/estado_pedido.dart';
+import 'package:qribar_cocina/data/datasources/remote_data_source/listeners_data_source_contract.dart';
 import 'package:qribar_cocina/data/models/ficha_local.dart';
 import 'package:qribar_cocina/data/models/modifier.dart';
 import 'package:qribar_cocina/data/models/pedidos.dart';
@@ -12,8 +13,7 @@ import 'package:qribar_cocina/providers/navegacion_model.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
 
-class ListenersProvider with ChangeNotifier {
-  final database = FirebaseDatabase.instance.ref();
+class ListenersDataSource with ChangeNotifier implements ListenersDataSourceContract {
   late ProductsService productService;
   late NavegacionModel nav;
   late String idBar;
@@ -23,19 +23,22 @@ class ListenersProvider with ChangeNotifier {
   StreamSubscription? _dataStreamGestionPedidos;
   StreamSubscription? _dataStreamPedidosRemovidos;
 
+  final database = FirebaseDatabase.instance.ref();
+
   void initializeListeners(BuildContext context) {
     productService = Provider.of<ProductsService>(context, listen: false);
     nav = Provider.of<NavegacionModel>(context, listen: false);
     idBar = productService.idBar;
 
-    _childListenerAddProductNew();
-    _childAddCategoriaNuevaMenu();
-    _childChangedCategoriaMenu();
-    _addAndChangedListenerPedidosMesasLocal();
-    _childRemoveListenerPedidos();
+    addProduct();
+    addCategoriaMenu();
+    changeCategoriaMenu();
+    addAndChangedPedidos();
+    removePedidos();
   }
 
-  Future<void> _childListenerAddProductNew() async {
+  @override
+  Future<void> addProduct() async {
     List<Complemento> listaComplements = [];
     List<String> alergias = [];
     List<Modifier> modifiers = [];
@@ -54,7 +57,6 @@ class ListenersProvider with ChangeNotifier {
         final Map<String, dynamic> data = Map<String, dynamic>.from(value);
         final String key = event.snapshot.key ?? '';
 
-        // Extraer complementos
         if (data["complementos"] != null && data["complementos"] is Map) {
           data["complementos"].forEach((k, v) {
             if (v is Map) {
@@ -69,7 +71,6 @@ class ListenersProvider with ChangeNotifier {
           });
         }
 
-        // Extraer alérgenos
         if (data["alergogenos"] != null && data["alergogenos"] is Map) {
           data["alergogenos"].forEach((k, v) {
             if (k is String) {
@@ -78,7 +79,6 @@ class ListenersProvider with ChangeNotifier {
           });
         }
 
-        // Extraer modificadores
         if (data['modifiers'] != null) {
           data['modifiers'].forEach((k, v) {
             modifiers.add(Modifier(
@@ -121,11 +121,9 @@ class ListenersProvider with ChangeNotifier {
           )
         ];
 
-        // Agregar producto si no existe ya en la lista
         final index = product.indexWhere((element) => element.nombreProducto == data["nombre_producto"]);
         if (index == -1) product.add(listaProductos[0]);
 
-        // Limpiar listas para el próximo producto
         listaComplements = [];
         alergias = [];
         modifiers = [];
@@ -138,7 +136,8 @@ class ListenersProvider with ChangeNotifier {
     );
   }
 
-  Future<void> _childAddCategoriaNuevaMenu() async {
+  @override
+  Future<void> addCategoriaMenu() async {
     final catProductos = productService.categoriasProdLocal;
 
     _dataStreamCategoria = database.child('ficha_local/$idBar/categoria_productos').onChildAdded.listen((event) {
@@ -160,7 +159,8 @@ class ListenersProvider with ChangeNotifier {
     });
   }
 
-  Future<void> _childChangedCategoriaMenu() async {
+  @override
+  Future<void> changeCategoriaMenu() async {
     final catProductos = productService.categoriasProdLocal;
 
     _dataStreamCategoria = database.child('ficha_local/$idBar/categoria_productos').onChildChanged.listen((event) {
@@ -180,7 +180,8 @@ class ListenersProvider with ChangeNotifier {
     });
   }
 
-  Future<void> _addAndChangedListenerPedidosMesasLocal() async {
+  @override
+  Future<void> addAndChangedPedidos() async {
     final itemPedidos = productService.pedidosRealizados;
     final salasMesa = productService.salasMesa;
 
@@ -263,12 +264,8 @@ class ListenersProvider with ChangeNotifier {
       if (element.idProducto == idProd) envio = element.envio ?? '';
     }
 
-    //(numPed != nav.pedAnterior || nav.mesaAnt != mesaSnap) &&
     if (dataMesas['estado_linea'] == EstadoPedido.pendiente && envio == 'cocina') {
       timbre();
-
-      //nav.pedAnterior = numPed;
-      //nav.mesaAnt = mesaSnap;
     } else if (dataMesas['estado_linea'] == EstadoPedido.cocinado || dataMesas['estado_linea'] == EstadoPedido.bloqueado) {
       itemPedidos.removeWhere((pedido) => pedido.id == pedidoId);
     }
@@ -276,7 +273,8 @@ class ListenersProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _childRemoveListenerPedidos() async {
+  @override
+  Future<void> removePedidos() async {
     final itemPedidos = productService.pedidosRealizados;
     final salasMesa = productService.salasMesa;
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/data/const/app_sizes.dart';
 import 'package:qribar_cocina/data/enums/assets_type.dart';
 import 'package:qribar_cocina/data/enums/selection_type.dart';
 import 'package:qribar_cocina/providers/navegacion_model.dart';
@@ -23,7 +24,7 @@ class MenuLateral extends StatelessWidget {
                   Center(child: Image.asset(AssetsType.logoCut.path, height: 100.0, fit: BoxFit.scaleDown))
                 ],
               )),
-          SizedBox(height: 10),
+         Gap.h10,
           ListTile(
               leading: Icon(Icons.kitchen_sharp, size: 40, color: Color.fromARGB(255, 212, 176, 0)),
               title: Text('Cocina Vista General', style: TextStyle(fontSize: 20, color: (nav.colorTema == Colors.black) ? Colors.white : Colors.black)),
@@ -31,7 +32,7 @@ class MenuLateral extends StatelessWidget {
                 Navigator.pop(context);
                 nav.categoriaSelected = 'Cocina Estado Pedidos';
               }),
-          SizedBox(height: 10),
+         Gap.h10,
           ListTile(
               leading: Icon(Icons.soup_kitchen, size: 40, color: Colors.deepOrange),
               title: Text('Cocina Vista Mesas', style: TextStyle(fontSize: 20, color: (nav.colorTema == Colors.black) ? Colors.white : Colors.black)),
@@ -48,7 +49,7 @@ class MenuLateral extends StatelessWidget {
             },
           ),
           Divider(thickness: 5, indent: 20, endIndent: 20, color: Color.fromARGB(137, 255, 0, 0)),
-          SizedBox(height: 15),
+          Gap.h16,
           ListTile(
             leading: Icon(Icons.lightbulb, color: Color.fromARGB(255, 226, 203, 27), size: 40),
             title: Text('Cambiar Tema', style: TextStyle(fontSize: 20, color: (nav.colorTema == Colors.black) ? Colors.white : Colors.black)),
@@ -61,7 +62,7 @@ class MenuLateral extends StatelessWidget {
               //Navigator.pop(context);
             },
           ),
-          SizedBox(height: 10),
+         Gap.h10,
         ],
       ),
     );

@@ -37,7 +37,6 @@ class BarraSuperiorTiempo extends StatelessWidget {
           child: Text('0-10 min ', style: TextStyle(fontSize: (ancho > 420) ? 24 : 18, color: Color.fromARGB(255, 255, 254, 254))),
           alignment: Alignment.bottomRight,
         ),
-        //SizedBox(width: 10),
         Container(
           decoration: BoxDecoration(
             color: Color.fromARGB(255, 255, 193, 7), //Color.fromARGB(255, 242, 242, 64),
@@ -57,7 +56,6 @@ class BarraSuperiorTiempo extends StatelessWidget {
           child: Text('10-20 min ', style: TextStyle(fontSize: (ancho > 420) ? 24 : 18, color: Color.fromARGB(255, 255, 255, 255))),
           alignment: Alignment.bottomRight,
         ),
-        //SizedBox(width: 10),
         Container(
           decoration: BoxDecoration(
             color: Color.fromRGBO(242, 132, 64, 1),
@@ -77,7 +75,6 @@ class BarraSuperiorTiempo extends StatelessWidget {
           child: Text('20-30 min ', style: TextStyle(fontSize: (ancho > 420) ? 24 : 18, color: Color.fromARGB(255, 255, 255, 255))),
           alignment: Alignment.bottomRight,
         ),
-        //SizedBox(width: 10),
         Container(
           decoration: BoxDecoration(
             color: Color.fromARGB(255, 255, 0, 0),
@@ -150,7 +147,6 @@ class BarraSupTipoPedido extends StatelessWidget {
                   alignment: Alignment.center,
                 ),
               ),
-              // SizedBox(width: 10),
               GestureDetector(
                 onTap: () {
                   filtro = 'pendiente';
@@ -176,7 +172,6 @@ class BarraSupTipoPedido extends StatelessWidget {
                   alignment: Alignment.center,
                 ),
               ),
-              // SizedBox(width: 10),
               GestureDetector(
                 onTap: () {
                   filtro = 'cocinado';
@@ -202,7 +197,6 @@ class BarraSupTipoPedido extends StatelessWidget {
                   alignment: Alignment.center,
                 ),
               ),
-              //   SizedBox(width: 10),
               GestureDetector(
                 onTap: () {
                   filtro = 'bloqueado';
@@ -222,7 +216,6 @@ class BarraSupTipoPedido extends StatelessWidget {
                       ),
                     ],
                   ),
-                  //width: (ancho > 420) ? 220 : 90,
                   height: 45,
                   child:
                       Text((ancho > 420) ? ' Bloqueado en Barra ' : ' Bloqueado ', style: TextStyle(fontSize: (ancho > 420) ? 22 : 18, color: Color.fromARGB(255, 255, 255, 255))),

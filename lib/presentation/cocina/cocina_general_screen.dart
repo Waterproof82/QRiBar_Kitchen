@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/data/const/app_sizes.dart';
 import 'package:qribar_cocina/data/const/estado_pedido.dart';
+import 'package:qribar_cocina/data/datasources/remote_data_source/listeners_data_source.dart';
 import 'package:qribar_cocina/data/enums/selection_type.dart';
 import 'package:qribar_cocina/data/extensions/build_context_extension.dart';
 import 'package:qribar_cocina/data/models/pedidos.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/barra_superior_tiempo.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_items.dart';
-import 'package:qribar_cocina/providers/listeners_provider.dart';
 import 'package:qribar_cocina/providers/navegacion_model.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
@@ -19,7 +20,7 @@ import 'package:qribar_cocina/services/functions.dart';
 class CocinaGeneralScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Provider.of<ListenersProvider>(context, listen: true); //Actualiza el estado de los pedidos
+    Provider.of<ListenersDataSource>(context, listen: true); //Actualiza el estado de los pedidos
 
     final itemPedidos = Provider.of<ProductsService>(context, listen: false).pedidosRealizados;
     final navegacionModel = Provider.of<NavegacionModel>(context, listen: false);
@@ -266,7 +267,7 @@ class _LineaProductoState extends State<LineaProducto> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Icon(Icons.cancel_outlined, color: Colors.white, size: 22),
-                        SizedBox(width: 10),
+                        Gap.w12,
                         Text('SE CANCELA EN BARRA', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500)),
                       ],
                     ),
@@ -279,7 +280,7 @@ class _LineaProductoState extends State<LineaProducto> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text('SERVIDO', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500)),
-                        SizedBox(width: 10),
+                        Gap.w12,
                         Icon(Icons.check_sharp, color: Colors.white, size: 22)
                       ],
                     ),

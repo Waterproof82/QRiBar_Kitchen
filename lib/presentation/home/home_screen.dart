@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/data/datasources/remote_data_source/listeners_data_source.dart';
 import 'package:qribar_cocina/data/enums/selection_type.dart';
 import 'package:qribar_cocina/data/extensions/build_context_extension.dart';
 import 'package:qribar_cocina/presentation/cocina/cocina_general_screen.dart';
 import 'package:qribar_cocina/presentation/cocina/cocina_pedidos_screen.dart';
+import 'package:qribar_cocina/presentation/home/widgets/custom_app_bar.dart';
 import 'package:qribar_cocina/presentation/home/widgets/menu_lateral.dart';
-import 'package:qribar_cocina/providers/listeners_provider.dart';
 import 'package:qribar_cocina/providers/navegacion_model.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
@@ -21,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
-    Provider.of<ListenersProvider>(context, listen: false).initializeListeners(context);
+    Provider.of<ListenersDataSource>(context, listen: false).initializeListeners(context);
     super.initState();
   }
 
@@ -42,26 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Scaffold(
         drawer: MenuLateral(),
-        appBar: AppBar(
-          toolbarHeight: 60,
-          backgroundColor: Colors.black,
-          iconTheme: IconThemeData(color: Colors.white),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    '· ${nav.categoriaSelected} ·',
-                    style: GoogleFonts.poiretOne(color: Color.fromARGB(255, 240, 240, 21), fontSize: (screenWidthSize > 450) ? 35 : 28, fontWeight: FontWeight.w600),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        appBar: CustomAppBar(nav: nav, screenWidthSize: screenWidthSize),
         body: Stack(
           children: [
             HeaderWave(),
