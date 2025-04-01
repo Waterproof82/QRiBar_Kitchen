@@ -7,12 +7,11 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/data/const/app_sizes.dart';
 import 'package:qribar_cocina/data/const/estado_pedido.dart';
-import 'package:qribar_cocina/data/datasources/remote_data_source/listeners_data_source.dart';
 import 'package:qribar_cocina/data/enums/selection_type.dart';
 import 'package:qribar_cocina/data/extensions/build_context_extension.dart';
 import 'package:qribar_cocina/data/models/pedidos.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/barra_superior_tiempo.dart';
-import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_items.dart';
+import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/providers/navegacion_model.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
@@ -20,13 +19,9 @@ import 'package:qribar_cocina/services/functions.dart';
 class CocinaGeneralScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Provider.of<ListenersDataSource>(context, listen: true); //Actualiza el estado de los pedidos
-
     final itemPedidos = Provider.of<ProductsService>(context, listen: false).pedidosRealizados;
     final navegacionModel = Provider.of<NavegacionModel>(context, listen: false);
     final ancho = context.width;
-
-    ordenaCategorias(context, itemPedidos);
 
     final List<Pedidos> itemPedidosSelected = [];
 
@@ -242,7 +237,7 @@ class _LineaProductoState extends State<LineaProducto> {
       child: Column(
         children: [
           Container(
-            width: ancho * 0.95,
+            width: ancho,
             decoration: BoxDecoration(
               color: (estadoLinea != EstadoPedido.cocinado) ? Color.fromARGB(255, 255, 255, 255) : Color.fromARGB(255, 23, 82, 47),
               borderRadius: BorderRadius.all(Radius.circular(100)),
@@ -268,7 +263,12 @@ class _LineaProductoState extends State<LineaProducto> {
                       children: [
                         Icon(Icons.cancel_outlined, color: Colors.white, size: 22),
                         Gap.w12,
-                        Text('SE CANCELA EN BARRA', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500)),
+                        Text('SE CANCELA EN BARRA',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 22,
+                            )),
                       ],
                     ),
                   ),
@@ -279,7 +279,12 @@ class _LineaProductoState extends State<LineaProducto> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text('SERVIDO', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500)),
+                        Text('SERVIDO',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 22,
+                            )),
                         Gap.w12,
                         Icon(Icons.check_sharp, color: Colors.white, size: 22)
                       ],
@@ -300,17 +305,27 @@ class _LineaProductoState extends State<LineaProducto> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         ClipRRect(
-                            borderRadius: BorderRadius.only(topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
-                            child: Container(
-                                margin: EdgeInsets.only(top: 0),
-                                child: Text(
-                                  ' x$listSelCant ',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  textAlign: TextAlign.left,
-                                  style:
-                                      GoogleFonts.notoSans(color: Colors.black, fontSize: (ancho > 450) ? 26 : 20, fontWeight: FontWeight.w500, backgroundColor: Colors.red[200]),
-                                ))),
+                          borderRadius: BorderRadius.only(topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                          child: Container(
+                            width: 60,
+                            height: double.infinity,
+                            margin: EdgeInsets.only(top: 0),
+                            color: Colors.red[200],
+                            child: Center(
+                              child: Text(
+                                ' x$listSelCant ',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.notoSans(
+                                  fontSize: (ancho > 450) ? 28 : 20,
+                                  fontWeight: FontWeight.w500,
+                                  // backgroundColor: Colors.red[200],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
 
                         Flexible(
                             fit: FlexFit.tight,
@@ -367,7 +382,11 @@ class _LineaProductoState extends State<LineaProducto> {
                   ),
                 )),
           ),
-          ModifiersItems(ancho: ancho, modifiers: widget.itemPedidos[widget.index].modifiers ?? []),
+          ModifiersOptions(
+            ancho: ancho,
+            modifiers: widget.itemPedidos[widget.index].modifiers ?? [],
+            mainModifierName: listSelName,
+          ),
         ],
       ),
     );
