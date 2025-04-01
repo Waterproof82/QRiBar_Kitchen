@@ -1,47 +1,54 @@
 class Modifier {
   final String name;
   final double increment;
+  final String mainProduct;
 
-  Modifier({
+  const Modifier({
     this.name = '',
     this.increment = 0.0,
+    this.mainProduct = '',
   });
 
-  /// Método para crear una copia con posibilidad de modificar cualquier atributo
+  /// Crear una copia modificada de la instancia
   Modifier copyWith({
     String? name,
     double? increment,
+    String? mainProduct,
   }) {
     return Modifier(
       name: name ?? this.name,
       increment: increment ?? this.increment,
+      mainProduct: mainProduct ?? this.mainProduct,
     );
   }
 
-  // Método para comparar si dos modificadores son iguales
-  bool isEqual(Modifier other) {
-    return name == other.name && increment == other.increment;
-  }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Modifier &&
+          name == other.name &&
+          increment == other.increment &&
+          mainProduct == other.mainProduct);
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Modifier && runtimeType == other.runtimeType && name == other.name && increment == other.increment;
+  int get hashCode => Object.hash(name, increment, mainProduct);
 
-  @override
-  int get hashCode => name.hashCode ^ increment.hashCode;
+  /// Convertir a Map (para Firebase, JSON, etc.)
+  Map<String, dynamic> toMap() => {
+        'name': name,
+        'increment': increment,
+        'mainProduct': mainProduct,
+      };
 
-  /// Método para convertir la instancia en un Map (útil para Firebase)
-  Map<String, dynamic> toMap() {
-    return {
-      'name': name,
-      'increment': increment,
-    };
-  }
+  /// Alias de `toMap()` para convertir a JSON
+  Map<String, dynamic> toJson() => toMap();
 
-  /// Método para crear una instancia desde un Map (útil para Firebase)
+  /// Crear una instancia desde un Map (para Firebase, JSON, etc.)
   factory Modifier.fromMap(Map<String, dynamic> map) {
     return Modifier(
-      name: map['name'] ?? '',
-      increment: (map['increment'] ?? 0.0).toDouble(),
+      name: map['name'] as String? ?? '',
+      increment: (map['increment'] as num?)?.toDouble() ?? 0.0,
+      mainProduct: map['mainProduct'] as String? ?? '',
     );
   }
 }
