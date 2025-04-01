@@ -8,37 +8,39 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  WakelockPlus.enable();
   await Firebase.initializeApp();
   await initializeDateFormatting('es_ES');
-  runApp(Providers());
+
+  WakelockPlus.enable();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  // Ocultar la barra superior
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom]);
+
+  runApp(const MyApp());
 }
 
-class Providers extends StatelessWidget {
-  const Providers({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AppProviders(
-      child: App(),
-    );
-  }
-}
-
-class App extends StatelessWidget {
-  final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
-
-  @override
-  Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom]);
-
-    return MaterialApp(
-      theme: ThemeData(primaryColor: Colors.green[700], scaffoldBackgroundColor: Colors.blueGrey),
-      debugShowCheckedModeBanner: false,
-      title: 'QRiBar Cocina',
-      initialRoute: AppRoutes.splash,
-      navigatorKey: navigatorKey,
-      routes: AppRoutes.routes,
+      child: MaterialApp(
+        theme: ThemeData(
+          primaryColor: Colors.green[700],
+          scaffoldBackgroundColor: Colors.blueGrey,
+        ),
+        debugShowCheckedModeBanner: false,
+        title: 'QRiBar Cocina',
+        initialRoute: AppRoutes.splash,
+        navigatorKey: GlobalKey<NavigatorState>(),
+        routes: AppRoutes.routes,
+      ),
     );
   }
 }

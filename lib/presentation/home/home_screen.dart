@@ -19,16 +19,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late ProductsService productsService;
+
   @override
   void initState() {
-    Provider.of<ListenersDataSource>(context, listen: false).initializeListeners(context);
     super.initState();
+    Provider.of<ListenersDataSource>(context, listen: false).initializeListeners(context);
+    productsService = Provider.of<ProductsService>(context, listen: false);
   }
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ListenersDataSource>(context, listen: true);
     final nav = Provider.of<NavegacionModel>(context, listen: true);
-    final productsService = Provider.of<ProductsService>(context, listen: false);
 
     final double screenWidthSize = context.width;
 
