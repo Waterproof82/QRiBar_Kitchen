@@ -84,6 +84,7 @@ class ListenersDataSource with ChangeNotifier implements ListenersDataSourceCont
             modifiers.add(Modifier(
               name: k,
               increment: v.toDouble(),
+              mainProduct: key,
             ));
           });
         }
@@ -189,82 +190,74 @@ class ListenersDataSource with ChangeNotifier implements ListenersDataSourceCont
       final path = 'gestion_pedidos/$idBar/${salas.mesa}';
 
       _dataStreamGestionPedidos = database.child(path).onChildAdded.listen((event) {
-        _handleDataChange(itemPedidos, idBar, nav, event.snapshot.value, '', productService);
+        _processPedido(event.snapshot, itemPedidos, idBar, productService);
       });
 
       _dataStreamGestionPedidos = database.child(path).onChildChanged.listen((event) {
-        String? pedidoId = event.snapshot.key;
-        _handleDataChange(itemPedidos, idBar, nav, event.snapshot.value, pedidoId, productService);
+        _processPedido(event.snapshot, itemPedidos, idBar, productService, isUpdate: true);
       });
     }
+  }
+
+  Future<void> _processPedido(
+    DataSnapshot snapshot,
+    List<Pedidos> itemPedidos,
+    String idBar,
+    ProductsService productService, {
+    bool isUpdate = false,
+  }) async {
+    final data = snapshot.value;
+    if (data == null || data is! Map) return;
+
+    final dataMesas = Map<String, dynamic>.from(data);
+    final idProd = dataMesas['idProducto'] as String?;
+    if (idProd == null) return;
+
+    final envio = await obtenerEnvioPorProducto(productService, idProd);
+    if (envio != 'cocina') return;
+
+    _handleDataChange(itemPedidos, idBar, dataMesas, snapshot.key, envio ?? 'error', isUpdate);
   }
 
   void _handleDataChange(
     List<Pedidos> itemPedidos,
     String idBar,
-    NavegacionModel nav,
-    dynamic data,
+    Map<String, dynamic> dataMesas,
     String? pedidoId,
-    ProductsService productService,
+    String envio,
+    bool isUpdate,
   ) {
-    final dataMesas = Map<String, dynamic>.from(data);
-
-    final idProd = dataMesas['idProducto'] as String;
-    final mesaSnap = dataMesas['mesa'] as String;
-    final numPed = dataMesas['numPedido'] as int;
-
-    List<Modifier> modifiers = [];
-    String envio = '';
-
-    //EXTRAS
-    final List<String> extras = [];
-    if (dataMesas['extras'] != null)
-      dataMesas['extras'].forEach(
-        (element) {
-          extras.add(element);
-        },
-      );
-    //
-
-    if (dataMesas['modifiers'] != null && dataMesas['modifiers'] is List) {
-      final modifiersList = List.from(dataMesas['modifiers']);
-      modifiers = modifiersList.map((modifier) {
-        if (modifier is Map) {
-          final modifierMap = Map<String, dynamic>.from(modifier);
-          return Modifier(
-            name: modifierMap['name'] ?? '',
-            increment: (modifierMap['increment'] ?? 0).toDouble(),
-          );
-        } else {
-          return Modifier();
-        }
-      }).toList();
-    }
-
-    itemPedidos.add(
-      Pedidos(
-        cantidad: dataMesas['cantidad'],
-        fecha: dataMesas['fecha'],
-        hora: dataMesas['hora'],
-        mesa: mesaSnap.toString(),
-        numPedido: numPed,
-        nota: dataMesas['nota'],
-        estadoLinea: dataMesas['estado_linea'],
-        idProducto: idProd,
-        enMarcha: false,
-        notaExtra: extras,
-        racion: dataMesas['racion'],
-        modifiers: modifiers,
-        envio: dataMesas['envio'],
-        id: dataMesas['id'],
-      ),
+    final nuevoPedido = Pedidos(
+      cantidad: dataMesas['cantidad'],
+      fecha: dataMesas['fecha'],
+      hora: dataMesas['hora'],
+      mesa: dataMesas['mesa'].toString(),
+      numPedido: dataMesas['numPedido'] as int,
+      nota: dataMesas['nota'],
+      estadoLinea: dataMesas['estado_linea'],
+      idProducto: dataMesas['idProducto'],
+      enMarcha: false,
+      notaExtra: List<String>.from(dataMesas['extras'] ?? []),
+      racion: dataMesas['racion'],
+      modifiers: (dataMesas['modifiers'] as List?)
+              ?.map((modifier) => Modifier(
+                    name: modifier['name'] ?? '',
+                    increment: (modifier['increment'] ?? 0).toDouble(),
+                    mainProduct: modifier['mainProduct'] ?? '',
+                  ))
+              .toList() ??
+          [],
+      envio: envio,
+      id: dataMesas['id'],
     );
 
-    for (var element in itemPedidos) {
-      if (element.idProducto == idProd) envio = element.envio ?? '';
+    if (isUpdate) {
+      itemPedidos.removeWhere((pedido) => pedido.id == pedidoId);
     }
 
-    if (dataMesas['estado_linea'] == EstadoPedido.pendiente && envio == 'cocina') {
+    itemPedidos.add(nuevoPedido);
+
+    if (dataMesas['estado_linea'] == EstadoPedido.pendiente) {
       timbre();
     } else if (dataMesas['estado_linea'] == EstadoPedido.cocinado || dataMesas['estado_linea'] == EstadoPedido.bloqueado) {
       itemPedidos.removeWhere((pedido) => pedido.id == pedidoId);
