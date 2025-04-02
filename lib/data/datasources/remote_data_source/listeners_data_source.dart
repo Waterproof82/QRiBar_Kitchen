@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/data/const/estado_pedido.dart';
 import 'package:qribar_cocina/data/datasources/remote_data_source/listeners_data_source_contract.dart';
-import 'package:qribar_cocina/data/models/ficha_local.dart';
+import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/modifier.dart';
 import 'package:qribar_cocina/data/models/pedidos.dart';
 import 'package:qribar_cocina/data/models/product.dart';

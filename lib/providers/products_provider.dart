@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:qribar_cocina/data/models/ficha_local.dart';
-import 'package:qribar_cocina/data/models/models.dart';
+import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/pedidos.dart';
-import 'package:qribar_cocina/data/models/pedidosLocal.dart';
+import 'package:qribar_cocina/data/models/product.dart';
+import 'package:qribar_cocina/data/models/sala_estado.dart';
 
 class ProductsService extends ChangeNotifier {
   final List<Product> products = [];
@@ -13,7 +13,7 @@ class ProductsService extends ChangeNotifier {
   final List<Pedidos> pedidosRealizadosMesaUsuario = [];
   final List<Pedidos> pedidosCancelados = [];
   final List<Pedidos> pedidosProcesados = [];
-  final List<PedidosLocal> salasMesa = [];
+  final List<SalaEstado> salasMesa = [];
   final List mesasActivas = [];
   final List<CategoriaProducto> categoriasProdLocal = [];
   final database = FirebaseDatabase.instance;
@@ -33,7 +33,7 @@ class ProductsService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<PedidosLocal>> loadMesas(idBarEmail) async {
+  Future<List<SalaEstado>> loadMesas(idBarEmail) async {
     this.isLoading = true;
     notifyListeners();
 
@@ -53,8 +53,8 @@ class ProductsService extends ChangeNotifier {
       final data = new Map<dynamic, dynamic>.from(value.snapshot.value as Map);
 
       data.forEach((k, v) {
-        final List<PedidosLocal> listaSalasMesa = [
-          PedidosLocal(
+        final List<SalaEstado> listaSalasMesa = [
+          SalaEstado(
             mesa: k,
             sala: v['sala'],
             estado: v['estado'],

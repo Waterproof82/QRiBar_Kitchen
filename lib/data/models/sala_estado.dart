@@ -1,28 +1,29 @@
 import 'dart:convert';
 
-class PedidosLocal {
-  PedidosLocal(
-      {this.cantidad,
-      this.categoria,
-      this.estado,
-      this.hora,
-      this.horaUltimaActiva,
-      this.fecha,
-      this.idBar,
-      this.mesa,
-      this.numPedido,
-      this.sala,
-      this.titulo,
-      this.id,
-      this.personas,
-      this.dibujo,
-      this.horaUltimoPedido,
-      this.horaUltimoPago,
-      this.callCamarero,
-      this.callPago,
-      this.nombre,
-      this.positionMap,
-      this.qrLink});
+class SalaEstado {
+  SalaEstado({
+    this.cantidad,
+    this.categoria,
+    this.estado,
+    this.hora,
+    this.horaUltimaActiva,
+    this.fecha,
+    this.idBar,
+    this.mesa,
+    this.numPedido,
+    this.sala,
+    this.titulo,
+    this.id,
+    this.personas,
+    this.dibujo,
+    this.horaUltimoPedido,
+    this.horaUltimoPago,
+    this.callCamarero,
+    this.callPago,
+    this.nombre,
+    this.positionMap,
+    this.qrLink,
+  });
 
   int? cantidad;
   String? categoria;
@@ -46,11 +47,11 @@ class PedidosLocal {
   int? positionMap;
   String? qrLink;
 
-  factory PedidosLocal.fromJson(String str) => PedidosLocal.fromMap(json.decode(str));
+  factory SalaEstado.fromJson(String str) => SalaEstado.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory PedidosLocal.fromMap(Map<String, dynamic> json) => PedidosLocal(
+  factory SalaEstado.fromMap(Map<String, dynamic> json) => SalaEstado(
         cantidad: json["cantidad"],
         categoria: json["categoria"],
         fecha: json["fecha"],
@@ -93,7 +94,7 @@ class PedidosLocal {
         "qr_link": qrLink,
       };
 
-  PedidosLocal copy() => PedidosLocal(
+  SalaEstado copy() => SalaEstado(
       cantidad: this.cantidad,
       categoria: this.categoria,
       fecha: this.fecha,
