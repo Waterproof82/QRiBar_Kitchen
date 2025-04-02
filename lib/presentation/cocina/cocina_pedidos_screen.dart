@@ -213,7 +213,6 @@ class ListaProductosPedidos extends StatelessWidget {
                                   style: GoogleFonts.notoSans(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500))),
                           alignment: Alignment.center,
                         ),
-                      Extras(ancho: ancho, item: itemPedidos[index]),
                     ],
                   ),
                 )
@@ -221,43 +220,6 @@ class ListaProductosPedidos extends StatelessWidget {
         },
       ),
     );
-  }
-}
-
-class Extras extends StatelessWidget {
-  const Extras({
-    Key? key,
-    required this.ancho,
-    required this.item,
-  }) : super(key: key);
-
-  final double ancho;
-  final Pedidos item;
-
-  @override
-  Widget build(BuildContext context) {
-    List<String> nuevaListaCorregida = [];
-    item.notaExtra!.forEach((cadena) {
-      nuevaListaCorregida.add(cadena);
-    });
-
-    return (nuevaListaCorregida.length > 0)
-        ? Container(
-            width: ancho,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(100)),
-                boxShadow: <BoxShadow>[BoxShadow(color: Colors.redAccent, blurRadius: 5, spreadRadius: -5)]),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Text(('  ${nuevaListaCorregida.join(', ')}'),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.notoSans(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500)),
-            ),
-          )
-        : SizedBox.shrink();
   }
 }
 

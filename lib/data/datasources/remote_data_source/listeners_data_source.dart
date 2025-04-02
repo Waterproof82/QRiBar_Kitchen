@@ -237,7 +237,6 @@ class ListenersDataSource with ChangeNotifier implements ListenersDataSourceCont
       estadoLinea: dataMesas['estado_linea'],
       idProducto: dataMesas['idProducto'],
       enMarcha: false,
-      notaExtra: List<String>.from(dataMesas['extras'] ?? []),
       racion: dataMesas['racion'],
       modifiers: (dataMesas['modifiers'] as List?)
               ?.map((modifier) => Modifier(
