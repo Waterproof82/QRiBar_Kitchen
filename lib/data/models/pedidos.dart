@@ -21,7 +21,6 @@ class Pedidos {
     this.fechaHora,
     this.id,
     this.enMarcha,
-    this.notaExtra,
     this.modifiers,
     this.racion,
   });
@@ -43,7 +42,6 @@ class Pedidos {
   String? fechaHora;
   String? tituloOriginal;
   bool? enMarcha;
-  List<String>? notaExtra;
   List<Modifier>? modifiers;
   bool? racion;
 
