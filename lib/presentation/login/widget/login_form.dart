@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/data/const/app_sizes.dart';
-import 'package:qribar_cocina/data/const/const.dart';
+import 'package:qribar_cocina/data/const/app_constants.dart';
 import 'package:qribar_cocina/presentation/login/functions/handle_login.dart';
 import 'package:qribar_cocina/presentation/login/provider/login_form_provider.dart';
 import 'package:qribar_cocina/presentation/login/ui/input_decoration.dart';
@@ -30,7 +30,7 @@ class LoginForm extends StatelessWidget {
               ),
               onChanged: (value) => loginForm.email = value,
               validator: (value) {
-                final regExp = RegExp(Const.emailPattern);
+                final regExp = RegExp(AppConstants.emailPattern);
                 return regExp.hasMatch(value ?? '') ? null : 'El correo no es correcto';
               },
               style: TextStyle(fontSize: 22),
