@@ -7,7 +7,7 @@ import 'package:qribar_cocina/presentation/cocina/cocina_general_screen.dart';
 import 'package:qribar_cocina/presentation/cocina/cocina_pedidos_screen.dart';
 import 'package:qribar_cocina/presentation/home/widgets/custom_app_bar.dart';
 import 'package:qribar_cocina/presentation/home/widgets/menu_lateral.dart';
-import 'package:qribar_cocina/providers/navegacion_model.dart';
+import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
 import 'package:qribar_cocina/widgets/loading_screen.dart';
@@ -31,11 +31,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     Provider.of<ListenersDataSource>(context, listen: true);
-    final nav = Provider.of<NavegacionModel>(context, listen: true);
+    final nav = Provider.of<NavegacionProvider>(context, listen: true);
 
     final double screenWidthSize = context.width;
 
-    if (productsService.isLoading) return LoadingScreen();
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -46,17 +45,22 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         drawer: MenuLateral(),
         appBar: CustomAppBar(nav: nav, screenWidthSize: screenWidthSize),
-        body: Stack(
-          children: [
-            HeaderWave(),
-            (nav.categoriaSelected == SelectionType.pedidosScreen.path)
-                ? CocinaPedidosScreen()
-                : (nav.categoriaSelected == SelectionType.generalScreen.path)
-                    ? CocinaGeneralScreen()
-                    : SizedBox.shrink()
-          ],
-        ),
+        body: productsService.isLoading ? LoadingScreen() : _buildContent(nav),
       ),
+    );
+  }
+
+  Widget _buildContent(NavegacionProvider nav) {
+    return Stack(
+      children: [
+        HeaderWave(),
+        if (nav.categoriaSelected == SelectionType.pedidosScreen.path)
+          CocinaPedidosScreen()
+        else if (nav.categoriaSelected == SelectionType.generalScreen.path)
+          CocinaGeneralScreen()
+        else
+          SizedBox.shrink(),
+      ],
     );
   }
 }

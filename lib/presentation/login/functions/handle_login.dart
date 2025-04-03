@@ -4,7 +4,11 @@ import 'package:qribar_cocina/data/extensions/string_extension.dart';
 import 'package:qribar_cocina/presentation/login/provider/login_form_provider.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 
-Future<void> handleLogin(BuildContext context, LoginFormProvider loginForm, ProductsService productsService) async {
+Future<void> handleLogin(
+  BuildContext context,
+  LoginFormProvider loginForm,
+  ProductsService productsService,
+) async {
   FocusScope.of(context).unfocus();
   if (!loginForm.isValidForm()) return;
 
@@ -22,7 +26,9 @@ Future<void> handleLogin(BuildContext context, LoginFormProvider loginForm, Prod
     await productsService.loadMesas(capitalizeResult);
 
     Navigator.pushReplacementNamed(context, 'home');
-  } on FirebaseAuthException {
+  } on FirebaseAuthException catch (e) {
+    print('Error de autenticación: $e');
+  } finally {
     loginForm.isLoading = false;
   }
 }
