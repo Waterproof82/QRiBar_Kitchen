@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/data/const/estado_pedido.dart';
 import 'package:qribar_cocina/data/datasources/local_data_source/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/datasources/remote_data_source/listeners_data_source_contract.dart';
+import 'package:qribar_cocina/data/enums/estado_pedido.dart';
 import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/modifier.dart';
 import 'package:qribar_cocina/data/models/pedidos.dart';
@@ -257,9 +257,9 @@ class ListenersDataSource with ChangeNotifier implements ListenersDataSourceCont
 
     itemPedidos.add(nuevoPedido);
 
-    if (dataMesas['estado_linea'] == EstadoPedido.pendiente) {
+    if (dataMesas['estado_linea'] == EstadoPedido.pendiente.name) {
       timbre();
-    } else if (dataMesas['estado_linea'] == EstadoPedido.cocinado || dataMesas['estado_linea'] == EstadoPedido.bloqueado) {
+    } else if (dataMesas['estado_linea'] == EstadoPedido.cocinado.name || dataMesas['estado_linea'] == EstadoPedido.bloqueado.name) {
       itemPedidos.removeWhere((pedido) => pedido.id == pedidoId);
     }
 

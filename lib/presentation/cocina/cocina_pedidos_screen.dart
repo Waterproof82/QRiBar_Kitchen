@@ -5,16 +5,11 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/data/const/app_sizes.dart';
-import 'package:qribar_cocina/data/const/estado_pedido.dart';
-import 'package:qribar_cocina/data/datasources/local_data_source/id_bar_data_source.dart';
-import 'package:qribar_cocina/data/enums/selection_type.dart';
-import 'package:qribar_cocina/data/extensions/build_context_extension.dart';
-import 'package:qribar_cocina/data/models/pedidos.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
+import 'package:qribar_cocina/widgets/data_exports.dart';
 
 class CocinaPedidosScreen extends StatelessWidget {
   @override
@@ -34,7 +29,7 @@ class CocinaPedidosScreen extends StatelessWidget {
       resultMesas = LinkedHashSet<String>.from(mesasAct).toList();
 
       itemPedidosSelected.addAll(
-          itemPedidos.where((pedido) => pedido.mesa == idMesaActual && pedido.numPedido == navegacionModel.idPedidoSelected && pedido.estadoLinea != EstadoPedido.bloqueado));
+          itemPedidos.where((pedido) => pedido.mesa == idMesaActual && pedido.numPedido == navegacionModel.idPedidoSelected && pedido.estadoLinea != EstadoPedido.bloqueado.name));
 
       countMenuPedido = itemPedidos.where((pedido) => pedido.mesa == idMesaActual).map((pedido) => pedido.numPedido).toList();
 
@@ -190,9 +185,9 @@ class ListaProductosPedidos extends StatelessWidget {
           itemPedidos.sort((a, b) => a.orden.compareTo(b.orden));
 
           if (itemPedidos[index].nota != null) notaBar = true;
-          return (itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != EstadoPedido.cocinado)
+          return (itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != EstadoPedido.cocinado.name)
               ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
                   child: Column(
                     children: [
                       LineaProducto(itemPedidos: itemPedidos, index: index, resultPrecio: resultPrecio),
@@ -292,7 +287,7 @@ class LineaProducto extends StatelessWidget {
                 return false;
               }
               if (direction == DismissDirection.endToStart) {
-                await _dataStreamGestionPedidos.update({'estado_linea': EstadoPedido.cocinado});
+                await _dataStreamGestionPedidos.update({'estado_linea': EstadoPedido.cocinado.name});
               }
 
               return rst;

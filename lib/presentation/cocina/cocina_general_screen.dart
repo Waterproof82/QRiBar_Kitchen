@@ -5,17 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/data/const/app_sizes.dart';
-import 'package:qribar_cocina/data/const/estado_pedido.dart';
-import 'package:qribar_cocina/data/datasources/local_data_source/id_bar_data_source.dart';
-import 'package:qribar_cocina/data/enums/selection_type.dart';
-import 'package:qribar_cocina/data/extensions/build_context_extension.dart';
-import 'package:qribar_cocina/data/models/pedidos.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/barra_superior_tiempo.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
+import 'package:qribar_cocina/widgets/data_exports.dart';
 
 class CocinaGeneralScreen extends StatelessWidget {
   @override
@@ -27,7 +22,7 @@ class CocinaGeneralScreen extends StatelessWidget {
     final List<Pedidos> itemPedidosSelected = [];
 
     if (itemPedidos.isNotEmpty) {
-      itemPedidosSelected.addAll(itemPedidos.where((item) => item.estadoLinea != EstadoPedido.bloqueado));
+      itemPedidosSelected.addAll(itemPedidos.where((item) => item.estadoLinea != EstadoPedido.bloqueado.name));
     }
     return Stack(
       children: [
@@ -64,7 +59,7 @@ class ListaProductosPedidos extends StatelessWidget {
         itemBuilder: (_, int index) {
           itemPedidos.sort((a, b) => a.hora.compareTo(b.hora));
           if (itemPedidos[index].nota != null) notaBar = true;
-          return (itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != EstadoPedido.cocinado)
+          return (itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != EstadoPedido.cocinado.name)
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
                   child: Column(
@@ -216,7 +211,7 @@ class _LineaProductoState extends State<LineaProducto> {
           Container(
             width: ancho,
             decoration: BoxDecoration(
-              color: (estadoLinea != EstadoPedido.cocinado) ? Color.fromARGB(255, 255, 255, 255) : Color.fromARGB(255, 23, 82, 47),
+              color: (estadoLinea != EstadoPedido.cocinado.name) ? Color.fromARGB(255, 255, 255, 255) : Color.fromARGB(255, 23, 82, 47),
               borderRadius: BorderRadius.all(Radius.circular(100)),
               boxShadow: <BoxShadow>[BoxShadow(color: Colors.black54, blurRadius: 5, spreadRadius: -5)],
             ),
@@ -228,7 +223,7 @@ class _LineaProductoState extends State<LineaProducto> {
                     return false;
                   }
                   if (direction == DismissDirection.endToStart) {
-                    await _dataStreamGestionPedidos.update({'estado_linea': EstadoPedido.cocinado});
+                    await _dataStreamGestionPedidos.update({'estado_linea': EstadoPedido.cocinado.name});
                   }
                   return rst;
                 },
@@ -326,18 +321,6 @@ class _LineaProductoState extends State<LineaProducto> {
                           color: Colors.red[300],
                           child: Row(
                             children: [
-                              // Container(
-                              //   width: (ancho > 450) ? 90 : 70,
-                              //   child: Text(' $hora ',
-                              //       overflow: TextOverflow.ellipsis,
-                              //       maxLines: 1,
-                              //       textAlign: TextAlign.left,
-                              //       style: GoogleFonts.poiretOne(
-                              //         color: Colors.white,
-                              //         fontSize: (ancho > 450) ? 24 : 20,
-                              //         fontWeight: FontWeight.bold,
-                              //       )),
-                              // ),
                               GestureDetector(
                                 onTap: () {
                                   nav.mesaActual = widget.itemPedidos[widget.index].mesa;
@@ -345,9 +328,9 @@ class _LineaProductoState extends State<LineaProducto> {
                                   nav.categoriaSelected = SelectionType.pedidosScreen.path;
                                 },
                                 child: Container(
-                                  margin: EdgeInsets.only(left: 10),
                                   width: (ancho > 450) ? 120 : 90,
                                   child: RichText(
+                                    textAlign: TextAlign.center,
                                     maxLines: 1,
                                     text: TextSpan(
                                       children: [
