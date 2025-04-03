@@ -5,7 +5,6 @@ import 'package:qribar_cocina/data/enums/assets_type.dart';
 import 'package:qribar_cocina/presentation/login/login_screen.dart';
 
 class Splash extends StatefulWidget {
-
   @override
   VideoState createState() => VideoState();
 }
@@ -17,8 +16,8 @@ class VideoState extends State<Splash> with SingleTickerProviderStateMixin {
   late Animation<double> animation;
 
   startTime() async {
-    var _duration = new Duration(seconds: 4);
-    return new Timer(_duration, navigationPage);
+    var _duration = Duration(seconds: 4);
+    return Timer(_duration, navigationPage);
   }
 
   void navigationPage() {
@@ -29,8 +28,8 @@ class VideoState extends State<Splash> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    animationController = new AnimationController(vsync: this, duration: new Duration(seconds: 2));
-    animation = new CurvedAnimation(parent: animationController, curve: Curves.easeOut);
+    animationController = AnimationController(vsync: this, duration: Duration(seconds: 2));
+    animation = CurvedAnimation(parent: animationController, curve: Curves.easeOut);
 
     animation.addListener(() => this.setState(() {}));
     animationController.forward();
@@ -48,23 +47,23 @@ class VideoState extends State<Splash> with SingleTickerProviderStateMixin {
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          new Column(
+          Column(
             mainAxisAlignment: MainAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Padding(
                   padding: EdgeInsets.only(bottom: 30.0),
-                  child: new Image.asset(
+                  child: Image.asset(
                     AssetsType.logoCut.path,
                     height: 25.0,
                     fit: BoxFit.scaleDown,
                   ))
             ],
           ),
-          new Column(
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              new Image.asset(
+              Image.asset(
                 AssetsType.logo.path,
                 width: animation.value * 250,
                 height: animation.value * 250,

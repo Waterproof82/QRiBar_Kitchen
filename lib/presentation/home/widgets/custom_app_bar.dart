@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:qribar_cocina/providers/navegacion_model.dart';
+import 'package:qribar_cocina/providers/navegacion_provider.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
@@ -11,7 +11,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.screenWidthSize,
   });
 
-  final NavegacionModel nav;
+  final NavegacionProvider nav;
   final double screenWidthSize;
 
   @override
