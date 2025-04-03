@@ -7,19 +7,20 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/data/const/app_sizes.dart';
 import 'package:qribar_cocina/data/const/estado_pedido.dart';
+import 'package:qribar_cocina/data/datasources/local_data_source/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/enums/selection_type.dart';
 import 'package:qribar_cocina/data/extensions/build_context_extension.dart';
 import 'package:qribar_cocina/data/models/pedidos.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart';
-import 'package:qribar_cocina/providers/navegacion_model.dart';
+import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
 
 class CocinaPedidosScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final itemPedidos = Provider.of<ProductsService>(context, listen: false).pedidosRealizados;
-    final navegacionModel = Provider.of<NavegacionModel>(context, listen: false);
+    final List<Pedidos> itemPedidos = Provider.of<ProductsService>(context, listen: false).pedidosRealizados;
+    final NavegacionProvider navegacionModel = Provider.of<NavegacionProvider>(context, listen: false);
 
     final idMesaActual = navegacionModel.mesaActual;
     final List<Pedidos> itemPedidosSelected = [];
@@ -44,7 +45,7 @@ class CocinaPedidosScreen extends StatelessWidget {
 
     return Stack(
       children: [
-        if (navegacionModel.numero == 0) PedidosMesasListMenu(navegacionModel, resultMesas),
+        PedidosMesasListMenu(navegacionModel, resultMesas),
         PedidosListMenu(navegacionModel.idPedidoSelected, navegacionModel, contadorNumPedido),
         ListaProductosPedidos(navegacionModel: navegacionModel, itemPedidos: itemPedidosSelected),
       ],
@@ -57,7 +58,7 @@ class PedidosListMenu extends StatelessWidget {
   final int idPedido;
   final navegacionModel;
   final int count;
-  final ScrollController _controller = new ScrollController();
+  final ScrollController _controller = ScrollController();
 
   void _goToElemento(int index) {
     _controller.animateTo((100.0 * index), duration: const Duration(milliseconds: 100), curve: Curves.easeIn);
@@ -92,7 +93,7 @@ class PedidosListMenu extends StatelessWidget {
                 style: GoogleFonts.notoSans(color: (idPedido == index + 1) ? Colors.white : Colors.black, fontSize: 15, fontWeight: FontWeight.w500),
               ),
               onPressed: () {
-                if (navegacionModel.numero == 0) navegacionModel.idPedidoSelected = index + 1;
+                navegacionModel.idPedidoSelected = index + 1;
                 _goToElemento(index);
               },
             ),
@@ -109,7 +110,7 @@ class PedidosMesasListMenu extends StatelessWidget {
   final navegacionModel;
   final resultMesas;
 
-  final ScrollController _controller = new ScrollController();
+  final ScrollController _controller = ScrollController();
 
   void _goToElement(int index) {
     _controller.animateTo((100.0), duration: const Duration(milliseconds: 200), curve: Curves.easeInCubic);
@@ -142,13 +143,12 @@ class PedidosMesasListMenu extends StatelessWidget {
               child: Text(
                 'Mesa ${int.parse(resultMesas[index])}',
                 style: GoogleFonts.notoSans(
-                  color: (navegacionModel.idPedidoSelectedMesas == index + 1) ? Colors.black : Colors.black,
+                  color: Colors.black,
                   fontSize: 17,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               onPressed: () async {
-                if (navegacionModel.numero == 0) navegacionModel.idPedidoSelectedMesas = (index + 1).toString();
                 navegacionModel.mesaActual = resultMesas[index];
                 navegacionModel.idPedidoSelected = 1;
                 _goToElement(index);
@@ -168,7 +168,7 @@ class ListaProductosPedidos extends StatelessWidget {
     required this.itemPedidos,
   }) : super(key: key);
 
-  final NavegacionModel navegacionModel;
+  final NavegacionProvider navegacionModel;
 
   final List<Pedidos> itemPedidos;
 
@@ -180,7 +180,7 @@ class ListaProductosPedidos extends StatelessWidget {
     double resultPrecio = 0;
 
     return Container(
-      color: navegacionModel.colorTema,
+      color: Colors.black,
       margin: EdgeInsets.only(top: 140),
       child: ListView.builder(
         controller: navegacionModel.pageController,
@@ -190,7 +190,7 @@ class ListaProductosPedidos extends StatelessWidget {
           itemPedidos.sort((a, b) => a.orden.compareTo(b.orden));
 
           if (itemPedidos[index].nota != null) notaBar = true;
-          return (navegacionModel.numero == 0 && itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != EstadoPedido.cocinado)
+          return (itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != EstadoPedido.cocinado)
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: Column(
@@ -198,10 +198,10 @@ class ListaProductosPedidos extends StatelessWidget {
                       LineaProducto(itemPedidos: itemPedidos, index: index, resultPrecio: resultPrecio),
                       if (itemPedidos[index].nota != null && itemPedidos[index].nota != '')
                         Container(
-                          width: ancho * 0.85,
+                          width: ancho,
                           padding: EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 230, 145, 145),
+                              color: Color.fromARGB(255, 255, 255, 255),
                               borderRadius: BorderRadius.all(Radius.circular(100)),
                               boxShadow: <BoxShadow>[BoxShadow(color: Colors.black, blurRadius: 5, spreadRadius: 0)]),
                           child: SingleChildScrollView(
@@ -210,7 +210,7 @@ class ListaProductosPedidos extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   textAlign: TextAlign.left,
-                                  style: GoogleFonts.notoSans(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500))),
+                                  style: GoogleFonts.notoSans(color: Colors.black, fontSize: 22, fontWeight: FontWeight.w500))),
                           alignment: Alignment.center,
                         ),
                     ],
@@ -243,10 +243,9 @@ class LineaProducto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nav = Provider.of<NavegacionModel>(context, listen: false);
-    final productsService = Provider.of<ProductsService>(context, listen: false);
+    final nav = Provider.of<NavegacionProvider>(context, listen: false);
     final database = FirebaseDatabase.instance;
-    String idBar = productsService.idBar;
+    String idBar = IdBarDataSource.instance.getIdBar();
     String mesa = nav.mesaActual;
 
     DatabaseReference _dataStreamGestionPedidos = database.ref('gestion_pedidos/$idBar/$mesa/${itemPedidos[index].id}');
@@ -323,85 +322,83 @@ class LineaProducto extends StatelessWidget {
                 ),
               ),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(15)),
-              child: Container(
-                decoration: BoxDecoration(
-                    color: (envioProd == 'barra') ? Color.fromARGB(0, 255, 255, 255) : nav.colorPed,
-                    border: Border.all(width: 2, color: Colors.white38),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: <BoxShadow>[BoxShadow(blurRadius: 5, spreadRadius: -5)]),
-                height: alto * 0.06,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
-                      child: Container(
-                        width: 60,
-                        height: double.infinity,
-                        margin: EdgeInsets.only(top: 0),
-                        color: Colors.red[200],
-                        child: Center(
-                          child: Text(
-                            ' x$listSelCant ',
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 0, 0, 0),
+                  border: Border.all(width: 2, color: Colors.white38),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: <BoxShadow>[BoxShadow(blurRadius: 5, spreadRadius: -5)]),
+              height: alto * 0.06,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                    child: Container(
+                      width: 60,
+                      height: double.infinity,
+                      margin: EdgeInsets.only(top: 0),
+                      color: Colors.red[200],
+                      child: Center(
+                        child: Text(
+                          ' x$listSelCant ',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.notoSans(
+                            fontSize: (ancho > 450) ? 28 : 20,
+                            fontWeight: FontWeight.w500,
+                            // backgroundColor: Colors.red[200],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Flexible(
+                    fit: FlexFit.tight,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Text(
+                        ' $listSelName',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        textAlign: TextAlign.left,
+                        style: GoogleFonts.notoSans(
+                          color: const Color.fromARGB(255, 255, 255, 255),
+                          fontSize: (ancho > 450) ? 26 : 20,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      nav.mesaActual = itemPedidos[index].mesa;
+                      nav.idPedidoSelected = itemPedidos[index].numPedido;
+                      nav.categoriaSelected = SelectionType.generalScreen.path;
+                    },
+                    child: Container(
+                      height: double.infinity,
+                      width: 120,
+                      // padding: const EdgeInsets.symmetric(horizontal: 2),
+                      color: Colors.red[300],
+                      child: Row(
+                        children: [
+                          Text(
+                            ' $hora ',
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.notoSans(
-                              fontSize: (ancho > 450) ? 28 : 20,
+                              fontSize: (ancho > 450) ? 26 : 20,
                               fontWeight: FontWeight.w500,
-                              // backgroundColor: Colors.red[200],
                             ),
-                          ),
-                        ),
+                          )
+                        ],
                       ),
                     ),
-                    Flexible(
-                      fit: FlexFit.tight,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Text(' $listSelName',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            textAlign: TextAlign.left,
-                            style: GoogleFonts.poiretOne(
-                                color: (envioProd == 'barra') ? Colors.black : Colors.white,
-                                fontSize: (ancho > 450) ? 26 : 20,
-                                fontWeight: FontWeight.bold,
-                                backgroundColor: Colors.transparent)),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        nav.mesaActual = itemPedidos[index].mesa;
-                        nav.idPedidoSelected = itemPedidos[index].numPedido;
-                        nav.categoriaSelected = SelectionType.generalScreen.path;
-                      },
-                      child: SizedBox(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Row(
-                            children: [
-                              Text(
-                                ' $hora ',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                textAlign: TextAlign.left,
-                                style: GoogleFonts.poiretOne(
-                                  color: Color.fromARGB(255, 255, 94, 1),
-                                  fontSize: (ancho > 450) ? 26 : 20,
-                                  fontWeight: FontWeight.w600,
-                                  backgroundColor: Colors.transparent,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

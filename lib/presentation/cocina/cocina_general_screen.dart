@@ -7,12 +7,13 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/data/const/app_sizes.dart';
 import 'package:qribar_cocina/data/const/estado_pedido.dart';
+import 'package:qribar_cocina/data/datasources/local_data_source/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/enums/selection_type.dart';
 import 'package:qribar_cocina/data/extensions/build_context_extension.dart';
 import 'package:qribar_cocina/data/models/pedidos.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/barra_superior_tiempo.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart';
-import 'package:qribar_cocina/providers/navegacion_model.dart';
+import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
 
@@ -20,7 +21,7 @@ class CocinaGeneralScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final itemPedidos = Provider.of<ProductsService>(context, listen: false).pedidosRealizados;
-    final navegacionModel = Provider.of<NavegacionModel>(context, listen: false);
+    final navegacionModel = Provider.of<NavegacionProvider>(context, listen: false);
     final ancho = context.width;
 
     final List<Pedidos> itemPedidosSelected = [];
@@ -44,7 +45,7 @@ class ListaProductosPedidos extends StatelessWidget {
     required this.itemPedidos,
   }) : super(key: key);
 
-  final NavegacionModel navegacionModel;
+  final NavegacionProvider navegacionModel;
   final List<Pedidos> itemPedidos;
 
   @override
@@ -63,7 +64,7 @@ class ListaProductosPedidos extends StatelessWidget {
         itemBuilder: (_, int index) {
           itemPedidos.sort((a, b) => a.hora.compareTo(b.hora));
           if (itemPedidos[index].nota != null) notaBar = true;
-          return (navegacionModel.numero == 0 && itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != EstadoPedido.cocinado)
+          return (itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != EstadoPedido.cocinado)
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: Column(
@@ -71,11 +72,11 @@ class ListaProductosPedidos extends StatelessWidget {
                       LineaProducto(itemPedidos: itemPedidos, index: index),
                       if (itemPedidos[index].nota != null && itemPedidos[index].nota != '')
                         Container(
-                          width: ancho * 0.95,
+                          width: ancho,
                           height: 30,
                           decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 230, 145, 145),
-                            borderRadius: BorderRadius.all(Radius.circular(100)),
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            borderRadius: BorderRadius.all(Radius.circular(20)),
                             boxShadow: <BoxShadow>[BoxShadow(color: Colors.black, blurRadius: 5, spreadRadius: 0)],
                           ),
                           child: SingleChildScrollView(
@@ -86,7 +87,7 @@ class ListaProductosPedidos extends StatelessWidget {
                                   textAlign: TextAlign.left,
                                   style: GoogleFonts.notoSans(
                                     color: const Color.fromARGB(255, 0, 0, 0),
-                                    fontSize: 18,
+                                    fontSize: 22,
                                     fontWeight: FontWeight.w500,
                                   ))),
                           alignment: Alignment.center,
@@ -140,8 +141,8 @@ class _LineaProductoState extends State<LineaProducto> {
 
   @override
   Widget build(BuildContext context) {
-    final nav = Provider.of<NavegacionModel>(context, listen: false);
-    final String idBar = Provider.of<ProductsService>(context, listen: false).idBar;
+    final nav = Provider.of<NavegacionProvider>(context, listen: false);
+    final String idBar = IdBarDataSource.instance.getIdBar();
 
     DateTime now = DateTime.now();
 
@@ -158,7 +159,7 @@ class _LineaProductoState extends State<LineaProducto> {
     Color colorLineaCocina = Colors.grey;
     // ignore: unused_local_variable
     String categoriaProd = '';
-    String envioProd = 'barra';
+
     String hora = '';
     int pedidoNum = 0;
     String mesaVar = '';
@@ -170,7 +171,6 @@ class _LineaProductoState extends State<LineaProducto> {
     listSelCant = itemPedido.cantidad;
     listSelName = obtenerNombreProducto(context, itemPedido.idProducto!, itemPedido.racion!);
 
-    envioProd = itemPedido.envio!;
     estadoLinea = itemPedido.estadoLinea ?? '';
     hora = (itemPedido.hora.isNotEmpty) ? itemPedido.hora.split(':').sublist(0, 2).join(':') : "--:--";
     pedidoNum = itemPedido.numPedido;
@@ -228,12 +228,13 @@ class _LineaProductoState extends State<LineaProducto> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Icon(Icons.cancel_outlined, color: Colors.white, size: 22),
+                        Gap.w12,
+                        Icon(Icons.cancel_outlined, color: Colors.white, size: 24),
                         Gap.w12,
                         Text('SE CANCELA EN BARRA',
                             style: TextStyle(
                               color: Colors.black,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w400,
                               fontSize: 22,
                             )),
                       ],
@@ -249,103 +250,116 @@ class _LineaProductoState extends State<LineaProducto> {
                         Text('SERVIDO',
                             style: TextStyle(
                               color: Colors.black,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w400,
                               fontSize: 22,
                             )),
                         Gap.w12,
-                        Icon(Icons.check_sharp, color: Colors.white, size: 22)
+                        Icon(Icons.check_sharp, color: Colors.white, size: 24),
+                        Gap.w12,
                       ],
                     ),
                   ),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: (envioProd == 'barra') ? Color.fromARGB(0, 255, 255, 255) : colorLineaCocina,
-                      border: Border.all(width: (varMarchando == false) ? 2 : 4, color: marchando),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: <BoxShadow>[BoxShadow(blurRadius: 5, spreadRadius: -5)],
-                    ),
-                    height: alto * 0.06,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.only(topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
-                          child: Container(
-                            width: 60,
-                            height: double.infinity,
-                            margin: EdgeInsets.only(top: 0),
-                            color: Colors.red[200],
-                            child: Center(
-                              child: Text(
-                                ' x$listSelCant ',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.notoSans(
-                                  fontSize: (ancho > 450) ? 28 : 20,
-                                  fontWeight: FontWeight.w500,
-                                  // backgroundColor: Colors.red[200],
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: colorLineaCocina,
+                    border: Border.all(width: (varMarchando == false) ? 2 : 4, color: marchando),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: <BoxShadow>[BoxShadow(blurRadius: 5, spreadRadius: -5)],
+                  ),
+                  height: alto * 0.06,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 65,
+                        height: double.infinity,
+                        margin: EdgeInsets.only(top: 0),
+                        color: Colors.red[200],
+                        child: Center(
+                          child: Text(
+                            ' x$listSelCant ',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSans(
+                              fontSize: (ancho > 450) ? 28 : 20,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        fit: FlexFit.tight,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            ' $listSelName',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            textAlign: TextAlign.left,
+                            style: GoogleFonts.notoSans(
+                              color: const Color.fromARGB(255, 255, 255, 255),
+                              fontSize: (ancho > 450) ? 26 : 20,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: double.infinity,
+                        color: Colors.red[300],
+                        child: Row(
+                          children: [
+                            // Container(
+                            //   width: (ancho > 450) ? 90 : 70,
+                            //   child: Text(' $hora ',
+                            //       overflow: TextOverflow.ellipsis,
+                            //       maxLines: 1,
+                            //       textAlign: TextAlign.left,
+                            //       style: GoogleFonts.poiretOne(
+                            //         color: Colors.white,
+                            //         fontSize: (ancho > 450) ? 24 : 20,
+                            //         fontWeight: FontWeight.bold,
+                            //       )),
+                            // ),
+                            GestureDetector(
+                              onTap: () {
+                                nav.mesaActual = widget.itemPedidos[widget.index].mesa;
+                                nav.idPedidoSelected = widget.itemPedidos[widget.index].numPedido;
+                                nav.categoriaSelected = SelectionType.pedidosScreen.path;
+                              },
+                              child: Container(
+                                margin: EdgeInsets.only(left: 10),
+                                width: 120,
+                                child: RichText(
+                                  maxLines: 1,
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: 'P$pedidoNum/',
+                                        style: GoogleFonts.notoSans(
+                                          color: Colors.black,
+                                          fontSize: (ancho > 450) ? 24 : 20,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: 'M${int.parse(mesaVar)}',
+                                        style: GoogleFonts.notoSans(
+                                          fontSize: (ancho > 450) ? 24 : 20,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-
-                        Flexible(
-                            fit: FlexFit.tight,
-                            child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Text(
-                                  ' $listSelName',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  textAlign: TextAlign.left,
-                                  style: GoogleFonts.poiretOne(
-                                      color: (envioProd == 'barra') ? Colors.black : Colors.white,
-                                      fontSize: (ancho > 450) ? 26 : 20,
-                                      fontWeight: FontWeight.bold,
-                                      backgroundColor: Colors.transparent),
-                                ))),
-
-                        SizedBox(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Row(
-                              children: [
-                                Text(' $hora ',
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    textAlign: TextAlign.left,
-                                    style: GoogleFonts.poiretOne(
-                                        color: (envioProd == 'barra') ? Colors.black : Colors.white,
-                                        fontSize: (ancho > 450) ? 26 : 20,
-                                        fontWeight: FontWeight.bold,
-                                        backgroundColor: Colors.transparent)),
-                                GestureDetector(
-                                  onTap: () {
-                                    nav.mesaActual = widget.itemPedidos[widget.index].mesa;
-                                    nav.idPedidoSelected = widget.itemPedidos[widget.index].numPedido;
-                                    nav.categoriaSelected = SelectionType.pedidosScreen.path;
-                                  },
-                                  child: Text('P$pedidoNum-M${int.parse(mesaVar)}',
-                                      maxLines: 1,
-                                      textAlign: TextAlign.left,
-                                      style: GoogleFonts.poiretOne(
-                                          color: (colorLineaCocina != Color.fromARGB(255, 0, 0, 0)) ? Color.fromARGB(255, 0, 0, 0) : Color.fromARGB(255, 255, 94, 1),
-                                          fontSize: (ancho > 450) ? 26 : 20,
-                                          fontWeight: FontWeight.bold,
-                                          backgroundColor: Colors.transparent)),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        //),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 )),
           ),

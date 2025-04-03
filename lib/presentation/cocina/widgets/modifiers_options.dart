@@ -26,7 +26,7 @@ class ModifiersOptions extends StatelessWidget {
         return showModifiers
             ? Container(
                 width: ancho,
-                height: 28,
+                height: 30,
                 padding: const EdgeInsets.symmetric(horizontal: 2),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -66,7 +66,11 @@ class ModifiersOptions extends StatelessWidget {
                               opcion.name,
                               maxLines: 1,
                               textAlign: TextAlign.left,
-                              style: GoogleFonts.poiretOne(color: Colors.black, fontSize: (ancho > 450) ? 22 : 16, fontWeight: FontWeight.bold),
+                              style: GoogleFonts.notoSans(
+                                color: Colors.black,
+                                fontSize: (ancho > 450) ? 24 : 20,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ],
                         ),

@@ -4,31 +4,32 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/data/const/estado_pedido.dart';
+import 'package:qribar_cocina/data/datasources/local_data_source/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/datasources/remote_data_source/listeners_data_source_contract.dart';
 import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/modifier.dart';
 import 'package:qribar_cocina/data/models/pedidos.dart';
 import 'package:qribar_cocina/data/models/product.dart';
-import 'package:qribar_cocina/providers/navegacion_model.dart';
+import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
 
 class ListenersDataSource with ChangeNotifier implements ListenersDataSourceContract {
   late ProductsService productService;
-  late NavegacionModel nav;
+  late NavegacionProvider nav;
   late String idBar;
 
   StreamSubscription? _dataStreamProductos;
   StreamSubscription? _dataStreamCategoria;
   StreamSubscription? _dataStreamGestionPedidos;
-  StreamSubscription? _dataStreamPedidosRemovidos;
+  StreamSubscription? _dataStreamRemovedPedidos;
 
   final database = FirebaseDatabase.instance.ref();
 
   void initializeListeners(BuildContext context) {
     productService = Provider.of<ProductsService>(context, listen: false);
-    nav = Provider.of<NavegacionModel>(context, listen: false);
-    idBar = productService.idBar;
+    nav = Provider.of<NavegacionProvider>(context, listen: false);
+    idBar = IdBarDataSource.instance.getIdBar();
 
     addProduct();
     addCategoriaMenu();
@@ -271,7 +272,7 @@ class ListenersDataSource with ChangeNotifier implements ListenersDataSourceCont
     final salasMesa = productService.salasMesa;
 
     for (var sala in salasMesa) {
-      _dataStreamPedidosRemovidos = database.child('gestion_pedidos/$idBar/${sala.mesa}').onChildRemoved.listen((event) {
+      _dataStreamRemovedPedidos = database.child('gestion_pedidos/$idBar/${sala.mesa}').onChildRemoved.listen((event) {
         try {
           String? pedidoId = event.snapshot.key;
           itemPedidos.removeWhere((pedido) => pedido.id == pedidoId);
@@ -288,7 +289,7 @@ class ListenersDataSource with ChangeNotifier implements ListenersDataSourceCont
     _dataStreamProductos?.cancel();
     _dataStreamCategoria?.cancel();
     _dataStreamGestionPedidos?.cancel();
-    _dataStreamPedidosRemovidos?.cancel();
+    _dataStreamRemovedPedidos?.cancel();
     super.dispose();
   }
 }
