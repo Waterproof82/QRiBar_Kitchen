@@ -68,7 +68,7 @@ class ModifiersOptions extends StatelessWidget {
                               textAlign: TextAlign.left,
                               style: GoogleFonts.notoSans(
                                 color: Colors.black,
-                                fontSize: (ancho > 450) ? 24 : 20,
+                                fontSize: (ancho > 450) ? 24 : 18,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
