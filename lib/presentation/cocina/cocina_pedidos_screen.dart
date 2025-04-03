@@ -9,7 +9,7 @@ import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
-import 'package:qribar_cocina/widgets/data_exports.dart';
+import 'package:qribar_cocina/routes/data_exports.dart';
 
 class CocinaPedidosScreen extends StatelessWidget {
   @override
