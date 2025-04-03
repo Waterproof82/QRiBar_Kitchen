@@ -23,13 +23,13 @@ Future<bool> onBackPressed(BuildContext context) async {
         context: context,
         barrierDismissible: false,
         builder: (context) => Container(
-          child: new AlertDialog(
+          child: AlertDialog(
             alignment: Alignment.center,
-            title: new Text(
+            title: Text(
               'Salir de la Carta',
               textAlign: TextAlign.center,
             ),
-            content: new Text(
+            content: Text(
               '¿Quieres cerrar la aplicación?',
               textAlign: TextAlign.center,
             ),
@@ -37,7 +37,7 @@ Future<bool> onBackPressed(BuildContext context) async {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  new MaterialButton(
+                  MaterialButton(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     disabledColor: Colors.grey,
                     elevation: 1,
@@ -50,7 +50,7 @@ Future<bool> onBackPressed(BuildContext context) async {
                       child: Text('Sí', style: TextStyle(color: Color.fromARGB(255, 255, 0, 0), fontSize: 18)),
                     ),
                   ),
-                  new MaterialButton(
+                  MaterialButton(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     disabledColor: Colors.grey,
                     elevation: 1,
