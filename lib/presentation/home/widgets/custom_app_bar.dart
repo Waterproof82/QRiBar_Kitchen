@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:qribar_cocina/data/extensions/build_context_extension.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -8,14 +9,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
     super.key,
     required this.nav,
-    required this.screenWidthSize,
   });
 
   final NavegacionProvider nav;
-  final double screenWidthSize;
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidthSize = context.width;
+
     return AppBar(
       toolbarHeight: 60,
       backgroundColor: Colors.black,

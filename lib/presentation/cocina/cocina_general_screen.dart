@@ -2,33 +2,66 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/barra_superior_tiempo.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart';
+import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
-import 'package:qribar_cocina/providers/products_provider.dart';
-import 'package:qribar_cocina/services/functions.dart';
 import 'package:qribar_cocina/routes/data_exports.dart';
+import 'package:qribar_cocina/services/functions.dart';
 
 class CocinaGeneralScreen extends StatelessWidget {
+  const CocinaGeneralScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
-    final itemPedidos = Provider.of<ProductsService>(context, listen: false).pedidosRealizados;
-    final navegacionModel = Provider.of<NavegacionProvider>(context, listen: false);
+    return BlocBuilder<ListenerBloc, ListenerState>(
+      builder: (context, state) {
+        return state.when(
+          initial: () => _buildScaffold(context, 'Inicializando...', const CircularProgressIndicator()),
+          loading: () => _buildScaffold(context, 'Cargando...', const CircularProgressIndicator()),
+          success: () => _buildScaffold(
+            context,
+            'Inicializado!',
+            _buildContent(Provider.of<NavegacionProvider>(context, listen: true)),
+          ),
+          pedidosUpdated: (pedidos) => _buildScaffold(
+            context,
+            'Pedidos Actualizados!',
+            _buildContent(Provider.of<NavegacionProvider>(context, listen: true), pedidos),
+          ),
+          failure: (message) => _buildScaffold(context, 'Error: $message', null),
+        );
+      },
+    );
+  }
+
+  Widget _buildScaffold(BuildContext context, String text, Widget? child) {
     final ancho = context.width;
 
-    final List<Pedidos> itemPedidosSelected = [];
-
-    if (itemPedidos.isNotEmpty) {
-      itemPedidosSelected.addAll(itemPedidos.where((item) => item.estadoLinea != EstadoPedido.bloqueado.name));
-    }
     return Stack(
       children: [
         BarraSuperiorTiempo(ancho: ancho),
-        ListaProductosPedidos(navegacionModel: navegacionModel, itemPedidos: itemPedidosSelected),
+        child ?? Center(child: Text(text)),
       ],
+    );
+  }
+
+  Widget _buildContent(NavegacionProvider nav, [List<Pedido>? pedidos]) {
+    final List<Pedido> itemPedidosSelected = [];
+
+    if (pedidos != null && pedidos.isNotEmpty) {
+      itemPedidosSelected.addAll(
+        pedidos.where((item) => item.estadoLinea != EstadoPedido.bloqueado.name),
+      );
+    }
+
+    return ListaProductosPedidos(
+      navegacionModel: nav,
+      itemPedidos: itemPedidosSelected,
     );
   }
 }
@@ -41,7 +74,7 @@ class ListaProductosPedidos extends StatelessWidget {
   }) : super(key: key);
 
   final NavegacionProvider navegacionModel;
-  final List<Pedidos> itemPedidos;
+  final List<Pedido> itemPedidos;
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +146,7 @@ class LineaProducto extends StatefulWidget {
     required this.index,
     required this.itemPedidos,
   });
-  final List<Pedidos> itemPedidos;
+  final List<Pedido> itemPedidos;
   final int index;
 
   @override
@@ -171,16 +204,16 @@ class _LineaProductoState extends State<LineaProducto> {
 
     Color marchando = Colors.white38;
     bool varMarchando = false;
-    final itemPedido = widget.itemPedidos[widget.index];
+    Pedido itemPedido = widget.itemPedidos[widget.index];
 
     listSelCant = itemPedido.cantidad;
-    listSelName = obtenerNombreProducto(context, itemPedido.idProducto!, itemPedido.racion!);
+    listSelName = obtenerNombreProducto(context, itemPedido.idProducto, itemPedido.racion!);
 
-    estadoLinea = itemPedido.estadoLinea ?? '';
+    estadoLinea = itemPedido.estadoLinea;
     //hora = (itemPedido.hora.isNotEmpty) ? itemPedido.hora.split(':').sublist(0, 2).join(':') : "--:--";
     pedidoNum = itemPedido.numPedido;
     mesaVar = itemPedido.mesa;
-    varMarchando = itemPedido.enMarcha ?? false;
+    varMarchando = itemPedido.enMarcha;
     marchando = (varMarchando == true) ? Color.fromARGB(255, 7, 255, 19) : Colors.white;
 
     final DatabaseReference _dataStreamGestionPedidos = database.ref('gestion_pedidos/$idBar/$mesaVar/${itemPedido.id}');
@@ -199,11 +232,7 @@ class _LineaProductoState extends State<LineaProducto> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          if (itemPedido.enMarcha == true) {
-            itemPedido.enMarcha = false;
-          } else if (itemPedido.enMarcha == false) {
-            itemPedido.enMarcha = true;
-          }
+          itemPedido = itemPedido.copyWith(enMarcha: !itemPedido.enMarcha);
         });
       },
       child: Column(

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:qribar_cocina/data/models/modifier.dart';
+import 'package:qribar_cocina/data/models/modifier/modifier.dart';
 
 class Product {
   String categoriaProducto;

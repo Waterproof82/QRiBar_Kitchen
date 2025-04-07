@@ -8,17 +8,17 @@ import 'package:provider/provider.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/providers/products_provider.dart';
-import 'package:qribar_cocina/services/functions.dart';
 import 'package:qribar_cocina/routes/data_exports.dart';
+import 'package:qribar_cocina/services/functions.dart';
 
 class CocinaPedidosScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final List<Pedidos> itemPedidos = Provider.of<ProductsService>(context, listen: false).pedidosRealizados;
+    final List<Pedido> itemPedidos = Provider.of<ProductsService>(context, listen: false).pedidosRealizados;
     final NavegacionProvider navegacionModel = Provider.of<NavegacionProvider>(context, listen: false);
 
     final idMesaActual = navegacionModel.mesaActual;
-    final List<Pedidos> itemPedidosSelected = [];
+    final List<Pedido> itemPedidosSelected = [];
 
     List<int> countMenuPedido = [];
     int contadorNumPedido = 0;
@@ -165,7 +165,7 @@ class ListaProductosPedidos extends StatelessWidget {
 
   final NavegacionProvider navegacionModel;
 
-  final List<Pedidos> itemPedidos;
+  final List<Pedido> itemPedidos;
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +236,7 @@ class LineaProducto extends StatelessWidget {
     required this.itemPedidos,
   });
 
-  final List<Pedidos> itemPedidos;
+  final List<Pedido> itemPedidos;
   final int index;
   final double resultPrecio;
   static Color colorLineaSinApuntar = Colors.white;
@@ -264,9 +264,9 @@ class LineaProducto extends StatelessWidget {
     bool rst = false;
 
     listSelCant = itemPedidos[index].cantidad;
-    listSelName = obtenerNombreProducto(context, itemPedidos[index].idProducto!, itemPedidos[index].racion!);
-    envioProd = itemPedidos[index].envio!;
-    estadoLinea = itemPedidos[index].estadoLinea ?? '';
+    listSelName = obtenerNombreProducto(context, itemPedidos[index].idProducto, itemPedidos[index].racion!);
+    envioProd = itemPedidos[index].envio;
+    estadoLinea = itemPedidos[index].estadoLinea;
     hora = (itemPedidos[index].hora.isNotEmpty) ? itemPedidos[index].hora.split(':').sublist(0, 2).join(':') : "--:--";
     pedidoNum = itemPedidos[index].numPedido;
     mesaVar = itemPedidos[index].mesa;
@@ -423,7 +423,7 @@ class LineaProducto extends StatelessWidget {
   }
 }
 
-Future<bool> onDismiss(BuildContext context, List<Pedidos> itemPedidos, int index) async {
+Future<bool> onDismiss(BuildContext context, List<Pedido> itemPedidos, int index) async {
   return await showDialog(
         context: context,
         barrierDismissible: false,
