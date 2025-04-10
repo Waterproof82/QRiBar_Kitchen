@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/data/repositories/data_sources/remote/listener_data_source_impl.dart';
 import 'package:qribar_cocina/data/repositories/data_sources/remote/listener_repository_impl.dart';
 import 'package:qribar_cocina/presentation/login/bloc/login_form_bloc.dart';
 import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
@@ -23,18 +24,15 @@ class AppProviders extends StatelessWidget {
       child: Builder(
         builder: (context) {
           final productsService = context.read<ProductsService>();
-          final nav = context.read<NavegacionProvider>();
           final database = FirebaseDatabase.instance;
 
-          final listenerRepo = ListenerRepositoryImpl(
+          final listenerDataSource = ListenersDataSourceImpl(
             database: database,
             productService: productsService,
-            nav: nav,
           );
+          final listenerRepo = ListenerRepositoryImpl(database: database, dataSource: listenerDataSource);
 
-          // Crear ListenerBloc y configurarlo en el repositorio
           final listenerBloc = ListenerBloc(repository: listenerRepo);
-          listenerRepo.setListenerBloc(listenerBloc);
 
           return MultiBlocProvider(
             providers: [
