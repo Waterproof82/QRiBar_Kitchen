@@ -4,13 +4,11 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:qribar_cocina/data/datasources/local_data_source/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/models/categoria_producto.dart';
-import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/data/models/sala_estado.dart';
 
 class ProductsService extends ChangeNotifier {
   final List<Product> products = [];
-  final List<Pedido> pedidosRealizados = [];
   final List<SalaEstado> salasMesa = [];
   final List<CategoriaProducto> categoriasProdLocal = [];
   final database = FirebaseDatabase.instance;
