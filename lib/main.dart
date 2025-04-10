@@ -19,7 +19,6 @@ void main() async {
     ]),
   ]);
 
-  // Ocultar la barra superior
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom]);
 
   runApp(AppProviders(child: App()));
@@ -40,4 +39,3 @@ class App extends StatelessWidget {
     );
   }
 }
-
