@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/providers/products_provider.dart';
+import 'package:qribar_cocina/data/models/categoria_producto.dart';
+import 'package:qribar_cocina/data/models/product.dart';
+import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/services/audio_manager.dart';
 
 final AudioManager _audioManager = AudioManager();
@@ -73,21 +75,26 @@ Future<bool> onBackPressed(BuildContext context) async {
 }
 
 String obtenerNombreProducto(BuildContext context, String idProducto, bool racion) {
-  final itemElemento = Provider.of<ProductsService>(context, listen: false).products;
+  final itemElemento = Provider.of<NavegacionProvider>(context, listen: false).products;
 
   final producto = itemElemento.firstWhere((item) => item.id == idProducto);
 
-  String nombreProducto = racion ? producto.nombreProducto : '${producto.nombreProducto} (${producto.nombreRacionMedia})';
-
-  return nombreProducto;
+  return racion ? producto.nombreProducto : '${producto.nombreProducto} (${producto.nombreRacionMedia})';
 }
 
-String obtenerCategoriaProducto(ProductsService productsService, String idProducto) {
-  final itemElemento = productsService.products;
+String obtenerCategoriaProducto(List<Product> product, String idProducto) {
+  try {
+    final producto = product.firstWhere((item) => item.id == idProducto,
+        orElse: () => Product(
+              id: '',
+              categoriaProducto: 'Categoría no encontrada',
+              nombreProducto: '',
+            ));
 
-  final producto = itemElemento.firstWhere((item) => item.id == idProducto);
-
-  return producto.categoriaProducto;
+    return producto.categoriaProducto;
+  } catch (e) {
+    return 'Categoría no encontrada';
+  }
 }
 
 class UpperCaseTextFormatter extends TextInputFormatter {
@@ -105,9 +112,9 @@ String capitalize(String value) {
   return "${value[0].toUpperCase()}${value.substring(1).toLowerCase()}";
 }
 
-Future<String?> obtenerEnvioPorProducto(ProductsService productService, String idProd) async {
-  final categoriaMap = {for (var categoria in productService.categoriasProdLocal) categoria.categoria: categoria};
+Future<String?> obtenerEnvioPorProducto(List<CategoriaProducto> categoriasProdLocal, String idProd, List<Product> product) async {
+  final categoriaMap = {for (var categoria in categoriasProdLocal) categoria.categoria: categoria};
 
-  final categoria = categoriaMap[obtenerCategoriaProducto(productService, idProd)];
+  final categoria = categoriaMap[obtenerCategoriaProducto(product, idProd)];
   return categoria?.envio;
 }
