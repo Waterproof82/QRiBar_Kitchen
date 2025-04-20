@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:qribar_cocina/data/models/pedido/pedido.dart';
-import 'package:qribar_cocina/data/repositories/data_sources/remote/listener_repository_impl.dart';
+import 'package:qribar_cocina/data/repositories/listener_repository_impl.dart';
 
 part 'listener_bloc.freezed.dart';
 part 'listener_event.dart';

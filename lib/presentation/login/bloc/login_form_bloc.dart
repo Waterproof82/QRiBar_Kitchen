@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:qribar_cocina/data/datasources/local_data_source/id_bar_data_source.dart';
+import 'package:qribar_cocina/data/data_sources/local/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/extensions/string_extension.dart';
 
 import 'login_form_event.dart';
