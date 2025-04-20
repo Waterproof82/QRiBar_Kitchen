@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
-import 'package:qribar_cocina/data/datasources/local_data_source/id_bar_data_source.dart';
-import 'package:qribar_cocina/data/repositories/data_sources/remote/listener_repository.dart';
-import 'package:qribar_cocina/data/repositories/data_sources/remote/listeners_data_source_contract.dart';
+import 'package:qribar_cocina/data/data_sources/local/id_bar_data_source.dart';
+import 'package:qribar_cocina/data/repositories/listener_repository.dart';
+import 'package:qribar_cocina/data/data_sources/remote/listeners_data_source_contract.dart';
 
 class ListenerRepositoryImpl implements ListenerRepository {
   final FirebaseDatabase database;

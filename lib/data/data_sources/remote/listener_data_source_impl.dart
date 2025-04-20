@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
-import 'package:qribar_cocina/data/datasources/local_data_source/id_bar_data_source.dart';
+import 'package:qribar_cocina/data/data_sources/local/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/enums/estado_pedido.dart';
 import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/complementos/complementos.dart';
@@ -9,7 +9,7 @@ import 'package:qribar_cocina/data/models/modifier/modifier.dart';
 import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/data/models/sala_estado.dart';
-import 'package:qribar_cocina/data/repositories/data_sources/remote/listeners_data_source_contract.dart';
+import 'package:qribar_cocina/data/data_sources/remote/listeners_data_source_contract.dart';
 import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
