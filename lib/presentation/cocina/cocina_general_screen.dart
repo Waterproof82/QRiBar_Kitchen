@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/data/models/modifier/modifier.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/barra_superior_tiempo.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
@@ -25,12 +24,12 @@ class CocinaGeneralScreen extends StatelessWidget {
           pedidosUpdated: (pedidos) => _buildScaffold(
             context,
             'Pedidos Actualizados!',
-            _buildContent(Provider.of<NavegacionProvider>(context, listen: true), pedidos),
+            _buildContent(pedidos),
           ),
           pedidoRemoved: (pedidos) => _buildScaffold(
             context,
             'Pedido Eliminado!',
-            _buildContent(Provider.of<NavegacionProvider>(context, listen: true), pedidos),
+            _buildContent(pedidos),
           ),
           failure: (message) => _buildScaffold(
             context,
@@ -54,7 +53,7 @@ class CocinaGeneralScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(NavegacionProvider nav, [List<Pedido>? pedidos]) {
+  Widget _buildContent([List<Pedido>? pedidos]) {
     final List<Pedido> itemPedidosSelected = [];
 
     if (pedidos != null && pedidos.isNotEmpty) {
@@ -64,7 +63,6 @@ class CocinaGeneralScreen extends StatelessWidget {
     }
 
     return ListaProductosPedidos(
-      navegacionModel: nav,
       itemPedidos: itemPedidosSelected,
     );
   }
@@ -73,15 +71,15 @@ class CocinaGeneralScreen extends StatelessWidget {
 class ListaProductosPedidos extends StatelessWidget {
   ListaProductosPedidos({
     Key? key,
-    required this.navegacionModel,
+
     required this.itemPedidos,
   }) : super(key: key);
 
-  final NavegacionProvider navegacionModel;
   final List<Pedido> itemPedidos;
 
   @override
   Widget build(BuildContext context) {
+    final pageController = Provider.of<NavegacionProvider>(context, listen: false).pageController;
     final ancho = context.width;
     // ignore: unused_local_variable
     bool notaBar = false;
@@ -90,7 +88,7 @@ class ListaProductosPedidos extends StatelessWidget {
       color: Colors.black,
       margin: EdgeInsets.only(top: 60),
       child: ListView.builder(
-        controller: navegacionModel.pageController,
+        controller: pageController,
         physics: BouncingScrollPhysics(),
         itemCount: itemPedidos.length,
         itemBuilder: (_, int index) {
@@ -155,10 +153,6 @@ class ListaProductosPedidos extends StatelessWidget {
   }
 }
 
-extension on List<Modifier>? {
-  compareTo(List<Modifier>? modifiers) {}
-}
-
 class LineaProducto extends StatefulWidget {
   const LineaProducto({
     required this.index,
@@ -198,8 +192,6 @@ class _LineaProductoState extends State<LineaProducto> {
   @override
   Widget build(BuildContext context) {
     final nav = Provider.of<NavegacionProvider>(context, listen: false);
-    final String idBar = IdBarDataSource.instance.getIdBar();
-
     DateTime now = DateTime.now();
 
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
@@ -248,7 +240,6 @@ class _LineaProductoState extends State<LineaProducto> {
       onTap: () {
         context.read<ListenerBloc>().add(
               ListenerEvent.updateEnMarchaPedido(
-                idBar: idBar,
                 mesa: itemPedido.mesa,
                 idPedido: itemPedido.id,
                 enMarcha: !itemPedido.enMarcha,
@@ -274,7 +265,6 @@ class _LineaProductoState extends State<LineaProducto> {
                   if (direction == DismissDirection.endToStart) {
                     context.read<ListenerBloc>().add(
                           ListenerEvent.updateEstadoPedido(
-                            idBar: idBar,
                             mesa: itemPedido.mesa,
                             idPedido: itemPedido.id,
                             nuevoEstado: EstadoPedido.cocinado.name,

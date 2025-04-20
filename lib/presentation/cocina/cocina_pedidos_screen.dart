@@ -296,7 +296,6 @@ class LineaProducto extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nav = Provider.of<NavegacionProvider>(context, listen: false);
-    String idBar = IdBarDataSource.instance.getIdBar();
 
     final ancho = context.width;
     final alto = context.height;
@@ -305,16 +304,9 @@ class LineaProducto extends StatelessWidget {
     // ignore: unused_local_variable
     String? estadoLinea = '';
     bool rst = false;
-    //Color marchando = const Color.fromARGB(255, 0, 0, 0);
-    //bool varMarchando = false;
 
-    //marchando = (itemPedidos[index].enMarcha == true) ? Color.fromARGB(255, 7, 255, 19) : Colors.white;
     listSelCant = itemPedidos[index].cantidad;
-    listSelName = obtenerNombreProducto(
-      context,
-      itemPedidos[index].idProducto,
-      itemPedidos[index].racion!,
-    );
+    listSelName = obtenerNombreProducto(context, itemPedidos[index].idProducto, itemPedidos[index].racion!);
     envioProd = itemPedidos[index].envio;
     estadoLinea = itemPedidos[index].estadoLinea;
     hora = (itemPedidos[index].hora.isNotEmpty) ? itemPedidos[index].hora.split(':').sublist(0, 2).join(':') : "--:--";
@@ -325,7 +317,6 @@ class LineaProducto extends StatelessWidget {
       onTap: () {
         context.read<ListenerBloc>().add(
               ListenerEvent.updateEnMarchaPedido(
-                idBar: idBar,
                 mesa: itemPedidos[index].mesa,
                 idPedido: itemPedidos[index].id,
                 enMarcha: !itemPedidos[index].enMarcha,
@@ -352,7 +343,6 @@ class LineaProducto extends StatelessWidget {
                 if (direction == DismissDirection.endToStart) {
                   context.read<ListenerBloc>().add(
                         ListenerEvent.updateEstadoPedido(
-                          idBar: idBar,
                           mesa: itemPedidos[index].mesa,
                           idPedido: itemPedidos[index].id,
                           nuevoEstado: EstadoPedido.cocinado.name,

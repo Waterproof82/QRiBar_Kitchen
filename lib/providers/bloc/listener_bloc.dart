@@ -17,9 +17,6 @@ class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
     _eventSubscription = repository.dataSource.eventsStream.listen((event) {
       event.mapOrNull(
           startListening: (e) => add(ListenerEvent.startListening()),
-          // productosUpdated: (e) => add(ListenerEvent.productosUpdated(e.productos)),
-          //categoriaAdded: (e) => add(ListenerEvent.categoriaAdded(e.categoria)),
-          //categoriaChanged: (e) => add(ListenerEvent.categoriaChanged(e.categoria)),
           pedidosUpdated: (e) => add(ListenerEvent.pedidosUpdated(e.pedidos)),
           pedidoRemoved: (e) => add(ListenerEvent.pedidoRemoved(e.pedido)),
           errorOccurred: (e) => add(ListenerEvent.errorOccurred(e.toString())));
@@ -35,22 +32,16 @@ class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
           emit(ListenerState.failure(e.toString()));
         }
       } else if (event is _PedidosUpdated) {
-        emit(ListenerState.pedidosUpdated(event.pedidos));
-      }
-
-      //  else if (event is _ProductosUpdated) {
-      //   emit(ListenerState.productosUpdated(event.productos));
-      // } else if (event is _CategoriaAdded) {
-      //   emit(ListenerState.categoriaAdded(event.categoria));
-      // } else if (event is _CategoriaChanged) {
-      //   emit(ListenerState.categoriaChanged(event.categoria));
-      // }
-      else if (event is _PedidoRemoved) {
-        emit(ListenerState.pedidoRemoved(event.pedido));
+        emit(
+          ListenerState.pedidosUpdated(event.pedidos),
+        );
+      } else if (event is _PedidoRemoved) {
+        emit(
+          ListenerState.pedidoRemoved(event.pedido),
+        );
       } else if (event is _UpdateEstadoPedido) {
         try {
           await repository.updateEstadoPedido(
-            idBar: event.idBar,
             mesa: event.mesa,
             idPedido: event.idPedido,
             nuevoEstado: event.nuevoEstado,
@@ -61,7 +52,6 @@ class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
       } else if (event is _UpdateEnMarchaPedido) {
         try {
           await repository.updateEnMarchaPedido(
-            idBar: event.idBar,
             mesa: event.mesa,
             idPedido: event.idPedido,
             enMarcha: event.enMarcha,
