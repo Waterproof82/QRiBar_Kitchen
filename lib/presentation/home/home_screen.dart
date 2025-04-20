@@ -1,38 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/data/datasources/remote_data_source/listeners_data_source.dart';
 import 'package:qribar_cocina/presentation/cocina/cocina_general_screen.dart';
 import 'package:qribar_cocina/presentation/cocina/cocina_pedidos_screen.dart';
 import 'package:qribar_cocina/presentation/home/widgets/custom_app_bar.dart';
-import 'package:qribar_cocina/widgets/menu_lateral.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
-import 'package:qribar_cocina/providers/products_provider.dart';
-import 'package:qribar_cocina/services/functions.dart';
 import 'package:qribar_cocina/routes/data_exports.dart';
+import 'package:qribar_cocina/services/functions.dart';
 import 'package:qribar_cocina/widgets/header_wave.dart';
-import 'package:qribar_cocina/widgets/loading_screen.dart';
+import 'package:qribar_cocina/widgets/menu_lateral.dart';
 
-class HomeScreen extends StatefulWidget {
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  late ProductsService productsService;
-
-  @override
-  void initState() {
-    super.initState();
-    Provider.of<ListenersDataSource>(context, listen: false).initializeListeners(context);
-    productsService = Provider.of<ProductsService>(context, listen: false);
-  }
-
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Provider.of<ListenersDataSource>(context, listen: true);
     final nav = Provider.of<NavegacionProvider>(context, listen: true);
-
-    final double screenWidthSize = context.width;
 
     return PopScope(
       canPop: false,
@@ -43,8 +23,8 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Scaffold(
         drawer: MenuLateral(nav: nav),
-        appBar: CustomAppBar(nav: nav, screenWidthSize: screenWidthSize),
-        body: productsService.isLoading ? LoadingScreen() : _buildContent(nav),
+        appBar: CustomAppBar(nav: nav),
+        body: _buildContent(nav),
       ),
     );
   }

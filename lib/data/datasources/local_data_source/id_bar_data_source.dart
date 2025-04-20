@@ -10,12 +10,10 @@ class IdBarDataSource {
 
   late String idBar;
 
-  // Getter to access idBar
   String getIdBar() {
     return idBar;
   }
 
-  // Setter to update idBar
   void setIdBar(String newIdBar) {
     idBar = newIdBar;
   }

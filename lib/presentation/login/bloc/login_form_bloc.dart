@@ -1,15 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:qribar_cocina/data/datasources/local_data_source/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/extensions/string_extension.dart';
-import 'package:qribar_cocina/providers/products_provider.dart';
 
 import 'login_form_event.dart';
 import 'login_form_state.dart';
 
 class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
-  final ProductsService productsService;
-
-  LoginFormBloc({required this.productsService}) : super(const LoginFormState()) {
+  LoginFormBloc() : super(const LoginFormState()) {
     on<EmailChanged>((event, emit) {
       emit(state.copyWith(email: event.email));
     });
@@ -34,7 +32,7 @@ class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
       );
 
       final userName = state.email.split('@').first.toTitleCase();
-      await productsService.loadMesas(userName);
+      IdBarDataSource.instance.setIdBar(userName);
 
       emit(state.copyWith(isLoading: false, loginSuccess: true));
     } on FirebaseAuthException {

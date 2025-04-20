@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:qribar_cocina/data/models/modifier.dart';
+import 'package:qribar_cocina/data/models/modifier/modifier.dart';
 import 'package:qribar_cocina/services/functions.dart';
 
 class ModifiersOptions extends StatelessWidget {
