@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/data/extensions/datetime_extension.dart';
+import 'package:qribar_cocina/data/extensions/date_time_extension.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/barra_superior_tiempo.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
