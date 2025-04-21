@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:qribar_cocina/data/data_sources/local/id_bar_data_source.dart';
+import 'package:qribar_cocina/data/data_sources/remote/listeners_data_source_contract.dart';
 import 'package:qribar_cocina/data/enums/estado_pedido.dart';
 import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/complementos/complementos.dart';
@@ -9,7 +10,6 @@ import 'package:qribar_cocina/data/models/modifier/modifier.dart';
 import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/data/models/sala_estado.dart';
-import 'package:qribar_cocina/data/data_sources/remote/listeners_data_source_contract.dart';
 import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
@@ -32,8 +32,9 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
   // 🔸 Subscripciones Firebase
   StreamSubscription? _dataStreamProductos;
   StreamSubscription? _dataStreamCategoria;
-  StreamSubscription? _dataStreamGestionPedidos;
-  StreamSubscription? _dataStreamRemovedPedidos;
+
+  final Map<String, StreamSubscription> _dataStreamGestionPedidosMap = {};
+  final Map<String, StreamSubscription> _dataStreamRemovedPedidosMap = {};
 
   // 🔸 Estado interno (cache local)
   final List<CategoriaProducto> categoriasProdLocal = [];
@@ -45,102 +46,84 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
 
   @override
   Future<void> addProduct() async {
-    List<Complemento> listaComplements = [];
-    List<String> alergias = [];
-    List<Modifier> modifiers = [];
-
     try {
       _dataStreamProductos = database.ref('productos/$idBar/').onChildAdded.listen(
         (event) {
-          final DataSnapshot snapshot = event.snapshot;
-          final dynamic value = snapshot.value;
+          final snapshot = event.snapshot;
+          final value = snapshot.value;
 
-          if (value == null || value is! Map<dynamic, dynamic>) {
-            print('Unexpected data format or null value: ${snapshot.value}');
+          if (value is! Map<dynamic, dynamic>) {
+            _eventController.add(ListenerEvent.errorOccurred('Formato de datos inesperado o valor nulo: $value'));
             return;
           }
 
-          final Map<String, dynamic> data = Map<String, dynamic>.from(value);
-          final String key = event.snapshot.key ?? '';
+          final data = Map<String, dynamic>.from(value);
+          final String key = snapshot.key ?? '';
 
-          if (data["complementos"] != null && data["complementos"] is Map) {
-            data["complementos"].forEach((k, v) {
-              if (v is Map) {
-                listaComplements.add(
-                  Complemento(
-                    activo: v["activo"] is bool ? v["activo"] as bool : true,
-                    incremento: v['incremento'] is bool ? v['incremento'] as bool : false,
-                    id: k,
-                  ),
+          // Extraer complementos
+          final List<Complemento> listaComplements = (data["complementos"] as Map<dynamic, dynamic>?)?.entries.where((e) => e.value is Map).map((e) {
+                final complemento = Map<String, dynamic>.from(e.value);
+                return Complemento(
+                  activo: complemento["activo"] is bool ? complemento["activo"] : true,
+                  incremento: complemento["incremento"] is bool ? complemento["incremento"] : false,
+                  id: e.key,
                 );
-              }
-            });
+              }).toList() ??
+              [];
+
+          // Extraer alérgenos
+          final List<String> alergias = (data["alergogenos"] as Map<dynamic, dynamic>?)?.keys.whereType<String>().toList() ?? [];
+
+          // Extraer modificadores
+          final List<Modifier> modifiers = (data["modifiers"] as Map<dynamic, dynamic>?)
+                  ?.entries
+                  .map((e) => Modifier(
+                        name: e.key,
+                        increment: (e.value is num) ? (e.value as num).toDouble() : 0.0,
+                        mainProduct: key,
+                      ))
+                  .toList() ??
+              [];
+
+          // Construir producto
+          final producto = Product(
+            id: key,
+            alergogenos: alergias,
+            categoriaProducto: data["categoria_producto"] ?? '',
+            costeProducto: (data["coste_producto"] as num?)?.toDouble() ?? 0.0,
+            disponible: data["disponible"] == true,
+            descripcionProducto: data["descripcion_producto"] ?? '',
+            descripcionProductoEn: data["descripcion_producto_en"] ?? '',
+            descripcionProductoDe: data["descripcion_producto_de"] ?? '',
+            fotoUrl: data["foto_url"] ?? '',
+            fotoUrlVideo: data["foto_url_video"] ?? '',
+            nombreProductoOriginal: data["nombre_producto"] ?? '',
+            nombreProducto: data["nombre_producto"] ?? '',
+            nombreProductoEn: data["nombre_producto_en"],
+            nombreProductoDe: data["nombre_producto_de"],
+            nombreRacion: data["nombre_racion"] ?? 'Ración',
+            nombreRacionMedia: data["nombre_racion_media"] ?? 'Media Ración',
+            nombreRacionEn: data["nombre_racion_en"] ?? '',
+            nombreRacionMediaEn: data["nombre_racion_media_en"] ?? '',
+            nombreRacionDe: data["nombre_racion_de"] ?? '',
+            nombreRacionMediaDe: data["nombre_racion_media_de"] ?? '',
+            precioProducto: (data["precio_producto"] as num?)?.toDouble() ?? 0.0,
+            precioProducto2: (data["precio_producto2"] as num?)?.toDouble() ?? 0.0,
+            complementos: listaComplements,
+            modifiers: modifiers,
+          );
+
+          // Evitar duplicados
+          if (!product.any((p) => p.id == producto.id)) {
+            product.add(producto);
+            navProvider.products.add(producto);
           }
-
-          if (data["alergogenos"] != null && data["alergogenos"] is Map) {
-            data["alergogenos"].forEach((k, v) {
-              if (k is String) {
-                alergias.add(k);
-              }
-            });
-          }
-
-          if (data['modifiers'] != null) {
-            data['modifiers'].forEach((k, v) {
-              modifiers.add(Modifier(
-                name: k,
-                increment: v.toDouble(),
-                mainProduct: key,
-              ));
-            });
-          }
-
-          final bool disponibleSnap = data['disponible'] is bool ? data['disponible'] as bool : false;
-          double coste = (data["coste_producto"] is num) ? (data["coste_producto"] as num).toDouble() : 0.0;
-          double precio2 = (data["precio_producto2"] is num) ? (data["precio_producto2"] as num).toDouble() : 0.0;
-
-          List<Product> listaProductos = [
-            Product(
-              alergogenos: alergias,
-              categoriaProducto: data["categoria_producto"] as String? ?? '',
-              costeProducto: coste,
-              disponible: disponibleSnap,
-              descripcionProducto: data["descripcion_producto"] as String? ?? '',
-              descripcionProductoEn: data["descripcion_producto_en"] as String? ?? '',
-              descripcionProductoDe: data["descripcion_producto_de"] as String? ?? '',
-              fotoUrl: data["foto_url"] as String? ?? '',
-              fotoUrlVideo: data["foto_url_video"] as String? ?? '',
-              nombreProductoOriginal: data["nombre_producto"] as String? ?? '',
-              nombreProducto: data["nombre_producto"] as String? ?? '',
-              nombreProductoEn: data["nombre_producto_en"] ?? null,
-              nombreProductoDe: data["nombre_producto_de"] ?? null,
-              nombreRacion: data["nombre_racion"] as String? ?? 'Ración',
-              nombreRacionMedia: data["nombre_racion_media"] as String? ?? 'Media Ración',
-              nombreRacionEn: data["nombre_racion_en"] as String? ?? '',
-              nombreRacionMediaEn: data["nombre_racion_media_en"] as String? ?? '',
-              nombreRacionDe: data["nombre_racion_de"] as String? ?? '',
-              nombreRacionMediaDe: data["nombre_racion_media_de"] as String? ?? '',
-              precioProducto: (data["precio_producto"] is num) ? (data["precio_producto"] as num).toDouble() : 0.0,
-              precioProducto2: precio2,
-              complementos: listaComplements,
-              modifiers: modifiers,
-              id: key,
-            )
-          ];
-
-          final index = product.indexWhere((element) => element.nombreProducto == data["nombre_producto"]);
-          if (index == -1) product.add(listaProductos[0]);
-
-          navProvider.products.add(listaProductos[0]);
-          listaComplements = [];
-          alergias = [];
-          modifiers = [];
         },
         onError: (error) {
-          print('Error occurred: $error');
+          _eventController.add(ListenerEvent.errorOccurred(error.toString()));
         },
       );
-    } on Exception catch (e) {
+    } catch (e) {
       _eventController.add(ListenerEvent.errorOccurred(e.toString()));
     }
   }
@@ -223,15 +206,29 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
   @override
   Future<void> addAndChangedPedidos() async {
     for (var salas in salasMesa) {
-      final path = 'gestion_pedidos/$idBar/${salas.mesa}';
+      final String? mesaId = salas.mesa;
+      if (mesaId == null) continue;
 
-      _dataStreamGestionPedidos = database.ref(path).onChildAdded.listen((event) {
+      // Verificar si ya existe una suscripción para esta mesa
+      if (_dataStreamGestionPedidosMap.containsKey(mesaId)) {
+        continue;
+      }
+
+      final path = 'gestion_pedidos/$idBar/$mesaId';
+
+      // Crear y almacenar la suscripción para onChildAdded
+      final addedSubscription = database.ref(path).onChildAdded.listen((event) {
         _processPedido(event.snapshot);
       });
 
-      _dataStreamGestionPedidos = database.ref(path).onChildChanged.listen((event) {
+      // Crear y almacenar la suscripción para onChildChanged
+      final changedSubscription = database.ref(path).onChildChanged.listen((event) {
         _processPedido(event.snapshot, isUpdate: true);
       });
+
+      // Almacenar ambas suscripciones en el mapa
+      _dataStreamGestionPedidosMap['$mesaId-added'] = addedSubscription;
+      _dataStreamGestionPedidosMap['$mesaId-changed'] = changedSubscription;
     }
   }
 
@@ -306,7 +303,15 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
   @override
   Future<void> removePedidos() async {
     for (var sala in salasMesa) {
-      _dataStreamRemovedPedidos = database.ref('gestion_pedidos/$idBar/${sala.mesa}').onChildRemoved.listen((event) {
+      final String? mesaId = sala.mesa;
+      if (mesaId == null) continue;
+
+      // Verificar si ya existe una suscripción para esta mesa
+      if (_dataStreamRemovedPedidosMap.containsKey(mesaId)) {
+        continue;
+      }
+
+      final subscription = database.ref('gestion_pedidos/$idBar/$mesaId').onChildRemoved.listen((event) {
         try {
           String? pedidoId = event.snapshot.key;
           if (pedidoId == null) return;
@@ -317,6 +322,9 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
           _eventController.add(ListenerEvent.errorOccurred(e.toString()));
         }
       });
+
+      // Almacenar la suscripción en el mapa
+      _dataStreamRemovedPedidosMap[mesaId] = subscription;
     }
   }
 
@@ -324,8 +332,19 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
   void dispose() {
     _dataStreamProductos?.cancel();
     _dataStreamCategoria?.cancel();
-    _dataStreamGestionPedidos?.cancel();
-    _dataStreamRemovedPedidos?.cancel();
+
+    // Cancelar todas las suscripciones almacenadas en el mapa por Mesa
+    //Pedidos Realizados
+    for (final subscription in _dataStreamGestionPedidosMap.values) {
+      subscription.cancel();
+    }
+
+    for (final subscription in _dataStreamRemovedPedidosMap.values) {
+      subscription.cancel();
+    }
+    //
+    _dataStreamGestionPedidosMap.clear();
+    _dataStreamRemovedPedidosMap.clear();
     _eventController.close();
   }
 }

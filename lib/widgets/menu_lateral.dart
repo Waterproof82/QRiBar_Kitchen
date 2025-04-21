@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qribar_cocina/data/const/app_sizes.dart';
 import 'package:qribar_cocina/data/enums/assets_type.dart';
+import 'package:qribar_cocina/data/enums/menu_type.dart';
 import 'package:qribar_cocina/data/enums/selection_type.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
@@ -49,12 +50,13 @@ class MenuLateral extends StatelessWidget {
                 color: Color.fromARGB(255, 212, 176, 0),
               ),
               title: Text(
-                'Cocina Vista General',
+                MenuType.vistaGeneral.path,
                 style: TextStyle(fontSize: 20, color: Colors.white),
               ),
               onTap: () {
                 Navigator.pop(context);
-                nav.categoriaSelected = 'Cocina Estado Pedidos';
+                nav.categoriaSelected = SelectionType.generalScreen.path;
+                ;
               }),
           Gap.h10,
           ListTile(
@@ -64,7 +66,7 @@ class MenuLateral extends StatelessWidget {
                 color: Colors.deepOrange,
               ),
               title: Text(
-                'Cocina Vista Mesas',
+                MenuType.vistaMesas.path,
                 style: TextStyle(fontSize: 20, color: Colors.white),
               ),
               onTap: () {
@@ -84,7 +86,7 @@ class MenuLateral extends StatelessWidget {
               size: 40,
             ),
             title: Text(
-              'Salir de la aplicación',
+              MenuType.salirApp.path,
               style: TextStyle(fontSize: 20, color: Colors.red),
             ),
             onTap: () {

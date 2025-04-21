@@ -27,15 +27,17 @@ void main() async {
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primaryColor: Colors.green[700],
-        scaffoldBackgroundColor: Colors.blueGrey,
+    return SafeArea(
+      child: MaterialApp(
+        theme: ThemeData(
+          primaryColor: Colors.green[700],
+          scaffoldBackgroundColor: Colors.blueGrey,
+        ),
+        debugShowCheckedModeBanner: false,
+        title: 'QRiBar Cocina',
+        initialRoute: AppRoutes.splash,
+        routes: AppRoutes.routes,
       ),
-      debugShowCheckedModeBanner: false,
-      title: 'QRiBar Cocina',
-      initialRoute: AppRoutes.splash,
-      routes: AppRoutes.routes,
     );
   }
 }
