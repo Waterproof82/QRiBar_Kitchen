@@ -231,7 +231,7 @@ class ListaProductosPedidos extends StatelessWidget {
           });
 
           if (itemPedidos[index].nota != null) notaBar = true;
-          return (itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != EstadoPedido.cocinado.name)
+          return (itemPedidos[index].estadoLinea != EstadoPedido.cocinado.name)
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
                   child: Column(

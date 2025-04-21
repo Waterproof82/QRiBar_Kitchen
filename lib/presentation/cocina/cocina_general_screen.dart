@@ -4,8 +4,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/data/extensions/datetime_extension.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/barra_superior_tiempo.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
@@ -23,18 +23,15 @@ class CocinaGeneralScreen extends StatelessWidget {
         return state.maybeWhen(
           pedidosUpdated: (pedidos) => _buildScaffold(
             context,
-            'Pedidos Actualizados!',
             _buildContent(pedidos),
           ),
           pedidoRemoved: (pedidos) => _buildScaffold(
             context,
-            'Pedido Eliminado!',
             _buildContent(pedidos),
           ),
           failure: (message) => _buildScaffold(
             context,
-            'Error: $message',
-            null,
+            Center(child: Text('Error: $message')),
           ),
           orElse: () => const SizedBox.shrink(),
         );
@@ -42,44 +39,39 @@ class CocinaGeneralScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildScaffold(BuildContext context, String text, Widget? child) {
+  Widget _buildScaffold(BuildContext context, Widget child) {
     final ancho = context.width;
 
     return Stack(
       children: [
         BarraSuperiorTiempo(ancho: ancho),
-        child ?? Center(child: Text(text)),
+        child,
       ],
     );
   }
 
-  Widget _buildContent([List<Pedido>? pedidos]) {
-    final List<Pedido> itemPedidosSelected = [];
+  Widget _buildContent(List<Pedido> pedidos) {
+    final pedidosFiltrados = pedidos
+        .where(
+          (item) => item.estadoLinea != EstadoPedido.bloqueado.name,
+        )
+        .toList();
 
-    if (pedidos != null && pedidos.isNotEmpty) {
-      itemPedidosSelected.addAll(
-        pedidos.where((item) => item.estadoLinea != EstadoPedido.bloqueado.name),
-      );
-    }
-
-    return ListaProductosPedidos(
-      itemPedidos: itemPedidosSelected,
-    );
+    return ListaProductosPedidos(itemPedidos: pedidosFiltrados);
   }
 }
 
 class ListaProductosPedidos extends StatelessWidget {
-  ListaProductosPedidos({
-    Key? key,
-
-    required this.itemPedidos,
-  }) : super(key: key);
+  ListaProductosPedidos({Key? key, required this.itemPedidos}) : super(key: key);
 
   final List<Pedido> itemPedidos;
 
   @override
   Widget build(BuildContext context) {
-    final pageController = Provider.of<NavegacionProvider>(context, listen: false).pageController;
+    final pageController = Provider.of<NavegacionProvider>(
+      context,
+      listen: false,
+    ).pageController;
     final ancho = context.width;
     // ignore: unused_local_variable
     bool notaBar = false;
@@ -104,7 +96,7 @@ class ListaProductosPedidos extends StatelessWidget {
           });
 
           if (itemPedidos[index].nota != null) notaBar = true;
-          return (itemPedidos[index].envio == 'cocina' && itemPedidos[index].estadoLinea != EstadoPedido.cocinado.name)
+          return (itemPedidos[index].estadoLinea != EstadoPedido.cocinado.name)
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
                   child: Column(
@@ -192,40 +184,30 @@ class _LineaProductoState extends State<LineaProducto> {
   @override
   Widget build(BuildContext context) {
     final nav = Provider.of<NavegacionProvider>(context, listen: false);
-    DateTime now = DateTime.now();
-
-    final DateFormat formatter = DateFormat('yyyy-MM-dd');
-    final String formatted = formatter.format(now);
-
     final ancho = context.width;
     final alto = context.height;
 
     final int listSelCant;
     final String listSelName;
+
     String? estadoLinea = '';
     bool rst = false;
     Color colorLineaCocina = Colors.grey;
-    // ignore: unused_local_variable
-    String categoriaProd = '';
-
-    //String hora = '';
     int pedidoNum = 0;
     String mesaVar = '';
-
     Color marchando = Colors.white38;
-    // bool varMarchando = false;
     Pedido itemPedido = widget.itemPedidos[widget.index];
 
     listSelCant = itemPedido.cantidad;
     listSelName = obtenerNombreProducto(context, itemPedido.idProducto, itemPedido.racion!);
 
     estadoLinea = itemPedido.estadoLinea;
-    //hora = (itemPedido.hora.isNotEmpty) ? itemPedido.hora.split(':').sublist(0, 2).join(':') : "--:--";
     pedidoNum = itemPedido.numPedido;
     mesaVar = itemPedido.mesa;
     marchando = (itemPedido.enMarcha == true) ? Color.fromARGB(255, 7, 255, 19) : Colors.white;
 
-    DateTime rstHora = DateTime.parse('$formatted ${itemPedido.hora}');
+    DateTime rstHora = DateTimeExtension.combineNowWithTime(itemPedido.hora);
+
     Duration diff = now.difference(rstHora);
     if (diff.inMinutes > 9 && diff.inMinutes < 21)
       colorLineaCocina = Colors.amber;

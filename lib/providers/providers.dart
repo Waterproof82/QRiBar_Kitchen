@@ -8,6 +8,7 @@ import 'package:qribar_cocina/presentation/login/bloc/login_form_bloc.dart';
 import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 
+/// A [StatelessWidget] which wraps the [App] with the necessary providers.
 class AppProviders extends StatelessWidget {
   final Widget child;
 
