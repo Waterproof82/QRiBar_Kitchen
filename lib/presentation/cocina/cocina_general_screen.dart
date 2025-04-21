@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/data/extensions/datetime_extension.dart';
+import 'package:qribar_cocina/data/extensions/date_time_extension.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/barra_superior_tiempo.dart';
 import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
@@ -18,34 +18,21 @@ class CocinaGeneralScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ListenerBloc, ListenerState>(
-      builder: (context, state) {
-        return state.maybeWhen(
-          pedidosUpdated: (pedidos) => _buildScaffold(
-            context,
-            _buildContent(pedidos),
-          ),
-          pedidoRemoved: (pedidos) => _buildScaffold(
-            context,
-            _buildContent(pedidos),
-          ),
-          failure: (message) => _buildScaffold(
-            context,
-            Center(child: Text('Error: $message')),
-          ),
-          orElse: () => const SizedBox.shrink(),
-        );
-      },
-    );
-  }
-
-  Widget _buildScaffold(BuildContext context, Widget child) {
     final ancho = context.width;
 
     return Stack(
       children: [
         BarraSuperiorTiempo(ancho: ancho),
-        child,
+        BlocBuilder<ListenerBloc, ListenerState>(
+          builder: (context, state) {
+            return state.maybeWhen(
+              pedidosUpdated: (pedidos) => _buildContent(pedidos),
+              pedidoRemoved: (pedidos) => _buildContent(pedidos),
+              failure: (message) => Center(child: Text('Error: $message')),
+              orElse: () => const SizedBox.shrink(),
+            );
+          },
+        ),
       ],
     );
   }

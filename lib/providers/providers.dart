@@ -23,31 +23,38 @@ class AppProviders extends StatelessWidget {
       child: Builder(
         builder: (context) {
           final database = FirebaseDatabase.instance;
-          final navProvider = context.read<NavegacionProvider>();
 
-          return MultiBlocProvider(
+          return MultiRepositoryProvider(
             providers: [
-              BlocProvider(create: (_) => LoginFormBloc()),
-              BlocProvider(
+              RepositoryProvider(
                 create: (_) {
+                  final navProvider = context.read<NavegacionProvider>();
                   final listenerDataSource = ListenersDataSourceImpl(
                     database: database,
                     navProvider: navProvider,
                   );
-
-                  final listenerRepo = ListenerRepositoryImpl(
+                  return ListenerRepositoryImpl(
                     database: database,
                     dataSource: listenerDataSource,
                   );
-
-                  return ListenerBloc(repository: listenerRepo)
-                    ..add(
-                      const ListenerEvent.startListening(),
-                    );
                 },
               ),
             ],
-            child: child,
+            child: MultiBlocProvider(
+              providers: [
+                BlocProvider(create: (_) => LoginFormBloc()),
+                BlocProvider(
+                  create: (context) {
+                    final listenerRepo = context.read<ListenerRepositoryImpl>();
+                    return ListenerBloc(repository: listenerRepo)
+                      ..add(
+                        const ListenerEvent.startListening(),
+                      );
+                  },
+                ),
+              ],
+              child: child,
+            ),
           );
         },
       ),
