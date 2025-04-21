@@ -18,34 +18,21 @@ class CocinaGeneralScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ListenerBloc, ListenerState>(
-      builder: (context, state) {
-        return state.maybeWhen(
-          pedidosUpdated: (pedidos) => _buildScaffold(
-            context,
-            _buildContent(pedidos),
-          ),
-          pedidoRemoved: (pedidos) => _buildScaffold(
-            context,
-            _buildContent(pedidos),
-          ),
-          failure: (message) => _buildScaffold(
-            context,
-            Center(child: Text('Error: $message')),
-          ),
-          orElse: () => const SizedBox.shrink(),
-        );
-      },
-    );
-  }
-
-  Widget _buildScaffold(BuildContext context, Widget child) {
     final ancho = context.width;
 
     return Stack(
       children: [
         BarraSuperiorTiempo(ancho: ancho),
-        child,
+        BlocBuilder<ListenerBloc, ListenerState>(
+          builder: (context, state) {
+            return state.maybeWhen(
+              pedidosUpdated: (pedidos) => _buildContent(pedidos),
+              pedidoRemoved: (pedidos) => _buildContent(pedidos),
+              failure: (message) => Center(child: Text('Error: $message')),
+              orElse: () => const SizedBox.shrink(),
+            );
+          },
+        ),
       ],
     );
   }
