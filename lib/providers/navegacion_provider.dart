@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:qribar_cocina/data/enums/selection_type.dart';
 import 'package:qribar_cocina/data/models/product.dart';
 
 class NavegacionProvider extends ChangeNotifier {
   final List<Product> products = [];
   final PageController _pageController = PageController();
 
-  String _categoriaSelected = "Cocina Estado Pedidos";
+  String _categoriaSelected = SelectionType.generalScreen.path;
   int _idPedidoSelected = 1;
   String _mesaActual = '0';
 
