@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:qribar_cocina/data/data_sources/local/id_bar_data_source.dart';
@@ -46,6 +47,10 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
 
   @override
   Future<void> addProduct() async {
+    // 🔸Cancelar suscripciones previas de forma asincrona
+    _dataStreamProductos?.cancel();
+    _dataStreamProductos = null;
+
     try {
       _dataStreamProductos = database.ref('productos/$idBar/').onChildAdded.listen(
         (event) {
@@ -205,30 +210,48 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
 
   @override
   Future<void> addAndChangedPedidos() async {
-    for (var salas in salasMesa) {
-      final String? mesaId = salas.mesa;
-      if (mesaId == null) continue;
-
-      // Verificar si ya existe una suscripción para esta mesa
-      if (_dataStreamGestionPedidosMap.containsKey(mesaId)) {
-        continue;
+    try {
+      // 🔸 Cancelar suscripciones previas si existen
+      for (var sub in _dataStreamGestionPedidosMap.values) {
+        try {
+          await sub.cancel();
+        } catch (e, stackTrace) {
+          log('Error al cancelar suscripción previa', error: e, stackTrace: stackTrace);
+        }
       }
+      _dataStreamGestionPedidosMap.clear();
 
-      final path = 'gestion_pedidos/$idBar/$mesaId';
+      for (var salas in salasMesa) {
+        final String? mesaId = salas.mesa;
+        if (mesaId == null) continue;
 
-      // Crear y almacenar la suscripción para onChildAdded
-      final addedSubscription = database.ref(path).onChildAdded.listen((event) {
-        _processPedido(event.snapshot);
-      });
+        // Verificar si ya existe una suscripción para esta mesa
+        if (_dataStreamGestionPedidosMap.containsKey('$mesaId-added') || _dataStreamGestionPedidosMap.containsKey('$mesaId-changed')) {
+          continue;
+        }
 
-      // Crear y almacenar la suscripción para onChildChanged
-      final changedSubscription = database.ref(path).onChildChanged.listen((event) {
-        _processPedido(event.snapshot, isUpdate: true);
-      });
+        final path = 'gestion_pedidos/$idBar/$mesaId';
 
-      // Almacenar ambas suscripciones en el mapa
-      _dataStreamGestionPedidosMap['$mesaId-added'] = addedSubscription;
-      _dataStreamGestionPedidosMap['$mesaId-changed'] = changedSubscription;
+        try {
+          // Crear y almacenar la suscripción para onChildAdded
+          final addedSubscription = database.ref(path).onChildAdded.listen((event) {
+            _processPedido(event.snapshot);
+          });
+
+          // Crear y almacenar la suscripción para onChildChanged
+          final changedSubscription = database.ref(path).onChildChanged.listen((event) {
+            _processPedido(event.snapshot, isUpdate: true);
+          });
+
+          // Almacenar ambas suscripciones en el mapa
+          _dataStreamGestionPedidosMap['$mesaId-added'] = addedSubscription;
+          _dataStreamGestionPedidosMap['$mesaId-changed'] = changedSubscription;
+        } catch (e, stackTrace) {
+          log('Error al crear listeners para $mesaId', error: e, stackTrace: stackTrace);
+        }
+      }
+    } catch (e, stackTrace) {
+      log('Error general en addAndChangedPedidos()', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -331,20 +354,23 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
   @override
   void dispose() {
     _dataStreamProductos?.cancel();
-    _dataStreamCategoria?.cancel();
+    _dataStreamProductos = null;
 
+    _dataStreamCategoria?.cancel();
+    _dataStreamCategoria = null;
     // Cancelar todas las suscripciones almacenadas en el mapa por Mesa
     //Pedidos Realizados
     for (final subscription in _dataStreamGestionPedidosMap.values) {
       subscription.cancel();
     }
+    _dataStreamGestionPedidosMap.clear();
 
     for (final subscription in _dataStreamRemovedPedidosMap.values) {
       subscription.cancel();
     }
-    //
-    _dataStreamGestionPedidosMap.clear();
     _dataStreamRemovedPedidosMap.clear();
+    //
+
     _eventController.close();
   }
 }
