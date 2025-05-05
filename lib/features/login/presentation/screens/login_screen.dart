@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:qribar_cocina/data/const/app_sizes.dart';
-import 'package:qribar_cocina/presentation/login/ui/auth_background.dart';
-import 'package:qribar_cocina/presentation/login/ui/login_container.dart';
-import 'package:qribar_cocina/presentation/login/widget/login_form.dart';
+import 'package:qribar_cocina/features/login/presentation/ui/auth_background.dart';
+import 'package:qribar_cocina/features/login/presentation/ui/login_container.dart';
+import 'package:qribar_cocina/features/login/presentation/widgets/login_form.dart';
 
 class LoginScreen extends StatelessWidget {
   @override

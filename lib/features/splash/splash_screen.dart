@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:qribar_cocina/data/enums/assets_type.dart';
-import 'package:qribar_cocina/presentation/login/login_screen.dart';
+import 'package:qribar_cocina/features/login/presentation/screens/login_screen.dart';
 
 class Splash extends StatefulWidget {
   @override

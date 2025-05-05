@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/presentation/cocina/cocina_general_screen.dart';
-import 'package:qribar_cocina/presentation/cocina/cocina_pedidos_screen.dart';
-import 'package:qribar_cocina/presentation/home/widgets/custom_app_bar.dart';
+import 'package:qribar_cocina/features/cocina/cocina_general_screen.dart';
+import 'package:qribar_cocina/features/cocina/cocina_pedidos_screen.dart';
+import 'package:qribar_cocina/features/home/widgets/custom_app_bar.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/routes/data_exports.dart';
 import 'package:qribar_cocina/services/functions.dart';

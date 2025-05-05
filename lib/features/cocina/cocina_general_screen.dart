@@ -6,8 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/data/extensions/date_time_extension.dart';
-import 'package:qribar_cocina/presentation/cocina/widgets/barra_superior_tiempo.dart';
-import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart';
+import 'package:qribar_cocina/data/extensions/repository_error_extension.dart';
+import 'package:qribar_cocina/features/cocina/widgets/barra_superior_tiempo.dart';
+import 'package:qribar_cocina/features/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/routes/data_exports.dart';
@@ -28,7 +29,9 @@ class CocinaGeneralScreen extends StatelessWidget {
             return state.maybeWhen(
               pedidosUpdated: (pedidos) => _buildContent(pedidos),
               pedidoRemoved: (pedidos) => _buildContent(pedidos),
-              failure: (message) => Center(child: Text('Error: $message')),
+              failure: (error) => Center(
+                child: Text('Error: ${error.translateError(context)}'),
+              ),
               orElse: () => const SizedBox.shrink(),
             );
           },
