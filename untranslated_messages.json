@@ -1,0 +1,26 @@
+{
+  "ca": [
+    "userNotFound",
+    "wrongPassword",
+    "searchByAutonomousCommunity",
+    "searchByProvince",
+    "searchByMunicipality",
+    "select",
+    "semanticMinMap",
+    "semanticMap"
+  ],
+
+  "eu": [
+    "userNotFound",
+    "wrongPassword",
+    "semanticMinMap",
+    "semanticMap"
+  ],
+
+  "gl": [
+    "userNotFound",
+    "wrongPassword",
+    "semanticMinMap",
+    "semanticMap"
+  ]
+}

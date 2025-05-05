@@ -1,0 +1,650 @@
+{
+    "@@locale": "ca",
+    "appName": "Protecció Civil",
+    "skip": "Saltar",
+    "@skip": {
+      "description": "Saltar el pas actual"
+    },
+    "next": "Següent",
+    "@next": {
+      "description": "Anar al pas següent"
+    },
+    "start": "Començar",
+    "@start": {
+      "description": "Començar"
+    },
+    "welcomeToCivilProtection": "Et donem la benvinguda a l’app de Protecció Civil!",
+    "@welcomeToCivilProtection": {
+      "description": "Et donem la benvinguda a l’app de Protecció Civil!"
+    },
+    "learnAboutDifferentRisks": "Informa’t sobre els diferents riscs i protegeix-te tu i els teus. Comencem!",
+    "@learnAboutDifferentRisks": {
+      "description": "Informa’t sobre els diferents riscs i protegeix-te tu i els teus. Comencem!"
+    },
+    "alertsTailoredToYourWorld": "Alertes adaptades al teu món",
+    "@alertsTailoredToYourWorld": {
+      "description": "Alertes adaptades al teu món"
+    },
+    "withCivilProtectionYouCan": "Amb Protecció Civil, pots rebre alertes sobre els diferents riscs a les zones que t’interessen.",
+    "@withCivilProtectionYouCan": {
+      "description": "Amb Protecció Civil, pots rebre alertes sobre els diferents riscs a les zones que t’interessen."
+    },
+    "aShieldAgainstTheElements": "Un escut contra els elements!",
+    "@aShieldAgainstTheElements": {
+      "description": "Un escut contra els elements!"
+    },
+    "fromVitalLinksToExpertAdvice": "Des d’enllaços vitals fins a consells experts, som aquí per preparar-te per a qualsevol fenomen.",
+    "@fromVitalLinksToExpertAdvice": {
+      "description": "Des d’enllaços vitals fins a consells experts, som aquí per preparar-te per a qualsevol fenomen."
+    },
+    "yourAlerts": "Les teves alertes",
+    "@yourAlerts": {
+      "description": "Les teves alertes"
+    },
+    "canActivateAlerts": "Pots activar les notificacions per als llocs dels quals t’agradaria rebre alertes",
+    "@canActivateAlerts": {
+      "description": "Pots activar les notificacions per als llocs dels quals t’agradaria rebre alertes"
+    },
+    "noActiveAlerts": "No tens activades les alertes de cap lloc",
+    "@noActiveAlerts": {
+      "description": "No tens activades les alertes de cap lloc"
+    },
+    "noActiveAlertsInfo": "Podràs afegir els llocs sobre els quals t’agradaria informar-te.",
+    "@noActiveAlertsInfo": {
+      "description": "Podràs afegir els llocs sobre els quals t’agradaria informar-te."
+    },
+    "activeAlerts": "Estàs al dia de tot!",
+    "@activeAlerts": {
+      "description": "Estàs al dia de tot!"
+    },
+    "activeAlertsInfo": "Assegura’t d’haver activat les alertes dels llocs dels quals t’agradaria rebre notificacions.",
+    "@activeAlertsInfo": {
+      "description": "Assegura’t d’haver activat les alertes dels llocs dels quals t’agradaria rebre notificacions."
+    },
+    "alertDetail": "Detall de l’alerta",
+    "@alertDetail": {
+      "description": "Detall de l’alerta"
+    },
+    "alertModalAreYouSure": "Segur que vols continuar?",
+    "@alertModalAreYouSure": {
+      "description": "Segur que vols continuar?"
+    },
+    "alertModalAreYouSureSubtitle": "Si elimines la subscripció a {address}, no rebràs més alertes d’aquesta zona. Per tornar a activar aquest lloc, fes clic al botó \"+\" per afegir una nova subscripció.",
+    "@alertModalAreYouSureSubtitle": {
+      "description": "Si elimines la subscripció a {address}, no rebràs més alertes d’aquesta zona. Per tornar a activar aquest lloc, fes clic al botó \"+\" per afegir una nova subscripció.",
+      "placeholders": {
+        "address": {
+          "type": "String",
+          "example": "Canillejas, Madrid, Comunitat de Madrid"
+        }
+      }
+    },
+    "alertModalDeleteButton": "Eliminar subscripció",
+    "@alertModalDeleteButton": {
+      "description": "Eliminar subscripció"
+    },
+    "alertSuscriptionTrashButton": "Eliminar alerta de",
+    "@alertSuscriptionTrashButton": {
+      "description": "Eliminar alerta de"
+    },
+    "subscribedPlaces": "Llocs subscrits",
+    "@subscribedPlaces": {
+      "description": "Llocs subscrits"
+    },
+    "activeAlert": "Activa",
+    "@activeAlert": {
+      "description": "Activa"
+    },
+    "inactiveAlert": "Finalitzada",
+    "@inactiveAlert": {
+      "description": "Finalitzada"
+    },
+    "endedAlerts": "Alertes finalitzades",
+    "@endedAlerts": {
+      "description": "Alertes finalitzades"
+    },
+    "alertNow": "Ara",
+    "@alertNow": {
+      "description": "Ara"
+    },
+    "alertMinutes": "{value, plural, one {Fa {value} minut}other{Fa {value} minuts}}}}",
+    "@alertMinutes": {
+      "placeholders": {
+        "value": {
+          "type": "int",
+          "example": "1"
+        }
+      }
+    },
+    "alertHours": "{value, plural, one {Fa {value} hora}other{Fa {value} hores}}}}",
+    "@alertHours": {
+      "placeholders": {
+        "value": {
+          "type": "int",
+          "example": "1"
+        }
+      }
+    },
+    "alertDays": "{value, plural, one {Fa {value} dia}other{Fa {value} dies}}}}",
+    "@alertDays": {
+      "placeholders": {
+        "value": {
+          "type": "int",
+          "example": "1"
+        }
+      }
+    },
+    "alertMonths": "{value, plural, one {Fa {value} mes}other{Fa {value} mesos}}}}",
+    "@alertMonths": {
+      "placeholders": {
+        "value": {
+          "type": "int",
+          "example": "1"
+        }
+      }
+    },
+    "alertYears": "{value, plural, one {Fa {value} any}other{Fa {value} anys}}}}",
+    "@alertYears": {
+      "placeholders": {
+        "value": {
+          "type": "int",
+          "example": "1"
+        }
+      }
+    },
+    "endedDateAlert": "Data final de l’alerta: {value}",
+    "@endedDateAlert": {
+      "placeholders": {
+        "value": {
+          "type": "String",
+          "example": "12-12-2024"
+        }
+      }
+    },
+    "youHave": "Tens ",
+    "@youHave": {
+      "description": "Tens"
+    },
+    "activeNumAlerts": "{value, plural, one {{value} alerta}other{{value} alertes}} }}",
+    "@activeNumAlerts": {
+      "placeholders": {
+        "value": {
+          "type": "int",
+          "example": "0"
+        }
+      }
+    },
+    "alertsNum": "{value, plural, one {activa}other{actives}}}}",
+    "@alertsNum": {
+      "placeholders": {
+        "value": {
+          "type": "int",
+          "example": "1"
+        }
+      }
+    },
+    "accept": "Acceptar",
+    "@accept": {
+      "description": "Acceptar"
+    },
+    "cancel": "Cancel·lar",
+    "@cancel": {
+      "description": "Cancel·lar"
+    },
+    "iHaveReadPrivacy": "He llegit i estic d'acord amb la política de privadesa",
+    "@iHaveReadPrivacy": {
+      "description": "He llegit i estic d'acord amb la política de privadesa"
+    },
+    "iHaveReadTerms": "He llegit i estic d’acord amb l’avís legal i els termes i condicions d’ús",
+    "@iHaveReadTerms": {
+      "description": "He llegit i estic d’acord amb l’avís legal i els termes i condicions d’ús"
+    },
+    "acceptanceOfConditions": "Acceptació de condicions",
+    "@acceptanceOfConditions": {
+      "description": "Acceptació de condicions"
+    },
+    "civilProtectionLogo": "Logotip de Protecció Civil",
+    "@civilProtectionLogo": {
+      "description": "Logotip de Protecció Civil"
+    },
+    "myProfile": "El meu perfil",
+    "@myProfile": {
+      "description": "El meu perfil"
+    },
+    "settings": "Ajusts",
+    "@settings": {
+      "description": "Ajusts"
+    },
+    "configuration": "Configuració",
+    "@configuration": {
+      "description": "Configuració"
+    },
+    "language": "Idioma",
+    "@language": {
+      "description": "Idioma"
+    },
+    "help": "Ajuda",
+    "@help": {
+      "description": "Ajuda"
+    },
+    "frequentAskedQuestions": "Preguntes freqüents",
+    "@frequentAskedQuestions": {
+      "description": "Preguntes freqüents"
+    },
+    "support": "Suport",
+    "@support": {
+      "description": "Suport"
+    },
+    "generalInformation": "Informació general",
+    "@generalInformation": {
+      "description": "Informació general"
+    },
+    "accesibilityStatement": "Declaració d’accessibilitat",
+    "@accesibilityStatement": {
+      "description": "Declaració d’accessibilitat"
+    },
+    "legalNotice": "Avís legal",
+    "@legalNotice": {
+      "description": "Avís legal"
+    },
+    "privacyPolicy": "Política de privadesa",
+    "@privacyPolicy": {
+      "description": "Política de privadesa"
+    },
+    "version": "Versió v.{version}",
+    "@version": {
+      "description": "Versió v.",
+      "placeholders": {
+        "version": {
+          "type": "String",
+          "example": "1.0.0"
+        }
+      }
+    },
+    "spanish": "Español",
+    "@spanish": {
+      "description": "Español"
+    },
+    "english": "English",
+    "@english": {
+      "description": "English"
+    },
+    "catalan": "Català",
+    "@catalan": {
+      "description": "Català"
+    },
+    "galician": "Galego",
+    "@galician": {
+      "description": "Galego"
+    },
+    "basque": "Euskara",
+    "@basque": {
+      "description": "Euskara"
+    },
+    "mapViewer": "Visor de mapa",
+    "@mapViewer": {
+      "description": "Visor de mapa"
+    },
+    "alerts": "Alertes",
+    "@alerts": {
+      "description": "Alertes"
+    },
+    "files": "Fitxers",
+    "@files": {
+      "description": "Fitxers"
+    },
+    "interest": "Interès",
+    "@interest": {
+      "description": "Interès"
+    },
+    "yourNationalAlertNetwork": "La teva xarxa d’alerta nacional",
+    "@yourNationalAlertNetwork": {
+      "description": "La teva xarxa d’alerta nacional"
+    },
+    "todayIs": "Avui és {date}",
+    "@todayIs": {
+      "description": "Avui és {date}",
+      "placeholders": {
+        "date": {
+          "type": "String",
+          "example": "8 de març de 2020"
+        }
+      }
+    },
+    "newSubscription": "Nova subscripció",
+    "@newSubscription": {
+      "description": "Nova subscripció"
+    },
+    "addNewSubscription": "Afegir nova subscripció",
+    "@addNewSubscription": {
+      "description": "Afegir nova subscripció"
+    },
+    "autonomousCommunity": "Comunitat autònoma",
+    "@autonomousCommunity": {
+      "description": "Comunitat autònoma"
+    },
+    "province": "Província",
+    "@province": {
+      "description": "Província"
+    },
+    "municipality": "Municipi",
+    "@municipality": {
+      "description": "Municipi"
+    },
+    "useCurrentLocation": "Utilitzar ubicació actual",
+    "@useCurrentLocation": {
+      "description": "Utilitzar ubicació actual"
+    },
+    "createNewSubscription": "Crear nova subscripció",
+    "@createNewSubscription": {
+      "description": "Crear nova subscripció"
+    },
+    "readyExclamations": "Llest!",
+    "@readyExclamations": {
+      "description": "Llest!"
+    },
+    "understood": "Entesos",
+    "@understood": {
+      "description": "Entesos"
+    },
+    "youHaveJustAddedAddress": "Acabes d’afegir {address} als teus llocs subscrits. Ara rebràs totes les alertes que afectin aquest lloc.",
+    "@youHaveJustAddedAddress": {
+      "placeholders": {
+        "address": {
+          "type": "String",
+          "example": "Canillejas, Madrid, Comunitat de Madrid"
+        }
+      }
+    },
+    "information": "Informació",
+    "@information": {
+      "description": "Informació"
+    },
+    "theAlertsWillBeAvailableForOneYear": "Les alertes estaran a la teva disposició en l’aplicació durant un any. Un cop transcorregut aquest temps, les alertes s’eliminaran.",
+    "@theAlertsWillBeAvailableForOneYear": {
+      "description": "Les alertes estaran a la teva disposició en l’aplicació durant un any. Un cop transcorregut aquest temps, les alertes s’eliminaran."
+    },
+    "magnitude3OrMore": "Magnitud: 3 o més",
+    "@magnitude3OrMore": {
+      "description": "Magnitud: 3 o més"
+    },
+    "magnitudeLessThan3": "Magnitud: menys de 3 i sentit",
+    "@magnitudeLessThan3": {
+      "description": "Magnitud: menys de 3 i sentit"
+    },
+    "recommendationsX": "Recomanacions {x}",
+    "@recommendationsX": {
+      "description": "Recomanacions {x}",
+      "placeholders": {
+        "x": {
+          "type": "String",
+          "example": "Recomanacions {x}"
+        }
+      }
+    },
+    "meteo": "Méteo",
+    "@meteo": {
+      "description": "Méteo"
+    },
+    "earthquakes": "Terratrèmols",
+    "@earthquakes": {
+      "description": "Terratrèmols"
+    },
+    "extremeRisk": "Risc extrem",
+    "@extremeRisk": {
+      "description": "Risc extrem"
+    },
+    "veryHighRisk": "Risc molt alt",
+    "@veryHighRisk": {
+      "description": "Risc molt alt"
+    },
+    "highRisk": "Risc alt",
+    "@highRisk": {
+      "description": "Risc alt"
+    },
+    "moderateRisk": "Risc moderat",
+    "@moderateRisk": {
+      "description": "Risc moderat"
+    },
+    "lowRisk": "Risc baix",
+    "@lowRisk": {
+      "description": "Risc baix"
+    },
+    "wildfire": "Incendis forestals",
+    "@wildfire": {
+      "description": "Incendis forestals"
+    },
+    "extreme": "Extrem",
+    "@extreme": {
+      "description": "Extrem"
+    },
+    "important": "Important",
+    "@important": {
+      "description": "Important"
+    },
+    "dependsOnActivity": "Depèn de l’activitat",
+    "@dependsOnActivity": {
+      "description": "Depèn de l’activitat"
+    },
+    "summary": "Resum",
+    "@summary": {
+      "description": "Resum"
+    },
+    "coastalHazards": "Fenòmens costaners",
+    "@coastalHazards": {
+      "description": "Fenòmens costaners"
+    },
+    "rainwaterAccumulation": "Acum. de pluja 1 h",
+    "@rainwaterAccumulation": {
+      "description": "Acum. de pluja 1 h"
+    },
+    "snowAccumulation": "Acum. de neu 24 h",
+    "@snowAccumulation": {
+      "description": "Acum. de neu 24 h"
+    },
+    "minimumTemperatures": "Temperatures mínimes",
+    "@minimumTemperatures": {
+      "description": "Temperatures mínimes"
+    },
+    "errorStartingApp": "Error iniciant l’aplicació",
+    "@errorStartingApp": {
+      "description": "Error iniciant l’aplicació"
+    },
+    "errorStartingAppText": "S’ha detectat un error de connexió.\nEls nostres serveis podrien no estar disponibles en aquests moments; comprova que tinguis connexió a internet i torna-ho a intentar més tard.",
+    "@errorStartingAppText": {
+      "description": "S’ha detectat un error de connexió.\nEls nostres serveis podrien no estar disponibles en aquests moments; comprova que tinguis connexió a internet i torna-ho a intentar més tard."
+    },
+    "retryText": "Reintentar",
+    "@retryText": {
+      "description": "Reintentar"
+    },
+    "appLogo": "Logotip de Protecció Civil, Ministeri de l’Interior",
+    "@appLogo": {
+      "description": "Logotip de Protecció Civil, Ministeri de l’Interior"
+    },
+    "peninsulaMapShowing": "Mapa de la península mostrant alertes de {x}",
+    "@peninsulaMapShowing": {
+      "description": "Mapa de la península mostrant alertes de {x}",
+      "placeholders": {
+        "x": {
+          "type": "String",
+          "example": "Mapa de la península mostrant alertes de terratrèmols"
+        }
+      }
+    },
+    "canariesMapShowing": "Mapa de les illes Canàries mostrant alertes de {x}",
+    "@canariasMapShowing": {
+      "description": "Mapa de les illes Canàries mostrant alertes de {x}",
+      "placeholders": {
+        "x": {
+          "type": "String",
+          "example": "Mapa de les illes Canàries mostrant alertes de terratrèmols"
+        }
+      }
+    },
+    "close": "Tancar",
+    "@close": {
+      "description": "Tancar"
+    },
+    "pageXofY": "Pàgina {x} de {y}",
+    "@pageXofY": {
+      "description": "Pàgina {x} de {y}",
+      "placeholders": {
+        "x": {
+          "type": "int",
+          "example": "1"
+        },
+        "i": {
+          "type": "int",
+          "example": "3"
+        }
+      }
+    },
+    "gpsRequired": "Es requereix GPS",
+    "@gpsRequired": {
+      "description": "Es requereix GPS"
+    },
+    "unorderedListSemantic": "Llista no ordenada de {size} {type}",
+    "@unorderedListSemantic": {
+      "description": "Missatge per conèixer la grandària i el tipus d’elements d’una llista a efectes d’accessibilitat",
+      "placeholders": {
+        "size": {
+          "type": "num",
+          "example": "10"
+        },
+        "type": {
+          "type": "String",
+          "example": "recorreguts"
+        }
+      }
+    },
+    "recommendations": "Recomanacions",
+    "@recommendations": {
+      "description": "Recomanacions"
+    },
+    "highWinds": "Vents forts",
+    "@highWinds": {
+      "description": "Vents forts"
+    },
+    "heavyRains": "Pluges intenses",
+    "@heavyRains": {
+      "description": "Pluges intenses"
+    },
+    "highTemperatures": "Temperatures altes",
+    "@highTemperatures": {
+      "description": "Temperatures altes"
+    },
+    "coastal": "Costaners",
+    "@coastal": {
+      "description": "Costaners"
+    },
+    "stormsAndLightningStrikes": "Tempestes i llamps",
+    "@stormsAndLightningStrikes": {
+      "description": "Tempestes i llamps"
+    },
+    "forestFires": "Incendis forestals",
+    "@forestFires": {
+      "description": "Incendis forestals"
+    },
+    "back": "Enrere",
+    "@back": {
+      "description": "Enrere"
+    },
+    "elementXInListSemantic": "Element {x} de {y}",
+    "@elementXInListSemantic": {
+      "description": "Element {x} de {y}",
+      "placeholders": {
+        "x": {
+          "type": "num",
+          "example": "1"
+        },
+        "i": {
+          "type": "num",
+          "example": "5"
+        }
+      }
+    },
+    "nextGenLogo": "Logotip de NextGenerationEU, Finançat per la Unió Europea",
+    "@nextGenLogo": {
+      "description": "Logotip de NextGenerationEU, Finançat per la Unió Europea"
+    },
+    "recoveryPlanLogo": "Logotip del Pla de Recuperació, Transformació i Resiliència",
+    "@recoveryPlanLogo": {
+      "description": "Logotip del Pla de Recuperació, Transformació i Resiliència"
+    },
+    "digitalSpainLogo": "Logotip d’España Digital 2026",
+    "@digitalSpainLogo": {
+      "description": "Logotip d’España Digital 2026"
+    },
+    "entries": "Entrades",
+    "@entries": {
+      "description": "Entrades"
+    },
+    "opensExternalLink": "Obre un enllaç extern",
+    "@opensExternalLink": {
+      "description": "Obre un enllaç extern"
+    },
+    "newVersionAvailable": "Nova versió disponible",
+    "@newVersionAvailable": {
+      "description": "Nova versió disponible"
+    },
+    "newVersionAvailableText": "Hi ha disponible una nova actualització de Protecció Civil.",
+    "@newVersionAvailableText": {
+      "description": "Hi ha disponible una nova actualització de Protecció Civil."
+    },
+    "omit": "Ometre",
+    "@omit": {
+      "description": "Ometre"
+    },
+    "forcedUpdate": "Actualització obligatòria de Protecció Civil v.{version}",
+    "@forcedUpdate": {
+      "description": "Actualització obligatòria de Protecció Civil v.{version}",
+      "placeholders": {
+        "version": {
+          "type": "String",
+          "example": "1.0.0"
+        }
+      }
+    },
+    "forcedUpdateText": "Per poder continuar utilitzant l’aplicació, cal actualitzar-la.",
+    "@forcedUpdateText": {
+      "description": "Per poder continuar utilitzant l’aplicació, cal actualitzar-la."
+    },
+    "update": "Actualitzar",
+    "@update": {
+      "description": "Actualitzar"
+    },
+    "civilProtectionAlert": "Alerta de Protecció Civil",
+    "@civilProtectionAlert": {
+      "description": "Alerta de Protecció Civil"
+    },
+    "errorPopUp": "Error!",
+    "@errorPopUp": {
+      "description": "Error!"
+    },
+    "anErrorOccurredDuringTheQuery": "S’ha produït un error durant la consulta. Torna-ho a intentar de nou.",
+    "@anErrorOccurredDuringTheQuery": {
+      "description": "S’ha produït un error durant la consulta. Torna-ho a intentar de nou."
+    },
+    "tryAgain": "Reintentar",
+    "@tryAgain": {
+      "description": "Reintentar"
+    },
+    "backToHome": "Tornar a l’inici",
+    "@backToHome": {
+      "description": "Tornar a l’inici"
+    },
+    "authenticationExpired": "Autenticació expirada",
+    "badRequest": "Sol·licitud incorrecta",
+    "unauthorized": "No autoritzat",
+    "forbidden": "Prohibit",
+    "notFound": "No trobat",
+    "conflict": "Conflicte",
+    "internalServerError": "Error intern del servidor",
+    "unknownError": "Error desconegut",
+    "noInternetConnection": "No hi ha connexió a internet",
+    "infoNotMatch": "La informació no coincideix",
+    "noAccess": "Sense accés",
+    "securityError": "Error de seguretat",
+    "clear": "Clar"
+  }
