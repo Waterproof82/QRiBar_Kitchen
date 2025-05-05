@@ -1,8 +1,8 @@
-import 'package:qribar_cocina/presentation/cocina/cocina_general_screen.dart';
-import 'package:qribar_cocina/presentation/cocina/cocina_pedidos_screen.dart';
-import 'package:qribar_cocina/presentation/home/home_screen.dart';
-import 'package:qribar_cocina/presentation/login/login_screen.dart';
-import 'package:qribar_cocina/presentation/splash/splash_screen.dart';
+import 'package:qribar_cocina/features/cocina/cocina_general_screen.dart';
+import 'package:qribar_cocina/features/cocina/cocina_pedidos_screen.dart';
+import 'package:qribar_cocina/features/home/home_screen.dart';
+import 'package:qribar_cocina/features/login/presentation/screens/login_screen.dart';
+import 'package:qribar_cocina/features/splash/splash_screen.dart';
 
 class AppRoutes {
   static const String splash = 'splash';

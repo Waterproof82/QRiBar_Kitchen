@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:qribar_cocina/providers/providers.dart';
 import 'package:qribar_cocina/routes/app_routes.dart';
@@ -37,6 +38,9 @@ class App extends StatelessWidget {
         title: 'QRiBar Cocina',
         initialRoute: AppRoutes.splash,
         routes: AppRoutes.routes,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: Locale('es'),
       ),
     );
   }

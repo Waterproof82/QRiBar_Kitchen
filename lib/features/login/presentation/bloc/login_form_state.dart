@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:qribar_cocina/data/types/repository_error.dart';
 
 part 'login_form_state.freezed.dart';
 
@@ -9,14 +10,6 @@ class LoginFormState with _$LoginFormState {
     @Default('') String password,
     @Default(false) bool isLoading,
     @Default(false) bool loginSuccess,
-    LoginFormFailure? failure,
+    RepositoryError? failure,
   }) = _LoginFormState;
-}
-
-@freezed
-class LoginFormFailure with _$LoginFormFailure {
-  const factory LoginFormFailure.notFound() = _NotFound;
-  const factory LoginFormFailure.unauthorized() = _Unauthorized;
-  const factory LoginFormFailure.network() = _Network;
-  const factory LoginFormFailure.unknown() = _Unknown;
 }

@@ -18,5 +18,4 @@ class ListenerEvent with _$ListenerEvent {
     required bool enMarcha,
   }) = _UpdateEnMarchaPedido;
 
-  const factory ListenerEvent.errorOccurred(String message) = _ErrorOccurred;
 }

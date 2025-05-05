@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/presentation/cocina/widgets/modifiers_options.dart';
+import 'package:qribar_cocina/data/extensions/repository_error_extension.dart';
+import 'package:qribar_cocina/features/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/routes/data_exports.dart';
@@ -27,6 +28,9 @@ class CocinaPedidosScreen extends StatelessWidget {
           pedidoRemoved: (pedidos) => _buildFromPedidos(
             pedidos,
             navegacionModel,
+          ),
+          failure: (error) => Center(
+            child: Text('Error: ${error.translateError(context)}'),
           ),
           orElse: () => const SizedBox.shrink(),
         );

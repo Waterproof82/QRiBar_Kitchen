@@ -2,9 +2,15 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/data/data_sources/local/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/data_sources/remote/listener_data_source_impl.dart';
 import 'package:qribar_cocina/data/repositories/listener_repository_impl.dart';
-import 'package:qribar_cocina/presentation/login/bloc/login_form_bloc.dart';
+import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
+import 'package:qribar_cocina/features/login/data/data_sources/remote/auth_remote_data_source_contract.dart';
+import 'package:qribar_cocina/features/login/data/data_sources/remote/auth_remote_data_source_impl.dart';
+import 'package:qribar_cocina/features/login/domain/repositories/login_repository_contract.dart';
+import 'package:qribar_cocina/features/login/data/repositories/login_repository_impl.dart';
+import 'package:qribar_cocina/features/login/domain/use_cases/login_use_case.dart';
 import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 
@@ -26,6 +32,18 @@ class AppProviders extends StatelessWidget {
 
           return MultiRepositoryProvider(
             providers: [
+              RepositoryProvider<AuthRemoteDataSourceContract>(
+                create: (_) => AuthRemoteDataSourceImpl(),
+              ),
+              RepositoryProvider<LoginRepositoryContract>(
+                create: (context) => LoginRepositoryImpl(
+                  context.read<AuthRemoteDataSourceContract>(),
+                  IdBarDataSource.instance,
+                ),
+              ),
+              RepositoryProvider<LoginUseCase>(
+                create: (context) => LoginUseCase(context.read<LoginRepositoryContract>()),
+              ),
               RepositoryProvider(
                 create: (_) {
                   final navProvider = context.read<NavegacionProvider>();
@@ -42,7 +60,11 @@ class AppProviders extends StatelessWidget {
             ],
             child: MultiBlocProvider(
               providers: [
-                BlocProvider(create: (_) => LoginFormBloc()),
+                BlocProvider(
+                  create: (context) => LoginFormBloc(
+                    loginUseCase: context.read<LoginUseCase>(),
+                  ),
+                ),
                 BlocProvider(
                   create: (context) {
                     final listenerRepo = context.read<ListenerRepositoryImpl>();

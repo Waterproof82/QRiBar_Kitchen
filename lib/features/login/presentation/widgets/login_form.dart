@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qribar_cocina/data/const/app_constants.dart';
 import 'package:qribar_cocina/data/const/app_sizes.dart';
-import 'package:qribar_cocina/presentation/login/bloc/login_form_bloc.dart';
-import 'package:qribar_cocina/presentation/login/bloc/login_form_event.dart';
-import 'package:qribar_cocina/presentation/login/bloc/login_form_state.dart';
-import 'package:qribar_cocina/presentation/login/ui/input_decoration.dart';
+import 'package:qribar_cocina/data/extensions/repository_error_extension.dart';
+import 'package:qribar_cocina/data/types/repository_error.dart';
+import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
+import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
+import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
+import 'package:qribar_cocina/features/login/presentation/ui/input_decoration.dart';
 
 class LoginForm extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -63,23 +65,14 @@ class LoginForm extends StatelessWidget {
                     style: TextStyle(fontSize: 22),
                   ),
                   Gap.h32,
-                  BlocSelector<LoginFormBloc, LoginFormState, LoginFormFailure?>(
+                  BlocSelector<LoginFormBloc, LoginFormState, RepositoryError?>(
                     selector: (state) => state.failure,
-                    builder: (context, failure) {
-                      if (failure != null) {
-                        return Text(
-                          failure.when(
-                            notFound: () => 'Error no encontrado',
-                            unauthorized: () => 'Password Incorrecto',
-                            network: () => 'Error en la red',
-                            unknown: () => 'Error desconocido',
+                    builder: (context, failure) => failure == null
+                        ? const SizedBox.shrink()
+                        : Text(
+                            failure.translateError(context),
+                            style: const TextStyle(color: Colors.red),
                           ),
-                          style: TextStyle(color: Colors.red),
-                        );
-                      } else {
-                        return SizedBox.shrink();
-                      }
-                    },
                   ),
                   MaterialButton(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
