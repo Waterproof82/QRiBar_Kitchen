@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:qribar_cocina/l10n/l10n.dart';
 import 'package:qribar_cocina/providers/providers.dart';
 import 'package:qribar_cocina/routes/app_routes.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -35,7 +36,7 @@ class App extends StatelessWidget {
           scaffoldBackgroundColor: Colors.blueGrey,
         ),
         debugShowCheckedModeBanner: false,
-        title: 'QRiBar Cocina',
+        onGenerateTitle: (context) => context.l10n.appName,
         initialRoute: AppRoutes.splash,
         routes: AppRoutes.routes,
         localizationsDelegates: AppLocalizations.localizationsDelegates,

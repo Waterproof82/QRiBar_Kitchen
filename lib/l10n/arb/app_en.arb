@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appName": "Civil Protection",
+  "appName": "QR iBar Kitchen",
   "skip": "Skip",
   "@skip": {
     "description": "Skip the current step"
@@ -647,8 +647,6 @@
   "infoNotMatch": "The information does not match",
   "noAccess": "No access",
   "securityError": "Security error",
-  "userNotFound": "User not found",
-  "wrongPassword": "Wrong password",
   "searchByAutonomousCommunity": "Search by Autonomous Community",
   "@searchByAutonomousCommunity": {
     "description": "Search by Autonomous Community"
@@ -667,5 +665,16 @@
   },
   "semanticMinMap": "Map of the Canary Islands showing weather alerts",
   "semanticMap": "Map of the Peninsula showing weather alerts",
-  "clear": "Clear"
+  "clear": "Clear",
+  "userNotFound": "User not found",
+  "wrongPassword": "Wrong password",
+  "generalView": "Kitchen General View",
+  "tablesView": "Kitchen Tables View",
+  "email": "Email",
+  "emailError": "The email is not correct",
+  "password": "Password",
+  "passwordError": "The password must be 6 characters",
+  "wait": "Wait...",
+  "enter": "Enter",
+  "exitApp": "Exit the application"
 }
