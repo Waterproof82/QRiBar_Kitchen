@@ -8,6 +8,7 @@ import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.d
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/input_decoration.dart';
+import 'package:qribar_cocina/l10n/l10n.dart';
 
 class LoginForm extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -37,14 +38,14 @@ class LoginForm extends StatelessWidget {
                     autocorrect: false,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecorations.authInputDecoration(
-                      hintText: 'ejemplo@qribar.es',
-                      labelText: 'Correo electrónico',
+                      hintText: 'xxxx@qribar.es',
+                      labelText: context.l10n.email,
                       prefixIcon: Icons.alternate_email_rounded,
                     ),
                     onChanged: (value) => bloc.add(EmailChanged(value)),
                     validator: (value) {
                       final regExp = RegExp(AppConstants.emailPattern);
-                      return regExp.hasMatch(value ?? '') ? null : 'El correo no es correcto';
+                      return regExp.hasMatch(value ?? '') ? null : context.l10n.emailError;
                     },
                     style: TextStyle(fontSize: 22),
                   ),
@@ -55,12 +56,12 @@ class LoginForm extends StatelessWidget {
                     keyboardType: TextInputType.text,
                     decoration: InputDecorations.authInputDecoration(
                       hintText: '*****',
-                      labelText: 'Contraseña',
+                      labelText: context.l10n.password,
                       prefixIcon: Icons.lock_clock_outlined,
                     ),
                     onChanged: (value) => bloc.add(PasswordChanged(value)),
                     validator: (value) {
-                      return (value != null && value.length >= 6) ? null : 'La contraseña tiene que ser de 6 caracteres';
+                      return (value != null && value.length >= 6) ? null : context.l10n.passwordError;
                     },
                     style: TextStyle(fontSize: 22),
                   ),
@@ -82,7 +83,7 @@ class LoginForm extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                       child: Text(
-                        isLoading ? 'Espere...' : 'Ingresar',
+                        isLoading ? context.l10n.wait : context.l10n.enter,
                         style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
                     ),

@@ -1,6 +1,6 @@
 {
   "@@locale": "es",
-  "appName": "Protección Civil",
+  "appName": "QR iBar Cocina",
   "skip": "Saltar",
   "@skip": {
     "description": "Saltar el paso actual"
@@ -647,9 +647,6 @@
   "infoNotMatch": "La información no coincide",
   "noAccess": "Sin acceso",
   "securityError": "Error de seguridad",
-  "userNotFound": "No existe el usuario",
-  "wrongPassword": "Contraseña incorrecta",
-
   "searchByAutonomousCommunity": "Buscar por Comunidad Autónoma",
   "@searchByAutonomousCommunity": {
     "description": "Buscar por Comunidad Autónoma"
@@ -668,6 +665,16 @@
   },
   "semanticMinMap": "Mapa de las Islas Canarias mostrando alertas de meteo",
   "semanticMap": "Mapa de la península mostrando alertas de meteo",
-  "clear": "Borrar"
-
+  "clear": "Borrar",
+  "userNotFound": "No existe el usuario",
+  "wrongPassword": "Contraseña incorrecta",
+  "generalView": "Cocina Vista General",
+  "tablesView": "Cocina Vista Mesas",
+  "email": "Correo electrónico",
+  "emailError": "El correo no es correcto",
+  "password": "Contraseña",
+  "passwordError": "La contraseña tiene que ser de 6 caracteres",
+  "wait": "Espere...",
+  "enter": "Entrar",
+  "exitApp": "Salir de la aplicación"
 }

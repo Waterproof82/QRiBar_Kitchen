@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:qribar_cocina/data/const/app_sizes.dart';
 import 'package:qribar_cocina/data/enums/assets_type.dart';
-import 'package:qribar_cocina/data/enums/menu_type.dart';
 import 'package:qribar_cocina/data/enums/selection_type.dart';
+import 'package:qribar_cocina/l10n/l10n.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
 
@@ -50,7 +50,7 @@ class MenuLateral extends StatelessWidget {
                 color: Color.fromARGB(255, 212, 176, 0),
               ),
               title: Text(
-                MenuType.vistaGeneral.path,
+                context.l10n.generalView,
                 style: TextStyle(fontSize: 20, color: Colors.white),
               ),
               onTap: () {
@@ -66,7 +66,7 @@ class MenuLateral extends StatelessWidget {
                 color: Colors.deepOrange,
               ),
               title: Text(
-                MenuType.vistaMesas.path,
+                context.l10n.tablesView,
                 style: TextStyle(fontSize: 20, color: Colors.white),
               ),
               onTap: () {
@@ -86,7 +86,7 @@ class MenuLateral extends StatelessWidget {
               size: 40,
             ),
             title: Text(
-              MenuType.salirApp.path,
+              context.l10n.exitApp,
               style: TextStyle(fontSize: 20, color: Colors.red),
             ),
             onTap: () {
