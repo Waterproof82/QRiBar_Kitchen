@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:qribar_cocina/data/enums/assets_type.dart';
+import 'package:qribar_cocina/data/types/svg_type.dart';
+import 'package:qribar_cocina/features/globals/svg_loader.dart';
 import 'package:qribar_cocina/features/login/presentation/screens/login_screen.dart';
 
 class Splash extends StatefulWidget {
@@ -52,19 +53,20 @@ class VideoState extends State<Splash> with SingleTickerProviderStateMixin {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Padding(
-                  padding: EdgeInsets.only(bottom: 30.0),
-                  child: Image.asset(
-                    AssetsType.logoCut.path,
-                    height: 25.0,
-                    fit: BoxFit.scaleDown,
-                  ))
+                padding: const EdgeInsets.only(bottom: 30.0), // esto sí puede ser const
+                child: SvgLoaderType(
+                  SvgType.logo,
+                  height: 25.0,
+                  fit: BoxFit.scaleDown,
+                ),
+              ),
             ],
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image.asset(
-                AssetsType.logo.path,
+              SvgLoaderType(
+                SvgType.logoName,
                 width: animation.value * 250,
                 height: animation.value * 250,
               ),
