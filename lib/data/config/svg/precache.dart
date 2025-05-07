@@ -1,0 +1,18 @@
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:qribar_cocina/data/types/svg_type.dart';
+
+Future<void> precacheSVGs() async {
+  for (final svgType in SvgType.values) {
+    final loader = SvgAssetLoader(svgType.path);
+    try {
+      await svg.cache.putIfAbsent(
+        loader.cacheKey(null),
+        () => loader.loadBytes(null),
+      );
+      print('SVG precacheado exitosamente: ${svgType.path}');
+    } catch (e, stackTrace) {
+      print('Error al precachear ${svgType.path}: $e');
+      print(stackTrace);
+    }
+  }
+}

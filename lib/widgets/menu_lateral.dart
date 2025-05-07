@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:qribar_cocina/data/const/app_sizes.dart';
 import 'package:qribar_cocina/data/enums/assets_type.dart';
 import 'package:qribar_cocina/data/enums/selection_type.dart';
+import 'package:qribar_cocina/data/types/svg_type.dart';
+import 'package:qribar_cocina/features/globals/svg_loader.dart';
 import 'package:qribar_cocina/l10n/l10n.dart';
 import 'package:qribar_cocina/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/services/functions.dart';
@@ -35,11 +37,10 @@ class MenuLateral extends StatelessWidget {
                     ),
                   )),
                   Center(
-                      child: Image.asset(
-                    AssetsType.logoCut.path,
-                    height: 100.0,
-                    fit: BoxFit.scaleDown,
-                  ))
+                    child: SvgLoaderType(
+                      SvgType.logo,
+                    ),
+                  )
                 ],
               )),
           Gap.h10,
