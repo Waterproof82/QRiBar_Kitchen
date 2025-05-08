@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/app/extensions/date_time_extension.dart';
 import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
-import 'package:qribar_cocina/app/routes/data_exports.dart';
+import 'package:qribar_cocina/shared/app_exports.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/cocina/widgets/barra_superior_tiempo.dart';

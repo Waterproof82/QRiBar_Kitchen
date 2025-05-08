@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/app/routes/data_exports.dart';
+import 'package:qribar_cocina/shared/app_exports.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/cocina/cocina_general_screen.dart';
 import 'package:qribar_cocina/features/cocina/cocina_pedidos_screen.dart';
