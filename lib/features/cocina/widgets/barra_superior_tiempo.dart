@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qribar_cocina/data/const/app_constants.dart';
+import 'package:qribar_cocina/app/const/app_constants.dart';
 
 class BarraSuperiorTiempo extends StatelessWidget {
   const BarraSuperiorTiempo({Key? key, required this.ancho}) : super(key: key);

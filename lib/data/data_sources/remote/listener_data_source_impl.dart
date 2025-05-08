@@ -1,21 +1,21 @@
 import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:qribar_cocina/app/enums/estado_pedido_enum.dart';
+import 'package:qribar_cocina/app/types/errors/network_error.dart';
+import 'package:qribar_cocina/app/types/repository_error.dart';
+import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/data/data_sources/local/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/data_sources/remote/listeners_data_source_contract.dart';
-import 'package:qribar_cocina/data/enums/estado_pedido.dart';
 import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/complementos/complementos.dart';
 import 'package:qribar_cocina/data/models/modifier/modifier.dart';
 import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/data/models/sala_estado.dart';
-import 'package:qribar_cocina/data/types/errors/network_error.dart';
-import 'package:qribar_cocina/data/types/repository_error.dart';
-import 'package:qribar_cocina/data/types/result.dart';
-import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
-import 'package:qribar_cocina/providers/navegacion_provider.dart';
-import 'package:qribar_cocina/services/functions.dart';
+import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
+import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
+import 'package:qribar_cocina/shared/utils/functions.dart';
 
 class ListenersDataSourceImpl implements ListenersDataSourceContract {
   // 🔸 Propiedades obligatorias por constructor
@@ -463,7 +463,7 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
       }
 
       // Si el estado es cocinado o bloqueado, solo removemos el pedido
-      if (estado == EstadoPedido.cocinado.name || estado == EstadoPedido.bloqueado.name) {
+      if (estado == EstadoPedidoEnum.cocinado.name || estado == EstadoPedidoEnum.bloqueado.name) {
         itemPedidos.removeWhere((pedido) => pedido.id == id);
       } else {
         // Creamos el nuevo pedido
@@ -495,7 +495,7 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
         itemPedidos.add(nuevoPedido);
 
         // Si el estado es pendiente, activamos el timbre
-        if (estado == EstadoPedido.pendiente.name) {
+        if (estado == EstadoPedidoEnum.pendiente.name) {
           timbre();
         }
       }

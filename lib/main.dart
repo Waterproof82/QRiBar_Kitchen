@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:qribar_cocina/core/bootstrap.dart';
-import 'package:qribar_cocina/providers/providers.dart';
+import 'package:qribar_cocina/app/core/bootstrap.dart';
+import 'package:qribar_cocina/features/app/providers/providers.dart';
 
 /// The entry point of the application.
 void main() async {

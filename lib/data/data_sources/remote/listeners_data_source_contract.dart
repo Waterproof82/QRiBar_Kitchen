@@ -1,4 +1,4 @@
-import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
+import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 
 abstract class ListenersDataSourceContract {
   Stream<ListenerEvent> get eventsStream;

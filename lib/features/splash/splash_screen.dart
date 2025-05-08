@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:qribar_cocina/data/types/svg_type.dart';
-import 'package:qribar_cocina/features/globals/svg_loader.dart';
-import 'package:qribar_cocina/features/login/presentation/screens/login_screen.dart';
+import 'package:qribar_cocina/app/enums/svg_enum.dart';
+import 'package:qribar_cocina/features/login/login_screen.dart';
+import 'package:qribar_cocina/shared/utils/svg_loader.dart';
 
 class Splash extends StatefulWidget {
   @override
@@ -55,7 +55,7 @@ class VideoState extends State<Splash> with SingleTickerProviderStateMixin {
               Padding(
                 padding: const EdgeInsets.only(bottom: 30.0), // esto sí puede ser const
                 child: SvgLoaderType(
-                  SvgType.logo,
+                  SvgEnum.logo,
                   height: 25.0,
                   fit: BoxFit.scaleDown,
                 ),
@@ -66,7 +66,7 @@ class VideoState extends State<Splash> with SingleTickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               SvgLoaderType(
-                SvgType.logoName,
+                SvgEnum.logoName,
                 width: animation.value * 250,
                 height: animation.value * 250,
               ),

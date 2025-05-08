@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/data/extensions/repository_error_extension.dart';
+import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
+import 'package:qribar_cocina/app/routes/data_exports.dart';
+import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
+import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/cocina/widgets/modifiers_options.dart';
-import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
-import 'package:qribar_cocina/providers/navegacion_provider.dart';
-import 'package:qribar_cocina/routes/data_exports.dart';
-import 'package:qribar_cocina/services/functions.dart';
+import 'package:qribar_cocina/shared/utils/functions.dart';
 
 class CocinaPedidosScreen extends StatelessWidget {
   const CocinaPedidosScreen({super.key});
@@ -51,7 +51,7 @@ class CocinaPedidosScreen extends StatelessWidget {
 
     final itemPedidosSelected = pedidos
         .where(
-          (pedido) => pedido.mesa == idMesaActual && pedido.numPedido == idPedidoSelected && pedido.estadoLinea != EstadoPedido.bloqueado.name,
+          (pedido) => pedido.mesa == idMesaActual && pedido.numPedido == idPedidoSelected && pedido.estadoLinea != EstadoPedidoEnum.bloqueado.name,
         )
         .toList();
 
@@ -235,7 +235,7 @@ class ListaProductosPedidos extends StatelessWidget {
           });
 
           if (itemPedidos[index].nota != null) notaBar = true;
-          return (itemPedidos[index].estadoLinea != EstadoPedido.cocinado.name)
+          return (itemPedidos[index].estadoLinea != EstadoPedidoEnum.cocinado.name)
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
                   child: Column(
@@ -349,7 +349,7 @@ class LineaProducto extends StatelessWidget {
                         ListenerEvent.updateEstadoPedido(
                           mesa: itemPedidos[index].mesa,
                           idPedido: itemPedidos[index].id,
-                          nuevoEstado: EstadoPedido.cocinado.name,
+                          nuevoEstado: EstadoPedidoEnum.cocinado.name,
                         ),
                       );
                 }
@@ -452,7 +452,7 @@ class LineaProducto extends StatelessWidget {
                       onTap: () {
                         nav.mesaActual = itemPedidos[index].mesa;
                         nav.idPedidoSelected = itemPedidos[index].numPedido;
-                        nav.categoriaSelected = SelectionType.generalScreen.path;
+                        nav.categoriaSelected = SelectionTypeEnum.generalScreen.path;
                       },
                       child: ClipRRect(
                         borderRadius: BorderRadius.only(

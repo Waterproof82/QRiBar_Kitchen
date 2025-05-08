@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:qribar_cocina/data/types/repository_error.dart';
+import 'package:qribar_cocina/app/types/repository_error.dart';
 
 part 'login_form_state.freezed.dart';
 

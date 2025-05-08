@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/app/routes/data_exports.dart';
+import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/cocina/cocina_general_screen.dart';
 import 'package:qribar_cocina/features/cocina/cocina_pedidos_screen.dart';
 import 'package:qribar_cocina/features/home/widgets/custom_app_bar.dart';
-import 'package:qribar_cocina/providers/navegacion_provider.dart';
-import 'package:qribar_cocina/routes/data_exports.dart';
-import 'package:qribar_cocina/services/functions.dart';
-import 'package:qribar_cocina/widgets/header_wave.dart';
-import 'package:qribar_cocina/widgets/menu_lateral.dart';
+import 'package:qribar_cocina/shared/utils/functions.dart';
+import 'package:qribar_cocina/shared/widgets/header_wave.dart';
+import 'package:qribar_cocina/shared/widgets/menu_lateral.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -33,9 +33,9 @@ class HomeScreen extends StatelessWidget {
     return Stack(
       children: [
         HeaderWave(),
-        if (nav.categoriaSelected == SelectionType.pedidosScreen.path)
+        if (nav.categoriaSelected == SelectionTypeEnum.pedidosScreen.path)
           CocinaPedidosScreen()
-        else if (nav.categoriaSelected == SelectionType.generalScreen.path)
+        else if (nav.categoriaSelected == SelectionTypeEnum.generalScreen.path)
           CocinaGeneralScreen()
         else
           SizedBox.shrink(),
