@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:qribar_cocina/data/const/app_constants.dart';
-import 'package:qribar_cocina/data/const/app_sizes.dart';
-import 'package:qribar_cocina/data/extensions/repository_error_extension.dart';
-import 'package:qribar_cocina/data/types/repository_error.dart';
+import 'package:qribar_cocina/app/const/app_constants.dart';
+import 'package:qribar_cocina/app/const/app_sizes.dart';
+import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
+import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/input_decoration.dart';
-import 'package:qribar_cocina/l10n/l10n.dart';
+import 'package:qribar_cocina/app/l10n/l10n.dart';
 
 class LoginForm extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();

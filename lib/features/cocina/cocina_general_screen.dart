@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/data/extensions/date_time_extension.dart';
-import 'package:qribar_cocina/data/extensions/repository_error_extension.dart';
+import 'package:qribar_cocina/app/extensions/date_time_extension.dart';
+import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
+import 'package:qribar_cocina/app/routes/data_exports.dart';
+import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
+import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/cocina/widgets/barra_superior_tiempo.dart';
 import 'package:qribar_cocina/features/cocina/widgets/modifiers_options.dart';
-import 'package:qribar_cocina/providers/bloc/listener_bloc.dart';
-import 'package:qribar_cocina/providers/navegacion_provider.dart';
-import 'package:qribar_cocina/routes/data_exports.dart';
-import 'package:qribar_cocina/services/functions.dart';
+import 'package:qribar_cocina/shared/utils/functions.dart';
 
 class CocinaGeneralScreen extends StatelessWidget {
   const CocinaGeneralScreen({super.key});
@@ -43,7 +43,7 @@ class CocinaGeneralScreen extends StatelessWidget {
   Widget _buildContent(List<Pedido> pedidos) {
     final pedidosFiltrados = pedidos
         .where(
-          (item) => item.estadoLinea != EstadoPedido.bloqueado.name,
+          (item) => item.estadoLinea != EstadoPedidoEnum.bloqueado.name,
         )
         .toList();
 
@@ -86,7 +86,7 @@ class ListaProductosPedidos extends StatelessWidget {
           });
 
           if (itemPedidos[index].nota != null) notaBar = true;
-          return (itemPedidos[index].estadoLinea != EstadoPedido.cocinado.name)
+          return (itemPedidos[index].estadoLinea != EstadoPedidoEnum.cocinado.name)
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
                   child: Column(
@@ -223,7 +223,7 @@ class _LineaProductoState extends State<LineaProducto> {
           Container(
             width: ancho,
             decoration: BoxDecoration(
-              color: (estadoLinea != EstadoPedido.cocinado.name) ? Color.fromARGB(255, 255, 255, 255) : Color.fromARGB(255, 23, 82, 47),
+              color: (estadoLinea != EstadoPedidoEnum.cocinado.name) ? Color.fromARGB(255, 255, 255, 255) : Color.fromARGB(255, 23, 82, 47),
               borderRadius: BorderRadius.all(Radius.circular(100)),
               boxShadow: <BoxShadow>[BoxShadow(color: Colors.black54, blurRadius: 5, spreadRadius: -5)],
             ),
@@ -239,7 +239,7 @@ class _LineaProductoState extends State<LineaProducto> {
                           ListenerEvent.updateEstadoPedido(
                             mesa: itemPedido.mesa,
                             idPedido: itemPedido.id,
-                            nuevoEstado: EstadoPedido.cocinado.name,
+                            nuevoEstado: EstadoPedidoEnum.cocinado.name,
                           ),
                         );
                   }
@@ -343,7 +343,7 @@ class _LineaProductoState extends State<LineaProducto> {
                                 onTap: () {
                                   nav.mesaActual = widget.itemPedidos[widget.index].mesa;
                                   nav.idPedidoSelected = widget.itemPedidos[widget.index].numPedido;
-                                  nav.categoriaSelected = SelectionType.pedidosScreen.path;
+                                  nav.categoriaSelected = SelectionTypeEnum.pedidosScreen.path;
                                 },
                                 child: Container(
                                   width: (ancho > 450) ? 120 : 90,

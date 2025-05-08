@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qribar_cocina/data/extensions/build_context_extension.dart';
+import 'package:qribar_cocina/app/extensions/build_context_extension.dart';
 
 class AuthBackground extends StatelessWidget {
   final Widget child;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:qribar_cocina/data/extensions/build_context_extension.dart';
-import 'package:qribar_cocina/providers/navegacion_provider.dart';
+import 'package:qribar_cocina/app/extensions/build_context_extension.dart';
+import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override

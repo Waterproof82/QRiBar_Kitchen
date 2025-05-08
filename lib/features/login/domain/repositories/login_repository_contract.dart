@@ -1,4 +1,4 @@
-import 'package:qribar_cocina/data/types/result.dart';
+import 'package:qribar_cocina/app/types/result.dart';
 
 abstract class LoginRepositoryContract {
   Future<Result<void>> loginWithEmailAndPassword({
