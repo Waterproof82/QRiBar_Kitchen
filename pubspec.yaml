@@ -45,3 +45,4 @@ flutter:
   assets:
     - assets/img/
     - assets/svg/
+    - assets/sounds/

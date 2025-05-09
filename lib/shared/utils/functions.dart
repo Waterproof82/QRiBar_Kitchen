@@ -10,7 +10,7 @@ final AudioManager _audioManager = AudioManager();
 
 void timbre() async {
   try {
-    await _audioManager.play('Bell.mp3');
+    await _audioManager.play('sounds/bell.mp3');
   } catch (e) {
     print(e);
   }
