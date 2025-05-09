@@ -9,9 +9,9 @@ Future<void> precacheSVGs() async {
         loader.cacheKey(null),
         () => loader.loadBytes(null),
       );
-      print('SVG precacheado exitosamente: ${svgType.path}');
+      print('SVG successfully precached: ${svgType.path}');
     } catch (e, stackTrace) {
-      print('Error al precachear ${svgType.path}: $e');
+      print('Error while precaching ${svgType.path}: $e');
       print(stackTrace);
     }
   }

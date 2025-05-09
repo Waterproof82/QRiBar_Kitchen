@@ -54,7 +54,7 @@ class VideoState extends State<Splash> with SingleTickerProviderStateMixin {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(bottom: 30.0), // esto sí puede ser const
-                child: SvgLoaderType(
+                child: SvgLoader(
                   SvgEnum.logo,
                   height: 25.0,
                   fit: BoxFit.scaleDown,
@@ -65,7 +65,7 @@ class VideoState extends State<Splash> with SingleTickerProviderStateMixin {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              SvgLoaderType(
+              SvgLoader(
                 SvgEnum.logoName,
                 width: animation.value * 250,
                 height: animation.value * 250,

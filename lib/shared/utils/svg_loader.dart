@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:qribar_cocina/app/enums/svg_enum.dart';
 
-class SvgLoaderType extends StatelessWidget {
-  const SvgLoaderType(SvgEnum svgType, {super.key, double? height, double? width, BoxFit fit = BoxFit.contain, Color? color})
+class SvgLoader extends StatelessWidget {
+  const SvgLoader(SvgEnum svgType, {super.key, double? height, double? width, BoxFit fit = BoxFit.contain, Color? color})
       : _svgType = svgType,
         _height = height,
         _width = width,

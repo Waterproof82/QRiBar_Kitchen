@@ -3,7 +3,7 @@ import 'package:dynatrace_flutter_plugin/dynatrace_flutter_plugin.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:qribar_cocina/app/config/svg/precache.dart';
+import 'package:qribar_cocina/shared/utils/svg_preloader.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 Future<void> initDi() async {

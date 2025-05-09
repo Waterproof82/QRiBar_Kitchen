@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:qribar_cocina/app/types/errors/network_error.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/app/types/result.dart';
-import 'package:qribar_cocina/app/di/di.dart';
+import 'package:qribar_cocina/app/config/di.dart';
 
 /// A [BlocObserver] which observes all [Bloc] state changes.
 class AppBlocObserver extends BlocObserver {
