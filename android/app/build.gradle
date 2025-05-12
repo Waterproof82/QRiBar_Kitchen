@@ -37,6 +37,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
@@ -78,6 +79,9 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
 }
 
 flutter {
@@ -86,16 +90,18 @@ flutter {
 
 dependencies {
     // Actualización del BoM de Firebase
-    implementation platform("com.google.firebase:firebase-bom:33.2.0")
+    implementation platform("com.google.firebase:firebase-bom:33.13.0")
     
     // Firebase SDKs con versiones gestionadas por el BoM
     implementation "com.google.firebase:firebase-auth"
     implementation "com.google.firebase:firebase-analytics-ktx"
-    implementation "com.google.firebase:firebase-inappmessaging-display:20.1.0"
+    implementation "com.google.firebase:firebase-inappmessaging-display:21.0.2"
 
     // Google Play Services actualizados
-    implementation 'com.google.android.gms:play-services-base:18.2.0'
-    //implementation 'com.google.android.gms:play-services-identity-credentials:16.0.0-alpha03'
+    implementation 'com.google.android.gms:play-services-base:18.7.0'
+    implementation 'com.google.android.gms:play-services-identity-credentials:16.0.0-alpha07'
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 
     // Otras dependencias
     implementation 'androidx.multidex:multidex:2.0.1'
