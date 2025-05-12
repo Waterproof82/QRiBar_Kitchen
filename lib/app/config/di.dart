@@ -6,6 +6,8 @@ import 'package:qribar_cocina/shared/utils/svg_preloader.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 Future<void> initDi() async {
+  //Globals.sharedPreferences = await SharedPreferences.getInstance();
+  
   await Future.wait([
     Firebase.initializeApp(),
     initializeDateFormatting('es_ES'),

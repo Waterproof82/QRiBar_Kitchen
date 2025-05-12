@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/app/const/globals.dart';
 import 'package:qribar_cocina/app/extensions/date_time_extension.dart';
 import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
@@ -28,9 +29,15 @@ class CocinaGeneralScreen extends StatelessWidget {
             return state.maybeWhen(
               pedidosUpdated: (pedidos) => _buildContent(pedidos),
               pedidoRemoved: (pedidos) => _buildContent(pedidos),
-              failure: (error) => Center(
-                child: Text('Error: ${error.translateError(context)}'),
-              ),
+              failure: (error) {
+                // Mostrar SnackBar global
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Globals.rootScaffoldMessengerKey.currentState?.showSnackBar(
+                    SnackBar(content: Text('Error: ${error.translateError(context)}')),
+                  );
+                });
+                return const SizedBox.shrink();
+              },
               orElse: () => const SizedBox.shrink(),
             );
           },
