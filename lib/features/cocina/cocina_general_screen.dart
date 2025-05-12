@@ -7,12 +7,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/app/extensions/date_time_extension.dart';
 import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
-import 'package:qribar_cocina/shared/app_exports.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/cocina/widgets/barra_superior_tiempo.dart';
 import 'package:qribar_cocina/features/cocina/widgets/modifiers_options.dart';
-import 'package:qribar_cocina/shared/utils/functions.dart';
+import 'package:qribar_cocina/shared/app_exports.dart';
 
 class CocinaGeneralScreen extends StatelessWidget {
   const CocinaGeneralScreen({super.key});
@@ -75,13 +74,10 @@ class ListaProductosPedidos extends StatelessWidget {
         itemCount: itemPedidos.length,
         itemBuilder: (_, int index) {
           itemPedidos.sort((a, b) {
-            final nombreA = obtenerNombreProducto(context, a.idProducto, a.racion!);
-            final nombreB = obtenerNombreProducto(context, b.idProducto, b.racion!);
-
             return a.hora.compareTo(b.hora) != 0
                 ? a.hora.compareTo(b.hora)
-                : nombreA.compareTo(nombreB) != 0
-                    ? nombreA.compareTo(nombreB)
+                : a.titulo!.compareTo(b.titulo!) != 0
+                    ? a.titulo!.compareTo(b.titulo!)
                     : (a.modifiers ?? []).toString().compareTo((b.modifiers ?? []).toString());
           });
 
@@ -189,7 +185,7 @@ class _LineaProductoState extends State<LineaProducto> {
     Pedido itemPedido = widget.itemPedidos[widget.index];
 
     listSelCant = itemPedido.cantidad;
-    listSelName = obtenerNombreProducto(context, itemPedido.idProducto, itemPedido.racion!);
+    listSelName = itemPedido.titulo ?? '';
 
     estadoLinea = itemPedido.estadoLinea;
     pedidoNum = itemPedido.numPedido;

@@ -13,7 +13,6 @@ class Pedido with _$Pedido {
     required String fecha,
     required String hora,
     String? titulo,
-    String? tituloOriginal,
     double? precioProducto,
     required String mesa,
     required int numPedido,
