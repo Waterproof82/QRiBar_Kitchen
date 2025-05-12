@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/product.dart';
-import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/shared/utils/audio_manager.dart';
 
 final AudioManager _audioManager = AudioManager();
 
 void timbre() async {
   try {
-    await _audioManager.play('Bell.mp3');
+    await _audioManager.play('sounds/bell.mp3');
   } catch (e) {
     print(e);
   }
@@ -74,12 +72,12 @@ Future<bool> onBackPressed(BuildContext context) async {
       false;
 }
 
-String obtenerNombreProducto(BuildContext context, String idProducto, bool racion) {
-  final itemElemento = Provider.of<NavegacionProvider>(context, listen: false).products;
-
+String obtenerNombreProducto(List<Product> itemElemento, String idProducto, bool racion) {
   final producto = itemElemento.firstWhere((item) => item.id == idProducto);
 
-  return racion ? producto.nombreProducto : '${producto.nombreProducto} (${producto.nombreRacionMedia})';
+  String nombreProducto = racion ? producto.nombreProducto : '${producto.nombreProducto} (${(producto.nombreRacionMedia) ?? 'Media Ración'})';
+
+  return nombreProducto;
 }
 
 String obtenerCategoriaProducto(List<Product> product, String idProducto) {

@@ -14,19 +14,14 @@ import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/data/models/sala_estado.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
-import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/shared/utils/functions.dart';
 
 class ListenersDataSourceImpl implements ListenersDataSourceContract {
   // 🔸 Propiedades obligatorias por constructor
   final FirebaseDatabase database;
-  final NavegacionProvider navProvider;
 
   // 🔸 Constructor
-  ListenersDataSourceImpl({
-    required this.database,
-    required this.navProvider,
-  });
+  ListenersDataSourceImpl({required this.database});
 
   // 🔸 Controlador de eventos
   final StreamController<ListenerEvent> _eventController = StreamController.broadcast();
@@ -42,7 +37,7 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
   // 🔸 Estado interno (cache local)
   final List<CategoriaProducto> categoriasProdLocal = [];
   final List<SalaEstado> salasMesa = [];
-  List<Product> product = [];
+  List<Product> products = [];
   List<Pedido> itemPedidos = [];
 
   String get idBar => IdBarDataSource.instance.getIdBar();
@@ -101,9 +96,8 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
           );
 
           // 5️⃣ Solo añadimos si no existía ya
-          if (!product.any((p) => p.id == producto.id)) {
-            product.add(producto);
-            navProvider.products.add(producto);
+          if (!products.any((p) => p.id == producto.id)) {
+            products.add(producto);
           }
         },
         onError: (err) {
@@ -425,7 +419,7 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
       final envio = await obtenerEnvioPorProducto(
         categoriasProdLocal,
         idProd,
-        product,
+        products,
       );
       if (envio != 'cocina') return;
 
@@ -456,6 +450,7 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
     try {
       final estado = dataMesas['estado_linea'] as String? ?? '';
       final id = pedidoId ?? '';
+      final titulo = obtenerNombreProducto(products, dataMesas['idProducto'], dataMesas['racion'] ?? true);
 
       // Si es una actualización, eliminamos el pedido antes de agregar el nuevo
       if (isUpdate) {
@@ -476,6 +471,7 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
           nota: dataMesas['nota'] as String? ?? '',
           estadoLinea: estado,
           idProducto: dataMesas['idProducto'] as String? ?? '',
+          titulo: titulo,
           enMarcha: dataMesas['en_marcha'] as bool? ?? false,
           racion: dataMesas['racion'] as bool? ?? true,
           modifiers: (dataMesas['modifiers'] as List?)?.map((modifier) {

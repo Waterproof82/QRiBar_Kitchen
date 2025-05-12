@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/app/const/globals.dart';
 import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
-import 'package:qribar_cocina/shared/app_exports.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/cocina/widgets/modifiers_options.dart';
-import 'package:qribar_cocina/shared/utils/functions.dart';
+import 'package:qribar_cocina/shared/app_exports.dart';
 
 class CocinaPedidosScreen extends StatelessWidget {
   const CocinaPedidosScreen({super.key});
@@ -29,9 +29,15 @@ class CocinaPedidosScreen extends StatelessWidget {
             pedidos,
             navegacionModel,
           ),
-          failure: (error) => Center(
-            child: Text('Error: ${error.translateError(context)}'),
-          ),
+          failure: (error) {
+            // Mostrar SnackBar global
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Globals.rootScaffoldMessengerKey.currentState?.showSnackBar(
+                SnackBar(content: Text('Error: ${error.translateError(context)}')),
+              );
+            });
+            return const SizedBox.shrink();
+          },
           orElse: () => const SizedBox.shrink(),
         );
       },
@@ -230,7 +236,7 @@ class ListaProductosPedidos extends StatelessWidget {
         itemCount: itemPedidos.length,
         itemBuilder: (_, int index) {
           itemPedidos.sort((a, b) {
-            final nombreCmp = obtenerNombreProducto(context, a.idProducto, a.racion!).compareTo(obtenerNombreProducto(context, b.idProducto, b.racion!));
+            final nombreCmp = a.titulo!.compareTo(b.titulo!);
             return nombreCmp != 0 ? nombreCmp : (a.modifiers ?? []).toString().compareTo((b.modifiers ?? []).toString());
           });
 
@@ -310,7 +316,7 @@ class LineaProducto extends StatelessWidget {
     bool rst = false;
 
     listSelCant = itemPedidos[index].cantidad;
-    listSelName = obtenerNombreProducto(context, itemPedidos[index].idProducto, itemPedidos[index].racion!);
+    listSelName = itemPedidos[index].titulo ?? '';
     envioProd = itemPedidos[index].envio;
     estadoLinea = itemPedidos[index].estadoLinea;
     hora = (itemPedidos[index].hora.isNotEmpty) ? itemPedidos[index].hora.split(':').sublist(0, 2).join(':') : "--:--";
