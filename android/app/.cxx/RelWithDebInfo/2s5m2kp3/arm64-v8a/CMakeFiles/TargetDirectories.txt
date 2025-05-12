@@ -1,2 +1,0 @@
-C:/Users/PC/Desktop/QRiBar/qribar_cocina/android/app/.cxx/RelWithDebInfo/2s5m2kp3/arm64-v8a/CMakeFiles/edit_cache.dir
-C:/Users/PC/Desktop/QRiBar/qribar_cocina/android/app/.cxx/RelWithDebInfo/2s5m2kp3/arm64-v8a/CMakeFiles/rebuild_cache.dir
