@@ -1,7 +1,7 @@
 name: qribar_cocina
 description: Tu carta digital inteligente.
 publish_to: 'none'
-version: 1.5.0+2
+version: 1.6.0+4
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
