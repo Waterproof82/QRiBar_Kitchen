@@ -11,6 +11,7 @@ import 'package:qribar_cocina/data/data_sources/remote/listener_remote_data_sour
 import 'package:qribar_cocina/data/repositories/remote/listener_repository_impl.dart';
 import 'package:qribar_cocina/features/app/app.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
+import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/login/data/data_sources/remote/auth_remote_data_source_contract.dart';
 import 'package:qribar_cocina/features/login/data/data_sources/remote/auth_remote_data_source_impl.dart';
@@ -18,7 +19,6 @@ import 'package:qribar_cocina/features/login/data/repositories/login_repository_
 import 'package:qribar_cocina/features/login/domain/repositories/login_repository_contract.dart';
 import 'package:qribar_cocina/features/login/domain/use_cases/login_use_case.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
-import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
 
 /// A [StatelessWidget] which wraps the [App] with the necessary providers.
 class AppProviders extends StatelessWidget {
@@ -54,6 +54,7 @@ class AppProviders extends StatelessWidget {
                 create: (_) {
                   final listenerDataSource = ListenersRemoteDataSource(
                     database: database,
+                    navegacionProvider: context.read<NavegacionProvider>(),
                   );
                   return ListenerRepositoryImpl(
                     database: database,
@@ -72,7 +73,7 @@ class AppProviders extends StatelessWidget {
             ],
             child: MultiBlocProvider(
               providers: [
-                                BlocProvider<LanguageCubit>(
+                BlocProvider<LanguageCubit>(
                   create: (context) {
                     final localization = context.read<LocalizationLocalDataSourceContract>();
                     return LanguageCubit(localization);
@@ -92,7 +93,6 @@ class AppProviders extends StatelessWidget {
                       );
                   },
                 ),
-
               ],
               child: App(),
             ),

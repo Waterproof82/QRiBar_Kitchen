@@ -14,13 +14,18 @@ import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/data/models/sala_estado.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
+import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/shared/utils/functions.dart';
 
 class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
   ListenersRemoteDataSource({
     required FirebaseDatabase database,
-  }) : _database = database;
+    required NavegacionProvider navegacionProvider,
+  })  : _database = database,
+        _navegacionProvider = navegacionProvider;
+
   final FirebaseDatabase _database;
+  final NavegacionProvider _navegacionProvider;
 
   // 🔸 Controlador de eventos
   final StreamController<ListenerEvent> _eventController = StreamController.broadcast();
@@ -97,6 +102,7 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
           // 5️⃣ Solo añadimos si no existía ya
           if (!products.any((p) => p.id == producto.id)) {
             products.add(producto);
+            _navegacionProvider.addProducto(producto);
           }
         },
         onError: (err) {
