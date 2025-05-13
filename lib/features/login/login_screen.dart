@@ -11,20 +11,14 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: LanguageDropdown(),
-          ),
-        ],
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
       body: AuthBackground(
         child: SingleChildScrollView(
           child: Column(
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [LanguageDropdown()],
+              ),
               Gap.h248,
               LoginContainer(
                 child: Column(

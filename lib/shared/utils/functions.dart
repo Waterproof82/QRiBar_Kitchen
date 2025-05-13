@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:qribar_cocina/app/l10n/l10n.dart';
 import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/shared/utils/audio_manager.dart';
@@ -26,11 +27,11 @@ Future<bool> onBackPressed(BuildContext context) async {
           child: AlertDialog(
             alignment: Alignment.center,
             title: Text(
-              'Salir de la Carta',
+              context.l10n.exitMenu,
               textAlign: TextAlign.center,
             ),
             content: Text(
-              '¿Quieres cerrar la aplicación?',
+              context.l10n.closeApp,
               textAlign: TextAlign.center,
             ),
             actions: <Widget>[
@@ -47,7 +48,7 @@ Future<bool> onBackPressed(BuildContext context) async {
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-                      child: Text('Sí', style: TextStyle(color: Color.fromARGB(255, 255, 0, 0), fontSize: 18)),
+                      child: Text(context.l10n.yes, style: TextStyle(color: Color.fromARGB(255, 255, 0, 0), fontSize: 18)),
                     ),
                   ),
                   MaterialButton(
@@ -60,7 +61,7 @@ Future<bool> onBackPressed(BuildContext context) async {
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-                      child: Text('No', style: TextStyle(color: Colors.white, fontSize: 18)),
+                      child: Text(context.l10n.no, style: TextStyle(color: Colors.white, fontSize: 18)),
                     ),
                   ),
                 ],

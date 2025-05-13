@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:qribar_cocina/app/const/globals.dart';
 import 'package:qribar_cocina/app/extensions/date_time_extension.dart';
 import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
+import 'package:qribar_cocina/app/l10n/l10n.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/cocina/widgets/barra_superior_tiempo.dart';
@@ -257,7 +258,7 @@ class _LineaProductoState extends State<LineaProducto> {
                         Gap.w12,
                         Icon(Icons.cancel_outlined, color: Colors.white, size: 24),
                         Gap.w12,
-                        Text('SE CANCELA EN BARRA',
+                        Text(context.l10n.cancelOrder,
                             style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.w400,
@@ -273,7 +274,7 @@ class _LineaProductoState extends State<LineaProducto> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text('SERVIDO',
+                        Text(context.l10n.served,
                             style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.w400,
@@ -346,7 +347,7 @@ class _LineaProductoState extends State<LineaProducto> {
                                 onTap: () {
                                   nav.mesaActual = widget.itemPedidos[widget.index].mesa;
                                   nav.idPedidoSelected = widget.itemPedidos[widget.index].numPedido;
-                                  nav.categoriaSelected = SelectionTypeEnum.pedidosScreen.path;
+                                  nav.categoriaSelected = SelectionTypeEnum.pedidosScreen.name;
                                 },
                                 child: Container(
                                   width: (ancho > 450) ? 120 : 90,

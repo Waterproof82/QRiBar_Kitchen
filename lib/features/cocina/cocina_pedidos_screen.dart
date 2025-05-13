@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/app/const/globals.dart';
 import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
+import 'package:qribar_cocina/app/l10n/l10n.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/cocina/widgets/modifiers_options.dart';
@@ -370,7 +371,7 @@ class LineaProducto extends StatelessWidget {
                     children: [
                       Icon(Icons.cancel_outlined, color: Colors.white, size: 22),
                       Gap.w12,
-                      Text('SE CANCELA EN BARRA',
+                      Text(context.l10n.cancelOrder,
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w500,
@@ -386,7 +387,7 @@ class LineaProducto extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text('SERVIDO',
+                      Text(context.l10n.served,
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w500,
@@ -458,7 +459,7 @@ class LineaProducto extends StatelessWidget {
                       onTap: () {
                         nav.mesaActual = itemPedidos[index].mesa;
                         nav.idPedidoSelected = itemPedidos[index].numPedido;
-                        nav.categoriaSelected = SelectionTypeEnum.generalScreen.path;
+                        nav.categoriaSelected = SelectionTypeEnum.generalScreen.name;
                       },
                       child: ClipRRect(
                         borderRadius: BorderRadius.only(

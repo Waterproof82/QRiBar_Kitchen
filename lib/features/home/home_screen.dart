@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/shared/app_exports.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/cocina/cocina_general_screen.dart';
 import 'package:qribar_cocina/features/cocina/cocina_pedidos_screen.dart';
 import 'package:qribar_cocina/features/home/widgets/custom_app_bar.dart';
+import 'package:qribar_cocina/shared/app_exports.dart';
 import 'package:qribar_cocina/shared/utils/functions.dart';
 import 'package:qribar_cocina/shared/widgets/header_wave.dart';
 import 'package:qribar_cocina/shared/widgets/menu_lateral.dart';
@@ -33,9 +33,9 @@ class HomeScreen extends StatelessWidget {
     return Stack(
       children: [
         HeaderWave(),
-        if (nav.categoriaSelected == SelectionTypeEnum.pedidosScreen.path)
+        if (nav.categoriaSelected == SelectionTypeEnum.pedidosScreen.name)
           CocinaPedidosScreen()
-        else if (nav.categoriaSelected == SelectionTypeEnum.generalScreen.path)
+        else if (nav.categoriaSelected == SelectionTypeEnum.generalScreen.name)
           CocinaGeneralScreen()
         else
           SizedBox.shrink(),
