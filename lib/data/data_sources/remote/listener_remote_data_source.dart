@@ -6,7 +6,7 @@ import 'package:qribar_cocina/app/types/errors/network_error.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/data/data_sources/local/id_bar_data_source.dart';
-import 'package:qribar_cocina/data/data_sources/remote/listeners_data_source_contract.dart';
+import 'package:qribar_cocina/data/data_sources/remote/listeners_remote_data_source_contract.dart';
 import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/complementos/complementos.dart';
 import 'package:qribar_cocina/data/models/modifier/modifier.dart';
@@ -14,14 +14,18 @@ import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/data/models/sala_estado.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
+import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/shared/utils/functions.dart';
 
-class ListenersDataSourceImpl implements ListenersDataSourceContract {
-  // 🔸 Propiedades obligatorias por constructor
-  final FirebaseDatabase database;
+class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
+  ListenersRemoteDataSource({
+    required FirebaseDatabase database,
+    required NavegacionProvider navegacionProvider,
+  })  : _database = database,
+        _navegacionProvider = navegacionProvider;
 
-  // 🔸 Constructor
-  ListenersDataSourceImpl({required this.database});
+  final FirebaseDatabase _database;
+  final NavegacionProvider _navegacionProvider;
 
   // 🔸 Controlador de eventos
   final StreamController<ListenerEvent> _eventController = StreamController.broadcast();
@@ -50,7 +54,7 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
 
     try {
       // 2️⃣ Nos suscribimos de nuevo
-      _dataStreamProductos = database.ref('productos/$idBar/').onChildAdded.listen(
+      _dataStreamProductos = _database.ref('productos/$idBar/').onChildAdded.listen(
         (event) {
           final snap = event.snapshot;
           final raw = snap.value;
@@ -98,6 +102,7 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
           // 5️⃣ Solo añadimos si no existía ya
           if (!products.any((p) => p.id == producto.id)) {
             products.add(producto);
+            _navegacionProvider.addProducto(producto);
           }
         },
         onError: (err) {
@@ -126,7 +131,7 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
     _dataStreamCategoria = null;
 
     try {
-      final ref = database.ref('ficha_local/$idBar/categoria_productos');
+      final ref = _database.ref('ficha_local/$idBar/categoria_productos');
 
       // 2️⃣ Procesar categorías ya existentes de una vez
       final snapshot = await ref.get();
@@ -213,7 +218,7 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
     _dataStreamCategoria = null;
 
     try {
-      _dataStreamCategoria = database.ref('ficha_local/$idBar/categoria_productos').onChildChanged.listen(
+      _dataStreamCategoria = _database.ref('ficha_local/$idBar/categoria_productos').onChildChanged.listen(
         (event) {
           final raw = event.snapshot.value;
 
@@ -262,7 +267,7 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
   Future<Result<void>> addSalaMesas() async {
     try {
       // 1️⃣ Obtenemos snapshot único de salas
-      final ref = database.ref('gestion_local/$idBar/');
+      final ref = _database.ref('gestion_local/$idBar/');
       final snapshot = await ref.get();
 
       // 2️⃣ Si no existe, limpiamos cache
@@ -340,7 +345,7 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
         if (_dataStreamGestionPedidosMap.containsKey(changedKey)) continue;
 
         final path = 'gestion_pedidos/$idBar/$mesaId';
-        final ref = database.ref(path);
+        final ref = _database.ref(path);
 
         // 3️⃣ onChildAdded
         final addedSub = ref.onChildAdded.listen(
@@ -528,7 +533,7 @@ class ListenersDataSourceImpl implements ListenersDataSourceContract {
         if (mesaId == null || mesaId.isEmpty) continue;
 
         final path = 'gestion_pedidos/$idBar/$mesaId';
-        final ref = database.ref(path);
+        final ref = _database.ref(path);
 
         // 3️⃣ onChildRemoved
         final sub = ref.onChildRemoved.listen(

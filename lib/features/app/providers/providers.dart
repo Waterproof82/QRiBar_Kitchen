@@ -2,11 +2,16 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/app/config/di.dart';
 import 'package:qribar_cocina/data/data_sources/local/id_bar_data_source.dart';
-import 'package:qribar_cocina/data/data_sources/remote/listener_data_source_impl.dart';
-import 'package:qribar_cocina/data/repositories/listener_repository_impl.dart';
+import 'package:qribar_cocina/data/data_sources/local/localization_local_data_source.dart';
+import 'package:qribar_cocina/data/data_sources/local/localization_local_datasource_contract.dart';
+import 'package:qribar_cocina/data/data_sources/local/preferences_local_datasource_contract.dart';
+import 'package:qribar_cocina/data/data_sources/remote/listener_remote_data_source.dart';
+import 'package:qribar_cocina/data/repositories/remote/listener_repository_impl.dart';
 import 'package:qribar_cocina/features/app/app.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
+import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/login/data/data_sources/remote/auth_remote_data_source_contract.dart';
 import 'package:qribar_cocina/features/login/data/data_sources/remote/auth_remote_data_source_impl.dart';
@@ -41,12 +46,15 @@ class AppProviders extends StatelessWidget {
                 ),
               ),
               RepositoryProvider<LoginUseCase>(
-                create: (context) => LoginUseCase(context.read<LoginRepositoryContract>()),
+                create: (context) => LoginUseCase(
+                  context.read<LoginRepositoryContract>(),
+                ),
               ),
               RepositoryProvider(
                 create: (_) {
-                  final listenerDataSource = ListenersDataSourceImpl(
+                  final listenerDataSource = ListenersRemoteDataSource(
                     database: database,
+                    navegacionProvider: context.read<NavegacionProvider>(),
                   );
                   return ListenerRepositoryImpl(
                     database: database,
@@ -54,9 +62,23 @@ class AppProviders extends StatelessWidget {
                   );
                 },
               ),
+              RepositoryProvider(
+                create: (_) => getIt.get<PreferencesLocalDataSourceContract>(),
+              ),
+              RepositoryProvider<LocalizationLocalDataSourceContract>(
+                create: (context) => LocalizationLocalDataSource(
+                  preferences: context.read<PreferencesLocalDataSourceContract>(),
+                ),
+              ),
             ],
             child: MultiBlocProvider(
               providers: [
+                BlocProvider<LanguageCubit>(
+                  create: (context) {
+                    final localization = context.read<LocalizationLocalDataSourceContract>();
+                    return LanguageCubit(localization);
+                  },
+                ),
                 BlocProvider(
                   create: (context) => LoginFormBloc(
                     loginUseCase: context.read<LoginUseCase>(),
