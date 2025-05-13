@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:qribar_cocina/app/extensions/build_context_extension.dart';
 
 class AuthBackground extends StatelessWidget {
   final Widget child;
@@ -38,11 +37,11 @@ class _HeaderIcon extends StatelessWidget {
 class _PurpleBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final height = context.height;
+    //final height = context.height;
 
     return Container(
       width: double.infinity,
-      height: height * 0.4,
+      // height: height * 0.8,
       decoration: _buildBoxDecoration(),
       child: Stack(
         children: [
