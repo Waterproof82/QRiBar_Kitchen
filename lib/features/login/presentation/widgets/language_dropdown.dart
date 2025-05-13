@@ -32,11 +32,31 @@ class LanguageDropdownState extends State<LanguageDropdown> {
 
     return DropdownButton<String>(
       value: _selectedLang,
-      icon: const Icon(Icons.language),
+      dropdownColor: Colors.black,
+      icon: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: const Icon(
+          Icons.language,
+          size: 30,
+          color: Colors.amber,
+        ),
+      ),
       underline: const SizedBox(),
       items: const [
-        DropdownMenuItem(value: 'es', child: Text('Español')),
-        DropdownMenuItem(value: 'en', child: Text('English')),
+        DropdownMenuItem(
+          value: 'es',
+          child: Text(
+            'Español',
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        ),
+        DropdownMenuItem(
+          value: 'en',
+          child: Text(
+            'English',
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        ),
       ],
       onChanged: (value) async {
         if (value != null && value != _selectedLang) {
