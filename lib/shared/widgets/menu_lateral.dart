@@ -56,7 +56,7 @@ class MenuLateral extends StatelessWidget {
               ),
               onTap: () {
                 Navigator.pop(context);
-                nav.categoriaSelected = SelectionTypeEnum.generalScreen.path;
+                nav.categoriaSelected = SelectionTypeEnum.generalScreen.name;
                 ;
               }),
           Gap.h10,
@@ -72,7 +72,7 @@ class MenuLateral extends StatelessWidget {
               ),
               onTap: () {
                 Navigator.pop(context);
-                nav.categoriaSelected = SelectionTypeEnum.pedidosScreen.path;
+                nav.categoriaSelected = SelectionTypeEnum.pedidosScreen.name;
               }),
           Divider(
             thickness: 5,

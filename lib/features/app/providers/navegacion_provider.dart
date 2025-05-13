@@ -5,7 +5,7 @@ import 'package:qribar_cocina/data/models/product.dart';
 class NavegacionProvider extends ChangeNotifier {
   final PageController _pageController = PageController();
 
-  String _categoriaSelected = SelectionTypeEnum.generalScreen.path;
+  String _categoriaSelected = SelectionTypeEnum.generalScreen.name;
   int _idPedidoSelected = 1;
   String _mesaActual = '0';
 

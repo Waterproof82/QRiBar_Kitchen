@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
 import 'package:qribar_cocina/app/extensions/build_context_extension.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 
@@ -16,6 +17,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final double screenWidthSize = context.width;
+    final selectionType = SelectionTypeEnum.values.firstWhere(
+      (e) => e.name == nav.categoriaSelected,
+    );
 
     return AppBar(
       toolbarHeight: 60,
@@ -28,7 +32,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
-                '· ${nav.categoriaSelected} ·',
+                selectionType.localizedLabel(context),
                 style: GoogleFonts.poiretOne(
                   color: Color.fromARGB(255, 240, 240, 21),
                   fontSize: (screenWidthSize > 450) ? 35 : 28,
