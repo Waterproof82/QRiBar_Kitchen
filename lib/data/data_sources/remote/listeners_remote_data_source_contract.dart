@@ -1,6 +1,6 @@
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 
-abstract class ListenersDataSourceContract {
+abstract class ListenersRemoteDataSourceContract {
   Stream<ListenerEvent> get eventsStream;
 
   Future<void> addProduct();
