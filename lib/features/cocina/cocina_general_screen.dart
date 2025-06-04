@@ -31,7 +31,6 @@ class CocinaGeneralScreen extends StatelessWidget {
               pedidosUpdated: (pedidos) => _buildContent(pedidos),
               pedidoRemoved: (pedidos) => _buildContent(pedidos),
               failure: (error) {
-                // Mostrar SnackBar global
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   Globals.rootScaffoldMessengerKey.currentState?.showSnackBar(
                     SnackBar(content: Text('Error: ${error.translateError(context)}')),

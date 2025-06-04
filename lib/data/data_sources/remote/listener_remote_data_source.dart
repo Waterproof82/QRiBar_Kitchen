@@ -45,7 +45,6 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
   List<Pedido> itemPedidos = [];
 
   String get idBar => IdBarDataSource.instance.getIdBar();
-
   @override
   Future<Result<void>> addProduct() async {
     // 1️⃣ Cancelamos la suscripción previa (si existe)
@@ -53,67 +52,21 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
     _dataStreamProductos = null;
 
     try {
-      // 2️⃣ Nos suscribimos de nuevo
-      _dataStreamProductos = _database.ref('productos/$idBar/').onChildAdded.listen(
-        (event) {
-          final snap = event.snapshot;
-          final raw = snap.value;
+      // 2️⃣ Suscripción a productos nuevos y modificados
+      final ref = _database.ref('productos/$idBar/');
 
-          // 3️⃣ Validación del formato
-          if (raw is! Map<dynamic, dynamic>) {
-            final msg = '⚠️ Formato inesperado o nulo en snapshot: $raw';
-            print(msg); // Puedes usar logger aquí si prefieres
-            return;
-          }
-
-          // 4️⃣ Parseo modelo Product
-          final data = Map<String, dynamic>.from(raw);
-          final key = snap.key!;
-
-          final producto = Product(
-            id: key,
-            alergogenos: (data['alergogenos'] as Map?)?.keys.cast<String>().toList() ?? [],
-            categoriaProducto: data['categoria_producto'] ?? '',
-            costeProducto: (data['coste_producto'] as num?)?.toDouble() ?? 0.0,
-            disponible: data['disponible'] == true,
-            descripcionProducto: data['descripcion_producto'] ?? '',
-            fotoUrl: data['foto_url'] ?? '',
-            nombreProducto: data['nombre_producto'] ?? '',
-            precioProducto: (data['precio_producto'] as num?)?.toDouble() ?? 0.0,
-            complementos: (data['complementos'] as Map?)?.entries.where((e) => e.value is Map).map((e) {
-                  final m = Map<String, dynamic>.from(e.value as Map);
-                  return Complemento(
-                    id: e.key,
-                    activo: m['activo'] is bool ? m['activo'] : true,
-                    incremento: m['incremento'] is bool ? m['incremento'] : false,
-                  );
-                }).toList() ??
-                [],
-            modifiers: (data['modifiers'] as Map?)?.entries.map((e) {
-                  return Modifier(
-                    name: e.key,
-                    increment: (e.value is num) ? (e.value as num).toDouble() : 0.0,
-                    mainProduct: key,
-                  );
-                }).toList() ??
-                [],
-          );
-
-          // 5️⃣ Solo añadimos si no existía ya
-          if (!products.any((p) => p.id == producto.id)) {
-            products.add(producto);
-            _navegacionProvider.addProducto(producto);
-          }
-        },
-        onError: (err) {
-          // 6️⃣ Log del error (no se emite evento al Bloc)
-          final netErr = NetworkError.fromException(err);
-          final repoErr = RepositoryError.fromDataSourceError(netErr);
-          print('❌ Error en listener de productos: $repoErr');
-        },
+      _dataStreamProductos = ref.onChildAdded.listen(
+        (event) => _handleProductoEvent(event, isChanged: false),
+        onError: (err) => _handleProductoError(err, 'onChildAdded'),
       );
 
-      // 7️⃣ Todo bien → devolvemos éxito
+      // Añadimos también el onChildChanged
+      ref.onChildChanged.listen(
+        (event) => _handleProductoEvent(event, isChanged: true),
+        onError: (err) => _handleProductoError(err, 'onChildChanged'),
+      );
+
+      // 3️⃣ Éxito
       return const Result.success(null);
     } catch (error) {
       return Result.failure(
@@ -122,6 +75,67 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
         ),
       );
     }
+  }
+
+  /// 🔁 Manejador común para onChildAdded y onChildChanged
+  void _handleProductoEvent(DatabaseEvent event, {required bool isChanged}) {
+    final snap = event.snapshot;
+    final raw = snap.value;
+
+    if (raw is! Map<dynamic, dynamic>) {
+      print('⚠️ Formato inesperado o nulo en snapshot: $raw');
+      return;
+    }
+
+    final data = Map<String, dynamic>.from(raw);
+    final key = snap.key!;
+    final producto = Product(
+      id: key,
+      alergogenos: (data['alergogenos'] as Map?)?.keys.cast<String>().toList() ?? [],
+      categoriaProducto: data['categoria_producto'] ?? '',
+      costeProducto: (data['coste_producto'] as num?)?.toDouble() ?? 0.0,
+      disponible: data['disponible'] == true,
+      descripcionProducto: data['descripcion_producto'] ?? '',
+      fotoUrl: data['foto_url'] ?? '',
+      nombreProducto: data['nombre_producto'] ?? '',
+      precioProducto: (data['precio_producto'] as num?)?.toDouble() ?? 0.0,
+      complementos: (data['complementos'] as Map?)?.entries.where((e) => e.value is Map).map((e) {
+            final m = Map<String, dynamic>.from(e.value as Map);
+            return Complemento(
+              id: e.key,
+              activo: m['activo'] is bool ? m['activo'] : true,
+              incremento: m['incremento'] is bool ? m['incremento'] : false,
+            );
+          }).toList() ??
+          [],
+      modifiers: (data['modifiers'] as Map?)?.entries.map((e) {
+            return Modifier(
+              name: e.key,
+              increment: (e.value is num) ? (e.value as num).toDouble() : 0.0,
+              mainProduct: key,
+            );
+          }).toList() ??
+          [],
+    );
+
+    final index = products.indexWhere((p) => p.id == producto.id);
+
+    if (index == -1) {
+      // Producto nuevo
+      products.add(producto);
+      _navegacionProvider.addProducto(producto);
+    } else if (isChanged) {
+      // Producto modificado
+      products[index] = producto;
+      _navegacionProvider.updateProducto(producto);
+    }
+  }
+
+  /// 🧾 Log de errores
+  void _handleProductoError(Object err, String source) {
+    final netErr = NetworkError.fromException(err);
+    final repoErr = RepositoryError.fromDataSourceError(netErr);
+    print('❌ Error en listener de productos [$source]: $repoErr');
   }
 
   @override
