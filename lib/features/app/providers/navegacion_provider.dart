@@ -17,6 +17,12 @@ class NavegacionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateProducto(Product productoActualizado) {
+    final index = _productos.indexWhere((p) => p.id == productoActualizado.id);
+    _productos[index] = productoActualizado;
+    notifyListeners();
+  }
+
   String get categoriaSelected => _categoriaSelected;
   set categoriaSelected(String name) {
     if (_categoriaSelected != name) {
