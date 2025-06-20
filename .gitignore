@@ -52,3 +52,6 @@ key.properties
 # Freezed generated files
 lib/**/*.freezed.dart
 lib/**/*.g.dart
+
+# Coverage and test output
+coverage/
