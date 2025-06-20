@@ -5,11 +5,21 @@ import 'login_form_event.dart';
 import 'login_form_state.dart';
 
 class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
-  final LoginUseCase loginUseCase;
+  final LoginUseCase _loginUseCase;
 
-  LoginFormBloc({required this.loginUseCase}) : super(const LoginFormState()) {
-    on<EmailChanged>((event, emit) => emit(state.copyWith(email: event.email)));
-    on<PasswordChanged>((event, emit) => emit(state.copyWith(password: event.password)));
+  LoginFormBloc({required LoginUseCase loginUseCase})
+      : _loginUseCase = loginUseCase,
+        super(const LoginFormState()) {
+    on<EmailChanged>(
+      (event, emit) => emit(
+        state.copyWith(email: event.email),
+      ),
+    );
+    on<PasswordChanged>(
+      (event, emit) => emit(
+        state.copyWith(password: event.password),
+      ),
+    );
     on<LoginSubmitted>(_handleLogin);
   }
 
@@ -19,7 +29,10 @@ class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
   ) async {
     emit(state.copyWith(isLoading: true, failure: null));
 
-    final result = await loginUseCase(email: state.email, password: state.password);
+    final result = await _loginUseCase(
+      email: state.email,
+      password: state.password,
+    );
 
     result.when(
       success: (_) => emit(state.copyWith(isLoading: false, loginSuccess: true)),

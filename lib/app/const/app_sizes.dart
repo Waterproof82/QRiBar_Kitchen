@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 /// This class contains all the sizes used in the app.
 final class AppSizes {
   /// Prevents the class from being instantiated.
-  const AppSizes._();
+  const AppSizes();
 
   /// The padding size of 4.0.
   static const double p4 = 4.0;
@@ -54,7 +54,7 @@ final class AppSizes {
 /// This class contains all the gaps used in the app.
 final class Gap {
   /// Prevents the class from being instantiated.
-  const Gap._();
+  const Gap();
 
   /// The height of 4.0.
   static const SizedBox h4 = SizedBox(height: AppSizes.p4);

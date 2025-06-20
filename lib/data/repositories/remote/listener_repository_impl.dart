@@ -9,24 +9,26 @@ import 'package:qribar_cocina/data/data_sources/remote/listeners_remote_data_sou
 import 'package:qribar_cocina/data/repositories/remote/listener_repository.dart';
 
 class ListenerRepositoryImpl implements ListenerRepository {
-  final FirebaseDatabase database;
-  final ListenersRemoteDataSourceContract dataSource;
+  final FirebaseDatabase _database;
+  final ListenersRemoteDataSourceContract _dataSource;
 
   ListenerRepositoryImpl({
-    required this.database,
-    required this.dataSource,
-  });
+    required FirebaseDatabase database,
+    required ListenersRemoteDataSourceContract dataSource,
+  })  : _database = database,
+        _dataSource = dataSource;
 
-  String get idBar => IdBarDataSource.instance.getIdBar();
+  String get _idBar => IdBarDataSource.instance.getIdBar();
 
+  @override
   Future<Result<void>> initializeListeners() async {
     try {
-      await dataSource.addProduct();
-      await dataSource.addCategoriaMenu();
-      await dataSource.changeCategoriaMenu();
-      await dataSource.addSalaMesas();
-      await dataSource.addAndChangedPedidos();
-      await dataSource.removePedidos();
+      await _dataSource.addProduct();
+      await _dataSource.addCategoriaMenu();
+      await _dataSource.changeCategoriaMenu();
+      await _dataSource.addSalaMesas();
+      await _dataSource.addAndChangedPedidos();
+      await _dataSource.removePedidos();
       return const Result.success(null);
     } catch (e) {
       return Result.failure(
@@ -44,7 +46,7 @@ class ListenerRepositoryImpl implements ListenerRepository {
     required String nuevoEstado,
   }) async {
     try {
-      final ref = database.ref('gestion_pedidos/$idBar/$mesa/$idPedido');
+      final ref = _database.ref('gestion_pedidos/$_idBar/$mesa/$idPedido');
       await ref.update({'estado_linea': nuevoEstado});
       return const Result.success(null);
     } catch (e) {
@@ -63,7 +65,7 @@ class ListenerRepositoryImpl implements ListenerRepository {
     required bool enMarcha,
   }) async {
     try {
-      final ref = database.ref('gestion_pedidos/$idBar/$mesa/$idPedido');
+      final ref = _database.ref('gestion_pedidos/$_idBar/$mesa/$idPedido');
       await ref.update({'en_marcha': enMarcha});
       return const Result.success(null);
     } catch (e) {
@@ -77,6 +79,9 @@ class ListenerRepositoryImpl implements ListenerRepository {
 
   @override
   void dispose() {
-    dataSource.dispose();
+    _dataSource.dispose();
   }
+
+  // Expones el dataSource solo si es necesario para el Bloc
+  ListenersRemoteDataSourceContract get dataSource => _dataSource;
 }

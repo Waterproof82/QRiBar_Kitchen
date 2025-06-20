@@ -32,10 +32,11 @@ class AppProviders extends StatelessWidget {
       ],
       child: Builder(
         builder: (context) {
-          final database = FirebaseDatabase.instance;
+          final FirebaseDatabase _database = FirebaseDatabase.instance;
 
           return MultiRepositoryProvider(
             providers: [
+              // 🔐 Auth
               RepositoryProvider<AuthRemoteDataSourceContract>(
                 create: (_) => AuthRemoteDataSourceImpl(),
               ),
@@ -50,19 +51,23 @@ class AppProviders extends StatelessWidget {
                   context.read<LoginRepositoryContract>(),
                 ),
               ),
-              RepositoryProvider(
-                create: (_) {
-                  final listenerDataSource = ListenersRemoteDataSource(
-                    database: database,
+
+              // 👂 Listener
+              RepositoryProvider<ListenerRepositoryImpl>(
+                create: (context) {
+                  final _listenerDataSource = ListenersRemoteDataSource(
+                    database: _database,
                     navegacionProvider: context.read<NavegacionProvider>(),
                   );
                   return ListenerRepositoryImpl(
-                    database: database,
-                    dataSource: listenerDataSource,
+                    database: _database,
+                    dataSource: _listenerDataSource,
                   );
                 },
               ),
-              RepositoryProvider(
+
+              // 💾 Local Preferences
+              RepositoryProvider<PreferencesLocalDataSourceContract>(
                 create: (_) => getIt.get<PreferencesLocalDataSourceContract>(),
               ),
               RepositoryProvider<LocalizationLocalDataSourceContract>(
@@ -75,22 +80,19 @@ class AppProviders extends StatelessWidget {
               providers: [
                 BlocProvider<LanguageCubit>(
                   create: (context) {
-                    final localization = context.read<LocalizationLocalDataSourceContract>();
-                    return LanguageCubit(localization);
+                    final _localization = context.read<LocalizationLocalDataSourceContract>();
+                    return LanguageCubit(_localization);
                   },
                 ),
-                BlocProvider(
+                BlocProvider<LoginFormBloc>(
                   create: (context) => LoginFormBloc(
                     loginUseCase: context.read<LoginUseCase>(),
                   ),
                 ),
-                BlocProvider(
+                BlocProvider<ListenerBloc>(
                   create: (context) {
-                    final listenerRepo = context.read<ListenerRepositoryImpl>();
-                    return ListenerBloc(repository: listenerRepo)
-                      ..add(
-                        const ListenerEvent.startListening(),
-                      );
+                    final _listenerRepo = context.read<ListenerRepositoryImpl>();
+                    return ListenerBloc(repository: _listenerRepo)..add(const ListenerEvent.startListening());
                   },
                 ),
               ],
