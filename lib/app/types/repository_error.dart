@@ -5,11 +5,11 @@ part 'repository_error.freezed.dart';
 
 @freezed
 class RepositoryError with _$RepositoryError {
-  const factory RepositoryError.badRequestListErrors(List<String> listErrors) = BadRequestListErrors;
+  const factory RepositoryError.badRequestListErrors(List<String> listErrors) = badRequestListErrors;
 
   const factory RepositoryError.securityError() = SecurityError;
 
-  const factory RepositoryError.badRequest() = BadRequest;
+  const factory RepositoryError.badRequest() = badRequest;
 
   const factory RepositoryError.noAccess() = NoAccess;
 
@@ -63,22 +63,3 @@ class RepositoryError with _$RepositoryError {
     return error ?? const RepositoryError.badRequest();
   }
 }
-
-// extension RepositoryErrorExtension on RepositoryError {
-//   String get message {
-//     return when(
-//       badRequestListErrors: (listErrors) => listErrors.join(', '),
-//       securityError: () => 'Error de seguridad. Contacta soporte.',
-//       badRequest: () => 'Solicitud incorrecta.',
-//       noAccess: () => 'No tienes acceso.',
-//       notFoundResource: () => 'Recurso no encontrado.',
-//       serverError: () => 'Error del servidor. Intenta más tarde.',
-//       noInternetConnection: () => 'Sin conexión a internet.',
-//       authExpired: () => 'Sesión expirada. Vuelve a iniciar sesión.',
-//       infoNotMatching: () => 'La información no coincide.',
-//       listErrors: (errorList) => errorList.join(', '),
-//       userNotFound: () => 'Usuario no encontrado.',
-//       wrongPassword: () => 'Contraseña incorrecta.',
-//     );
-//   }
-// }
