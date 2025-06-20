@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:qribar_cocina/app/config/app_theme.dart';
 import 'package:qribar_cocina/app/const/globals.dart';
 import 'package:qribar_cocina/app/l10n/l10n.dart';
 import 'package:qribar_cocina/app/routes/app_routes.dart';
@@ -13,10 +14,7 @@ class App extends StatelessWidget {
       builder: (context, state) {
         return SafeArea(
           child: MaterialApp(
-            theme: ThemeData(
-              primaryColor: Colors.green[700],
-              scaffoldBackgroundColor: Colors.blueGrey,
-            ),
+            theme: appTheme,
             debugShowCheckedModeBanner: false,
             onGenerateTitle: (context) => context.l10n.appName,
             initialRoute: AppRoutes.splash,

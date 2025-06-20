@@ -10,20 +10,26 @@ class LanguageChangedState {
 class LanguageCubit extends Cubit<LanguageChangedState> {
   final LocalizationLocalDataSourceContract _localization;
 
-  LanguageCubit(this._localization)
-      : super(LanguageChangedState(
-          localeCode: _localization.getCachedLocalLanguageCode(),
-        ));
+  LanguageCubit(LocalizationLocalDataSourceContract localization)
+      : _localization = localization,
+        super(
+          LanguageChangedState(
+            localeCode: localization.getCachedLocalLanguageCode(),
+          ),
+        );
 
-  void fetchLanguage() => emit(
-        LanguageChangedState(
-          localeCode: _localization.getCachedLocalLanguageCode(),
-        ),
-      );
+  void fetchLanguage() {
+    emit(
+      LanguageChangedState(
+        localeCode: _localization.getCachedLocalLanguageCode(),
+      ),
+    );
+  }
 
   Locale get locale => Locale(state.localeCode);
 
   Future<void> changeLanguage(String localeCode) async {
+    if (localeCode == state.localeCode) return;
     await _localization.cacheLocalLanguageCode(localeCode);
     emit(LanguageChangedState(localeCode: localeCode));
   }
