@@ -17,7 +17,9 @@ class LoginScreen extends StatelessWidget {
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [LanguageDropdown()],
+                children: [
+                  Flexible(child: LanguageDropdown()),
+                ],
               ),
               Gap.h248,
               LoginContainer(

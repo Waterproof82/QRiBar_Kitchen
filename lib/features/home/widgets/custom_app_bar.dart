@@ -4,6 +4,7 @@ import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
 import 'package:qribar_cocina/app/extensions/build_context_extension.dart';
 import 'package:qribar_cocina/app/extensions/selection_type_enum_extension.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
+import 'package:qribar_cocina/features/login/presentation/widgets/language_dropdown.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
@@ -27,7 +28,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Colors.black,
       iconTheme: IconThemeData(color: Colors.white),
       title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Flexible(
             child: FittedBox(
@@ -43,6 +44,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
           ),
+          LanguageDropdown(),
         ],
       ),
     );
