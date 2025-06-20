@@ -13,8 +13,7 @@ void main() {
       );
 
       final error = NetworkError.fromException(dioError);
-      // Asumiendo que getErrorFromDioError devuelve un tipo de NetworkError,
-      // validamos que no sea UnexpectedError ni noInternetConnection
+
       expect(error, isNot(const NetworkError.unexpectedError()));
       expect(error, isNot(const NetworkError.noInternetConnection()));
     });
@@ -45,8 +44,7 @@ void main() {
     });
 
     test('fromException catches errors in try-catch and returns unexpectedError', () {
-      // Forzar un error en fromException pasando algo que lance alString.contains
-      // Pero aquí es difícil forzar. Simplemente se prueba que no lance.
+
       final error = NetworkError.fromException(null);
       expect(error, const NetworkError.unexpectedError());
     });
