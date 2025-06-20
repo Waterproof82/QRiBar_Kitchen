@@ -44,7 +44,7 @@ void main() {
   });
 
   test('changeLanguage updates cache and emits new state if locale changed', () async {
-    when(() => mockLocalization.getCachedLocalLanguageCode()).thenReturn('en'); // <-- Aquí
+    when(() => mockLocalization.getCachedLocalLanguageCode()).thenReturn('en');
     when(() => mockLocalization.cacheLocalLanguageCode('de')).thenAnswer((_) async {});
 
     cubit = LanguageCubit(mockLocalization);
@@ -58,7 +58,7 @@ void main() {
   });
 
   test('changeLanguage does nothing if localeCode is same', () async {
-    when(() => mockLocalization.getCachedLocalLanguageCode()).thenReturn('en'); // <-- Aquí
+    when(() => mockLocalization.getCachedLocalLanguageCode()).thenReturn('en');
 
     cubit = LanguageCubit(mockLocalization);
 
@@ -79,7 +79,7 @@ void main() {
   });
 
   test('changeLanguage llama cacheLocalLanguageCode y emite nuevo estado', () async {
-    when(() => mockLocalization.getCachedLocalLanguageCode()).thenReturn('en'); // MOCK CORRECTO
+    when(() => mockLocalization.getCachedLocalLanguageCode()).thenReturn('en');
     when(() => mockLocalization.cacheLocalLanguageCode('fr')).thenAnswer((_) async {});
 
     cubit = LanguageCubit(mockLocalization);
@@ -91,7 +91,7 @@ void main() {
   });
 
   test('changeLanguage emite correctamente varios cambios de idioma', () async {
-    when(() => mockLocalization.getCachedLocalLanguageCode()).thenReturn('en'); // MOCK CORRECTO
+    when(() => mockLocalization.getCachedLocalLanguageCode()).thenReturn('en');
     when(() => mockLocalization.cacheLocalLanguageCode(any())).thenAnswer((_) async {});
 
     cubit = LanguageCubit(mockLocalization);

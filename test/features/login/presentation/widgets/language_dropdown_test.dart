@@ -6,6 +6,8 @@ import 'package:qribar_cocina/data/data_sources/local/localization_local_datasou
 import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
 import 'package:qribar_cocina/features/login/presentation/widgets/language_dropdown.dart';
 
+import '../../../../helpers/pump_app.dart';
+
 // Mock
 class MockLocalizationDataSource extends Mock implements LocalizationLocalDataSourceContract {}
 
@@ -16,42 +18,34 @@ void main() {
   setUp(() {
     mockLocalization = MockLocalizationDataSource();
 
-    // El idioma por defecto es 'es'
     when(() => mockLocalization.getCachedLocalLanguageCode()).thenReturn('es');
-
-    // Usa any() sin tipo genérico para String
     when(() => mockLocalization.cacheLocalLanguageCode(any())).thenAnswer((_) async {});
 
     languageCubit = LanguageCubit(mockLocalization);
   });
 
-  testWidgets('LanguageDropdown muestra y cambia el idioma correctamente', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: RepositoryProvider<LocalizationLocalDataSourceContract>.value(
-          value: mockLocalization,
-          child: BlocProvider<LanguageCubit>.value(
-            value: languageCubit,
-            child: const Scaffold(
-              body: LanguageDropdown(),
-            ),
-          ),
-        ),
-      ),
+  testWidgets('LanguageDropdown muestra y cambia el idioma correctamente', (tester) async {
+    await tester.pumpApp(
+      const LanguageDropdown(),
+      repositories: [
+        RepositoryProvider<LocalizationLocalDataSourceContract>.value(value: mockLocalization),
+      ],
+      blocs: [
+        BlocProvider<LanguageCubit>.value(value: languageCubit),
+      ],
     );
 
-    // Verifica que aparezca el idioma predeterminado
+    // Verifica idioma predeterminado
     expect(find.text('Español'), findsOneWidget);
 
     clearInteractions(mockLocalization);
 
-    // Simula cambiar a inglés
+    // Cambia a inglés
     await tester.tap(find.byType(DropdownButton<String>));
     await tester.pumpAndSettle();
     await tester.tap(find.text('English').last);
     await tester.pumpAndSettle();
 
-    // Verifica que cacheLocalLanguageCode haya sido llamado una vez con 'en'
     verify(() => mockLocalization.cacheLocalLanguageCode('en')).called(2);
     expect(languageCubit.state.localeCode, 'en');
   });

@@ -1,32 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
+
+import '../../helpers/pump_app.dart';
 
 void main() {
   group('RepositoryErrorExtension - translateError', () {
     late BuildContext context;
 
     Future<void> _pumpWithContext(WidgetTester tester, Locale locale) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          locale: locale,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: AppLocalizations.delegate.isSupported(locale) ? [locale] : const [Locale('en')],
-          home: Builder(
-            builder: (ctx) {
-              context = ctx;
-              return const Scaffold(body: SizedBox.shrink());
-            },
-          ),
+      await tester.pumpApp(
+        Builder(
+          builder: (ctx) {
+            context = ctx;
+            return const SizedBox.shrink();
+          },
         ),
+        locale: locale,
       );
       await tester.pumpAndSettle();
     }
@@ -102,12 +94,6 @@ void main() {
       final result = RepositoryError.wrongPassword().translateError(context);
       expect(result, AppLocalizations.of(context).wrongPassword);
     });
-
-    // testWidgets('orElse returns unknownError by default', (tester) async {
-    //   await _pumpWithContext(tester, const Locale('en'));
-    //   final result = const RepositoryError.unknown().translateError(context);
-    //   expect(result, AppLocalizations.of(context).unknownError);
-    // });
 
   });
 }
