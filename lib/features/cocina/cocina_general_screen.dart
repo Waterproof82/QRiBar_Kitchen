@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:qribar_cocina/app/const/globals.dart';
 import 'package:qribar_cocina/app/extensions/date_time_extension.dart';
 import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
-import 'package:qribar_cocina/app/l10n/l10n.dart';
+import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/cocina/widgets/barra_superior_tiempo.dart';
@@ -26,30 +25,39 @@ class CocinaGeneralScreen extends StatelessWidget {
       children: [
         BarraSuperiorTiempo(ancho: ancho),
         BlocBuilder<ListenerBloc, ListenerState>(
-          builder: (context, state) {
-            return state.maybeWhen(
-              pedidosUpdated: (pedidos) => _buildContent(pedidos),
-              pedidoRemoved: (pedidos) => _buildContent(pedidos),
-              failure: (error) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Globals.rootScaffoldMessengerKey.currentState?.showSnackBar(
-                    SnackBar(content: Text('Error: ${error.translateError(context)}')),
-                  );
-                });
-                return const SizedBox.shrink();
-              },
-              orElse: () => const SizedBox.shrink(),
-            );
-          },
+          builder: (context, state) => _handleState(context, state),
         ),
       ],
     );
   }
 
-  Widget _buildContent(List<Pedido> pedidos) {
+  Widget _handleState(BuildContext context, ListenerState state) {
+    return state.maybeWhen(
+      pedidosUpdated: _buildPedidos,
+      pedidoRemoved: _buildPedidos,
+      failure: (error) {
+        _showError(context, error);
+        return const SizedBox.shrink();
+      },
+      orElse: () => const SizedBox.shrink(),
+    );
+  }
+
+  void _showError(BuildContext context, RepositoryError error) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final messenger = Globals.rootScaffoldMessengerKey.currentState;
+      if (messenger?.mounted ?? false) {
+        messenger!.showSnackBar(
+          SnackBar(content: Text('Error: ${error.translateError(context)}')),
+        );
+      }
+    });
+  }
+
+  Widget _buildPedidos(List<Pedido> pedidos) {
     final pedidosFiltrados = pedidos
         .where(
-          (item) => item.estadoLinea != EstadoPedidoEnum.bloqueado.name,
+          (p) => p.estadoLinea != EstadoPedidoEnum.bloqueado.name,
         )
         .toList();
 
@@ -58,81 +66,93 @@ class CocinaGeneralScreen extends StatelessWidget {
 }
 
 class ListaProductosPedidos extends StatelessWidget {
-  ListaProductosPedidos({Key? key, required this.itemPedidos}) : super(key: key);
+  const ListaProductosPedidos({
+    Key? key,
+    required this.itemPedidos,
+  }) : super(key: key);
 
   final List<Pedido> itemPedidos;
 
   @override
   Widget build(BuildContext context) {
-    final pageController = Provider.of<NavegacionProvider>(
-      context,
-      listen: false,
-    ).pageController;
+    final pageController = context.read<NavegacionProvider>().pageController;
     final ancho = context.width;
-    // ignore: unused_local_variable
-    bool notaBar = false;
+
+    final pedidosOrdenados = [...itemPedidos]..sort((a, b) {
+        final horaCompare = a.hora.compareTo(b.hora);
+        if (horaCompare != 0) return horaCompare;
+
+        final tituloCompare = a.titulo?.compareTo(b.titulo ?? '') ?? 0;
+        if (tituloCompare != 0) return tituloCompare;
+
+        return (a.modifiers ?? []).toString().compareTo((b.modifiers ?? []).toString());
+      });
 
     return Container(
       color: Colors.black,
-      margin: EdgeInsets.only(top: 60),
+      margin: const EdgeInsets.only(top: 60),
       child: ListView.builder(
         controller: pageController,
-        physics: BouncingScrollPhysics(),
-        itemCount: itemPedidos.length,
-        itemBuilder: (_, int index) {
-          itemPedidos.sort((a, b) {
-            return a.hora.compareTo(b.hora) != 0
-                ? a.hora.compareTo(b.hora)
-                : a.titulo!.compareTo(b.titulo!) != 0
-                    ? a.titulo!.compareTo(b.titulo!)
-                    : (a.modifiers ?? []).toString().compareTo((b.modifiers ?? []).toString());
-          });
+        physics: const BouncingScrollPhysics(),
+        itemCount: pedidosOrdenados.length,
+        itemBuilder: (_, index) {
+          final pedido = pedidosOrdenados[index];
 
-          if (itemPedidos[index].nota != null) notaBar = true;
-          return (itemPedidos[index].estadoLinea != EstadoPedidoEnum.cocinado.name)
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
-                  child: Column(
-                    children: [
-                      LineaProducto(itemPedidos: itemPedidos, index: index),
-                      if (itemPedidos[index].nota != null && itemPedidos[index].nota != '')
-                        Container(
-                          width: ancho,
-                          padding: const EdgeInsets.symmetric(horizontal: 2),
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 255, 255, 255),
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            boxShadow: <BoxShadow>[BoxShadow(color: Colors.black, blurRadius: 5, spreadRadius: 0)],
-                          ),
-                          child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.note_alt_outlined,
-                                    size: 20,
-                                    color: Colors.red,
-                                  ),
-                                  Text(' ${itemPedidos[index].nota}',
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      textAlign: TextAlign.left,
-                                      style: GoogleFonts.notoSans(
-                                        color: const Color.fromARGB(255, 0, 0, 0),
-                                        fontSize: (ancho > 450) ? 22 : 18,
-                                        fontWeight: FontWeight.w500,
-                                      )),
-                                ],
-                              )),
-                          // alignment: Alignment.center,
-                        ),
-                      // Extras(ancho: ancho, item: itemPedidos[index]),
-                    ],
-                  ),
-                )
-              : SizedBox.shrink();
+          if (pedido.estadoLinea == EstadoPedidoEnum.cocinado.name) {
+            return const SizedBox.shrink();
+          }
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
+            child: Column(
+              children: [
+                LineaProducto(itemPedidos: pedidosOrdenados, index: index),
+                if (pedido.nota != null && pedido.nota!.trim().isNotEmpty) _NotaBar(pedido.nota!, ancho),
+              ],
+            ),
+          );
         },
+      ),
+    );
+  }
+}
+
+class _NotaBar extends StatelessWidget {
+  final String nota;
+  final double ancho;
+
+  const _NotaBar(this.nota, this.ancho);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: ancho,
+      height: 30,
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: const [
+          BoxShadow(color: Colors.black, blurRadius: 5, spreadRadius: 0),
+        ],
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            const Icon(Icons.note_alt_outlined, size: 20, color: Colors.red),
+            Text(
+              ' $nota',
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: GoogleFonts.notoSans(
+                color: Colors.black,
+                fontSize: ancho > 450 ? 22 : 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -140,9 +160,11 @@ class ListaProductosPedidos extends StatelessWidget {
 
 class LineaProducto extends StatefulWidget {
   const LineaProducto({
+    Key? key,
     required this.index,
     required this.itemPedidos,
-  });
+  }) : super(key: key);
+
   final List<Pedido> itemPedidos;
   final int index;
 
@@ -151,18 +173,17 @@ class LineaProducto extends StatefulWidget {
 }
 
 class _LineaProductoState extends State<LineaProducto> {
-  late DateTime now;
-  late Timer timer = Timer(Duration(), () {});
-  final database = FirebaseDatabase.instance;
+  late DateTime _now;
+  late Timer _timer;
 
   @override
   void initState() {
     super.initState();
-    now = DateTime.now();
-    timer = Timer.periodic(Duration(minutes: 1), (Timer t) {
+    _now = DateTime.now();
+    _timer = Timer.periodic(const Duration(minutes: 1), (_) {
       if (mounted) {
         setState(() {
-          now = DateTime.now();
+          _now = DateTime.now();
         });
       }
     });
@@ -170,8 +191,19 @@ class _LineaProductoState extends State<LineaProducto> {
 
   @override
   void dispose() {
-    timer.cancel();
+    _timer.cancel();
     super.dispose();
+  }
+
+  Color _getColorLineaCocina(Duration diff) {
+    if (diff.inMinutes > 30) {
+      return const Color.fromARGB(255, 255, 0, 0);
+    } else if (diff.inMinutes > 20) {
+      return const Color.fromRGBO(242, 132, 64, 1);
+    } else if (diff.inMinutes > 9) {
+      return Colors.amber;
+    }
+    return Colors.black;
   }
 
   @override
@@ -180,36 +212,18 @@ class _LineaProductoState extends State<LineaProducto> {
     final ancho = context.width;
     final alto = context.height;
 
-    final int listSelCant;
-    final String listSelName;
+    final Pedido itemPedido = widget.itemPedidos[widget.index];
+    final int listSelCant = itemPedido.cantidad;
+    final String listSelName = itemPedido.titulo ?? '';
+    final String estadoLinea = itemPedido.estadoLinea;
+    final int pedidoNum = itemPedido.numPedido;
+    final String mesaVar = itemPedido.mesa;
+    final bool enMarcha = itemPedido.enMarcha;
 
-    String? estadoLinea = '';
-    bool rst = false;
-    Color colorLineaCocina = Colors.grey;
-    int pedidoNum = 0;
-    String mesaVar = '';
-    Color marchando = Colors.white38;
-    Pedido itemPedido = widget.itemPedidos[widget.index];
-
-    listSelCant = itemPedido.cantidad;
-    listSelName = itemPedido.titulo ?? '';
-
-    estadoLinea = itemPedido.estadoLinea;
-    pedidoNum = itemPedido.numPedido;
-    mesaVar = itemPedido.mesa;
-    marchando = (itemPedido.enMarcha == true) ? Color.fromARGB(255, 7, 255, 19) : Colors.white;
-
-    DateTime rstHora = DateTimeExtension.combineNowWithTime(itemPedido.hora);
-
-    Duration diff = now.difference(rstHora);
-    if (diff.inMinutes > 9 && diff.inMinutes < 21)
-      colorLineaCocina = Colors.amber;
-    else if (diff.inMinutes > 20 && diff.inMinutes < 31)
-      colorLineaCocina = Color.fromRGBO(242, 132, 64, 1);
-    else if (diff.inMinutes > 30)
-      colorLineaCocina = Color.fromARGB(255, 255, 0, 0);
-    else
-      colorLineaCocina = Color.fromARGB(255, 0, 0, 0);
+    final DateTime rstHora = DateTimeExtension.combineNowWithTime(itemPedido.hora);
+    final Duration diff = _now.difference(rstHora);
+    final Color colorLineaCocina = _getColorLineaCocina(diff);
+    final Color marchando = enMarcha ? const Color.fromARGB(255, 7, 255, 19) : Colors.white;
 
     return GestureDetector(
       onTap: () {
@@ -217,7 +231,7 @@ class _LineaProductoState extends State<LineaProducto> {
               ListenerEvent.updateEnMarchaPedido(
                 mesa: itemPedido.mesa,
                 idPedido: itemPedido.id,
-                enMarcha: !itemPedido.enMarcha,
+                enMarcha: !enMarcha,
               ),
             );
       },
@@ -226,166 +240,164 @@ class _LineaProductoState extends State<LineaProducto> {
           Container(
             width: ancho,
             decoration: BoxDecoration(
-              color: (estadoLinea != EstadoPedidoEnum.cocinado.name) ? Color.fromARGB(255, 255, 255, 255) : Color.fromARGB(255, 23, 82, 47),
-              borderRadius: BorderRadius.all(Radius.circular(100)),
-              boxShadow: <BoxShadow>[BoxShadow(color: Colors.black54, blurRadius: 5, spreadRadius: -5)],
+              color: estadoLinea != EstadoPedidoEnum.cocinado.name ? Colors.white : const Color.fromARGB(255, 23, 82, 47),
+              borderRadius: BorderRadius.circular(100),
+              boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 5, spreadRadius: -5)],
             ),
             child: Dismissible(
-                key: UniqueKey(),
-                onDismissed: (direction) {},
-                confirmDismiss: (direction) async {
-                  if (direction == DismissDirection.startToEnd) {
-                    return false;
-                  }
-                  if (direction == DismissDirection.endToStart) {
-                    context.read<ListenerBloc>().add(
-                          ListenerEvent.updateEstadoPedido(
-                            mesa: itemPedido.mesa,
-                            idPedido: itemPedido.id,
-                            nuevoEstado: EstadoPedidoEnum.cocinado.name,
-                          ),
-                        );
-                  }
-                  return rst;
-                },
-                background: Container(
-                  color: Colors.redAccent,
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Gap.w12,
-                        Icon(Icons.cancel_outlined, color: Colors.white, size: 24),
-                        Gap.w12,
-                        Text(context.l10n.cancelOrder,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w400,
-                              fontSize: 22,
-                            )),
-                      ],
-                    ),
-                  ),
-                ),
-                secondaryBackground: Container(
-                  color: Colors.green,
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(context.l10n.served,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w400,
-                              fontSize: 22,
-                            )),
-                        Gap.w12,
-                        Icon(Icons.check_sharp, color: Colors.white, size: 24),
-                        Gap.w12,
-                      ],
-                    ),
-                  ),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: colorLineaCocina,
-                    border: Border.all(width: (itemPedido.enMarcha == false) ? 2 : 4, color: marchando),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: <BoxShadow>[BoxShadow(blurRadius: 5, spreadRadius: -5)],
-                  ),
-                  height: alto * 0.05,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.only(topLeft: Radius.circular(5), bottomLeft: Radius.circular(5)),
-                        child: Container(
-                          width: (ancho > 450) ? 65 : 45,
-                          height: double.infinity,
-                          margin: EdgeInsets.only(top: 0),
-                          color: Colors.red[200],
-                          child: Center(
-                            child: Text(
-                              ' x$listSelCant ',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.notoSans(
-                                fontSize: (ancho > 450) ? 28 : 20,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
+              key: UniqueKey(),
+              confirmDismiss: (direction) async {
+                if (direction == DismissDirection.startToEnd) return false;
+                if (direction == DismissDirection.endToStart) {
+                  context.read<ListenerBloc>().add(
+                        ListenerEvent.updateEstadoPedido(
+                          mesa: itemPedido.mesa,
+                          idPedido: itemPedido.id,
+                          nuevoEstado: EstadoPedidoEnum.cocinado.name,
                         ),
+                      );
+                  return true;
+                }
+                return false;
+              },
+              onDismissed: (direction) {},
+              background: Container(
+                color: Colors.redAccent,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: const [
+                    SizedBox(width: 12),
+                    Icon(Icons.cancel_outlined, color: Colors.white, size: 24),
+                    SizedBox(width: 12),
+                    Text(
+                      'Cancelar',
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontSize: 22),
+                    ),
+                  ],
+                ),
+              ),
+              secondaryBackground: Container(
+                color: Colors.green,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: const [
+                    Text(
+                      'Servido',
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontSize: 22),
+                    ),
+                    SizedBox(width: 12),
+                    Icon(Icons.check_sharp, color: Colors.white, size: 24),
+                    SizedBox(width: 12),
+                  ],
+                ),
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: colorLineaCocina,
+                  border: Border.all(width: enMarcha ? 4 : 2, color: marchando),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: const [BoxShadow(blurRadius: 5, spreadRadius: -5)],
+                ),
+                height: alto * 0.05,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(5),
+                        bottomLeft: Radius.circular(5),
                       ),
-                      Flexible(
-                        fit: FlexFit.tight,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
+                      child: Container(
+                        width: ancho > 450 ? 65 : 45,
+                        height: double.infinity,
+                        color: Colors.red[200],
+                        child: Center(
                           child: Text(
-                            ' $listSelName',
-                            overflow: TextOverflow.ellipsis,
+                            ' x$listSelCant ',
                             maxLines: 1,
-                            textAlign: TextAlign.left,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
                             style: GoogleFonts.notoSans(
-                              color: const Color.fromARGB(255, 255, 255, 255),
-                              fontSize: (ancho > 450) ? 26 : 18,
-                              fontWeight: FontWeight.w400,
+                              fontSize: ancho > 450 ? 28 : 20,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
                       ),
-                      ClipRRect(
-                        borderRadius: BorderRadius.only(topRight: Radius.circular(5), bottomRight: Radius.circular(5)),
-                        child: Container(
-                          height: double.infinity,
-                          color: Colors.red[300],
-                          child: Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  nav.mesaActual = widget.itemPedidos[widget.index].mesa;
-                                  nav.idPedidoSelected = widget.itemPedidos[widget.index].numPedido;
-                                  nav.categoriaSelected = SelectionTypeEnum.pedidosScreen.name;
-                                },
-                                child: Container(
-                                  width: (ancho > 450) ? 120 : 90,
-                                  child: RichText(
-                                    textAlign: TextAlign.center,
-                                    maxLines: 1,
-                                    text: TextSpan(
-                                      children: [
-                                        TextSpan(
-                                          text: 'P$pedidoNum/',
-                                          style: GoogleFonts.notoSans(
-                                            color: Colors.black,
-                                            fontSize: (ancho > 450) ? 24 : 20,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                    ),
+                    Flexible(
+                      fit: FlexFit.tight,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          ' $listSelName',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.left,
+                          style: GoogleFonts.notoSans(
+                            color: Colors.white,
+                            fontSize: ancho > 450 ? 26 : 18,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    ),
+                    ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(5),
+                        bottomRight: Radius.circular(5),
+                      ),
+                      child: Container(
+                        height: double.infinity,
+                        color: Colors.red[300],
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                nav.mesaActual = itemPedido.mesa;
+                                nav.idPedidoSelected = itemPedido.numPedido;
+                                nav.categoriaSelected = SelectionTypeEnum.pedidosScreen.name;
+                              },
+                              child: Container(
+                                width: ancho > 450 ? 120 : 90,
+                                alignment: Alignment.center,
+                                child: RichText(
+                                  maxLines: 1,
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: 'P$pedidoNum/',
+                                        style: GoogleFonts.notoSans(
+                                          color: Colors.black,
+                                          fontSize: ancho > 450 ? 24 : 20,
+                                          fontWeight: FontWeight.w500,
                                         ),
-                                        TextSpan(
-                                          text: 'M${int.parse(mesaVar)}',
-                                          style: GoogleFonts.notoSans(
-                                            fontSize: (ancho > 450) ? 24 : 20,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                      ),
+                                      TextSpan(
+                                        text: 'M${int.tryParse(mesaVar) ?? mesaVar}',
+                                        style: GoogleFonts.notoSans(
+                                          fontSize: ancho > 450 ? 24 : 20,
+                                          fontWeight: FontWeight.w500,
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                )),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
           ModifiersOptions(
             ancho: ancho,
-            modifiers: widget.itemPedidos[widget.index].modifiers ?? [],
+            modifiers: itemPedido.modifiers ?? const [],
             mainModifierName: listSelName,
           ),
         ],
