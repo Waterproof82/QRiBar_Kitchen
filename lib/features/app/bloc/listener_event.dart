@@ -18,4 +18,5 @@ class ListenerEvent with _$ListenerEvent {
     required bool enMarcha,
   }) = _UpdateEnMarchaPedido;
 
+  const factory ListenerEvent.streamError(RepositoryError error) = _StreamError;
 }
