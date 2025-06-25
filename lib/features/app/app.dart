@@ -6,7 +6,7 @@ import 'package:qribar_cocina/app/const/globals.dart';
 import 'package:qribar_cocina/app/l10n/l10n.dart';
 import 'package:qribar_cocina/app/routes/app_routes.dart';
 import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
-import 'package:qribar_cocina/shared/utils/global_error_listener.dart';
+import 'package:qribar_cocina/shared/widgets/global_error_listener.dart';
 
 class App extends StatelessWidget {
   @override
