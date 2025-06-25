@@ -3,15 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'package:qribar_cocina/app/const/globals.dart';
 import 'package:qribar_cocina/app/extensions/date_time_extension.dart';
-import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
-import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/cocina/widgets/barra_superior_tiempo.dart';
 import 'package:qribar_cocina/features/cocina/widgets/modifiers_options.dart';
+import 'package:qribar_cocina/features/cocina/widgets/pedido_dismissible.dart';
 import 'package:qribar_cocina/shared/app_exports.dart';
 
 class CocinaGeneralScreen extends StatelessWidget {
@@ -35,23 +32,8 @@ class CocinaGeneralScreen extends StatelessWidget {
     return state.maybeWhen(
       pedidosUpdated: _buildPedidos,
       pedidoRemoved: _buildPedidos,
-      failure: (error) {
-        _showError(context, error);
-        return const SizedBox.shrink();
-      },
       orElse: () => const SizedBox.shrink(),
     );
-  }
-
-  void _showError(BuildContext context, RepositoryError error) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final messenger = Globals.rootScaffoldMessengerKey.currentState;
-      if (messenger?.mounted ?? false) {
-        messenger!.showSnackBar(
-          SnackBar(content: Text('Error: ${error.translateError(context)}')),
-        );
-      }
-    });
   }
 
   Widget _buildPedidos(List<Pedido> pedidos) {
@@ -208,7 +190,6 @@ class _LineaProductoState extends State<LineaProducto> {
 
   @override
   Widget build(BuildContext context) {
-    final nav = Provider.of<NavegacionProvider>(context, listen: false);
     final ancho = context.width;
     final alto = context.height;
 
@@ -224,7 +205,6 @@ class _LineaProductoState extends State<LineaProducto> {
     final Duration diff = _now.difference(rstHora);
     final Color colorLineaCocina = _getColorLineaCocina(diff);
     final Color marchando = enMarcha ? const Color.fromARGB(255, 7, 255, 19) : Colors.white;
-
     return GestureDetector(
       onTap: () {
         context.read<ListenerBloc>().add(
@@ -244,155 +224,17 @@ class _LineaProductoState extends State<LineaProducto> {
               borderRadius: BorderRadius.circular(100),
               boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 5, spreadRadius: -5)],
             ),
-            child: Dismissible(
-              key: UniqueKey(),
-              confirmDismiss: (direction) async {
-                if (direction == DismissDirection.startToEnd) return false;
-                if (direction == DismissDirection.endToStart) {
-                  context.read<ListenerBloc>().add(
-                        ListenerEvent.updateEstadoPedido(
-                          mesa: itemPedido.mesa,
-                          idPedido: itemPedido.id,
-                          nuevoEstado: EstadoPedidoEnum.cocinado.name,
-                        ),
-                      );
-                  return true;
-                }
-                return false;
-              },
-              onDismissed: (direction) {},
-              background: Container(
-                color: Colors.redAccent,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
-                    SizedBox(width: 12),
-                    Icon(Icons.cancel_outlined, color: Colors.white, size: 24),
-                    SizedBox(width: 12),
-                    Text(
-                      'Cancelar',
-                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontSize: 22),
-                    ),
-                  ],
-                ),
-              ),
-              secondaryBackground: Container(
-                color: Colors.green,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: const [
-                    Text(
-                      'Servido',
-                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontSize: 22),
-                    ),
-                    SizedBox(width: 12),
-                    Icon(Icons.check_sharp, color: Colors.white, size: 24),
-                    SizedBox(width: 12),
-                  ],
-                ),
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: colorLineaCocina,
-                  border: Border.all(width: enMarcha ? 4 : 2, color: marchando),
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: const [BoxShadow(blurRadius: 5, spreadRadius: -5)],
-                ),
-                height: alto * 0.05,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(5),
-                        bottomLeft: Radius.circular(5),
-                      ),
-                      child: Container(
-                        width: ancho > 450 ? 65 : 45,
-                        height: double.infinity,
-                        color: Colors.red[200],
-                        child: Center(
-                          child: Text(
-                            ' x$listSelCant ',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.notoSans(
-                              fontSize: ancho > 450 ? 28 : 20,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      fit: FlexFit.tight,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Text(
-                          ' $listSelName',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.left,
-                          style: GoogleFonts.notoSans(
-                            color: Colors.white,
-                            fontSize: ancho > 450 ? 26 : 18,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ),
-                    ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topRight: Radius.circular(5),
-                        bottomRight: Radius.circular(5),
-                      ),
-                      child: Container(
-                        height: double.infinity,
-                        color: Colors.red[300],
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                nav.mesaActual = itemPedido.mesa;
-                                nav.idPedidoSelected = itemPedido.numPedido;
-                                nav.categoriaSelected = SelectionTypeEnum.pedidosScreen.name;
-                              },
-                              child: Container(
-                                width: ancho > 450 ? 120 : 90,
-                                alignment: Alignment.center,
-                                child: RichText(
-                                  maxLines: 1,
-                                  textAlign: TextAlign.center,
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: 'P$pedidoNum/',
-                                        style: GoogleFonts.notoSans(
-                                          color: Colors.black,
-                                          fontSize: ancho > 450 ? 24 : 20,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'M${int.tryParse(mesaVar) ?? mesaVar}',
-                                        style: GoogleFonts.notoSans(
-                                          fontSize: ancho > 450 ? 24 : 20,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            child: PedidoDismissible(
+              itemPedido: itemPedido,
+              listSelCant: listSelCant,
+              listSelName: listSelName,
+              pedidoNum: pedidoNum,
+              mesaVar: mesaVar,
+              enMarcha: enMarcha,
+              ancho: ancho,
+              alto: alto,
+              colorLineaCocina: colorLineaCocina,
+              marchando: marchando,
             ),
           ),
           ModifiersOptions(

@@ -20,86 +20,91 @@ import 'package:qribar_cocina/features/login/domain/repositories/login_repositor
 import 'package:qribar_cocina/features/login/domain/use_cases/login_use_case.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
 
+/// 🚀
 /// A [StatelessWidget] which wraps the [App] with the necessary providers.
+/// This widget handles dependency injection for repositories, data sources,
+/// providers and blocs used throughout the application.
 class AppProviders extends StatelessWidget {
   const AppProviders({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final FirebaseDatabase _database = FirebaseDatabase.instance;
+
     return MultiProvider(
+      /// 🌐 Global non-Bloc providers
       providers: [
         ChangeNotifierProvider(create: (_) => NavegacionProvider()),
       ],
-      child: Builder(
-        builder: (context) {
-          final FirebaseDatabase _database = FirebaseDatabase.instance;
+      child: MultiRepositoryProvider(
+        /// 📦 Repository and DataSource injection
+        providers: [
+          /// 🔐 Remote DataSource for Firebase Authentication
+          RepositoryProvider<AuthRemoteDataSourceContract>(
+            create: (_) => AuthRemoteDataSourceImpl(),
+          ),
 
-          return MultiRepositoryProvider(
-            providers: [
-              // 🔐 Auth
-              RepositoryProvider<AuthRemoteDataSourceContract>(
-                create: (_) => AuthRemoteDataSourceImpl(),
-              ),
-              RepositoryProvider<LoginRepositoryContract>(
-                create: (context) => LoginRepositoryImpl(
-                  context.read<AuthRemoteDataSourceContract>(),
-                  IdBarDataSource.instance,
-                ),
-              ),
-              RepositoryProvider<LoginUseCase>(
-                create: (context) => LoginUseCase(
-                  context.read<LoginRepositoryContract>(),
-                ),
-              ),
-
-              // 👂 Listener
-              RepositoryProvider<ListenerRepositoryImpl>(
-                create: (context) {
-                  final _listenerDataSource = ListenersRemoteDataSource(
-                    database: _database,
-                    navegacionProvider: context.read<NavegacionProvider>(),
-                  );
-                  return ListenerRepositoryImpl(
-                    database: _database,
-                    dataSource: _listenerDataSource,
-                  );
-                },
-              ),
-
-              // 💾 Local Preferences
-              RepositoryProvider<PreferencesLocalDataSourceContract>(
-                create: (_) => getIt.get<PreferencesLocalDataSourceContract>(),
-              ),
-              RepositoryProvider<LocalizationLocalDataSourceContract>(
-                create: (context) => LocalizationLocalDataSource(
-                  preferences: context.read<PreferencesLocalDataSourceContract>(),
-                ),
-              ),
-            ],
-            child: MultiBlocProvider(
-              providers: [
-                BlocProvider<LanguageCubit>(
-                  create: (context) {
-                    final _localization = context.read<LocalizationLocalDataSourceContract>();
-                    return LanguageCubit(_localization);
-                  },
-                ),
-                BlocProvider<LoginFormBloc>(
-                  create: (context) => LoginFormBloc(
-                    loginUseCase: context.read<LoginUseCase>(),
-                  ),
-                ),
-                BlocProvider<ListenerBloc>(
-                  create: (context) {
-                    final _listenerRepo = context.read<ListenerRepositoryImpl>();
-                    return ListenerBloc(repository: _listenerRepo)..add(const ListenerEvent.startListening());
-                  },
-                ),
-              ],
-              child: App(),
+          /// 👤 Login repository using remote data source and singleton IdBarDataSource
+          RepositoryProvider<LoginRepositoryContract>(
+            create: (context) => LoginRepositoryImpl(
+              context.read<AuthRemoteDataSourceContract>(),
+              IdBarDataSource.instance,
             ),
-          );
-        },
+          ),
+
+          /// 📋 UseCase for Login business logic
+          RepositoryProvider<LoginUseCase>(
+            create: (context) => LoginUseCase(
+              context.read<LoginRepositoryContract>(),
+            ),
+          ),
+
+          /// 🎧 Remote DataSource and Repository for Firebase listeners
+          RepositoryProvider<ListenerRepositoryImpl>(
+            create: (context) {
+              final _listenerDataSource = ListenersRemoteDataSource(
+                database: _database,
+                navegacionProvider: context.read<NavegacionProvider>(),
+              );
+              return ListenerRepositoryImpl(
+                database: _database,
+                dataSource: _listenerDataSource,
+              );
+            },
+          ),
+
+          /// ⚙️ Local DataSources for preferences and localization
+          RepositoryProvider<PreferencesLocalDataSourceContract>(
+            create: (_) => getIt.get<PreferencesLocalDataSourceContract>(),
+          ),
+          RepositoryProvider<LocalizationLocalDataSourceContract>(
+            create: (context) => LocalizationLocalDataSource(
+              preferences: context.read<PreferencesLocalDataSourceContract>(),
+            ),
+          ),
+        ],
+        child: MultiBlocProvider(
+          /// 🧩 Blocs managing app state
+          providers: [
+            BlocProvider<ListenerBloc>(
+              create: (context) => ListenerBloc(
+                repository: context.read<ListenerRepositoryImpl>(),
+              ),
+            ),
+            BlocProvider<LoginFormBloc>(
+              create: (context) => LoginFormBloc(
+                loginUseCase: context.read<LoginUseCase>(),
+                listenerBloc: context.read<ListenerBloc>(),
+              ),
+            ),
+            BlocProvider<LanguageCubit>(
+              create: (context) => LanguageCubit(
+                context.read<LocalizationLocalDataSourceContract>(),
+              ),
+            ),
+          ],
+          child: App(),
+        ),
       ),
     );
   }

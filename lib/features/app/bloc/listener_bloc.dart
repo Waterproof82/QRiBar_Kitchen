@@ -36,7 +36,7 @@ class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
         );
       },
     );
-    
+
     on<_StartListening>(_onStartListening);
     on<_PedidosUpdated>(_onPedidosUpdated);
     on<_PedidoRemoved>(_onPedidoRemoved);

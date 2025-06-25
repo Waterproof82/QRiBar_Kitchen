@@ -18,7 +18,12 @@ class ListenerRepositoryImpl implements ListenerRepository {
   })  : _database = database,
         _dataSource = dataSource;
 
-  String get _idBar => IdBarDataSource.instance.getIdBar();
+  String get _idBar {
+    if (!IdBarDataSource.instance.hasIdBar) {
+      throw StateError('idBar no inicializado en ListenersRemoteDataSource');
+    }
+    return IdBarDataSource.instance.idBar;
+  }
 
   @override
   Future<Result<void>> initializeListeners() async {

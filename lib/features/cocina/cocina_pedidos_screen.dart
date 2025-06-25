@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/app/const/globals.dart';
-import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
-import 'package:qribar_cocina/app/l10n/l10n.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/cocina/widgets/modifiers_options.dart';
+import 'package:qribar_cocina/features/cocina/widgets/pedido_dismissible.dart';
 import 'package:qribar_cocina/shared/app_exports.dart';
 
 class CocinaPedidosScreen extends StatelessWidget {
@@ -30,15 +28,6 @@ class CocinaPedidosScreen extends StatelessWidget {
             pedidos,
             navegacionModel,
           ),
-          failure: (error) {
-            // Mostrar SnackBar global
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Globals.rootScaffoldMessengerKey.currentState?.showSnackBar(
-                SnackBar(content: Text('Error: ${error.translateError(context)}')),
-              );
-            });
-            return const SizedBox.shrink();
-          },
           orElse: () => const SizedBox.shrink(),
         );
       },
@@ -306,20 +295,17 @@ class LineaProducto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nav = Provider.of<NavegacionProvider>(context, listen: false);
-
     final ancho = context.width;
     final alto = context.height;
     final int listSelCant;
     final String listSelName;
-    // ignore: unused_local_variable
-    String? estadoLinea = '';
-    bool rst = false;
+
+    final bool enMarcha = itemPedidos[index].enMarcha;
+    final Color marchando = enMarcha ? const Color.fromARGB(255, 7, 255, 19) : Colors.white;
 
     listSelCant = itemPedidos[index].cantidad;
     listSelName = itemPedidos[index].titulo ?? '';
     envioProd = itemPedidos[index].envio;
-    estadoLinea = itemPedidos[index].estadoLinea;
     hora = (itemPedidos[index].hora.isNotEmpty) ? itemPedidos[index].hora.split(':').sublist(0, 2).join(':') : "--:--";
     pedidoNum = itemPedidos[index].numPedido;
     mesaVar = itemPedidos[index].mesa;
@@ -330,7 +316,7 @@ class LineaProducto extends StatelessWidget {
               ListenerEvent.updateEnMarchaPedido(
                 mesa: itemPedidos[index].mesa,
                 idPedido: itemPedidos[index].id,
-                enMarcha: !itemPedidos[index].enMarcha,
+                enMarcha: !enMarcha,
               ),
             );
       },
@@ -344,140 +330,17 @@ class LineaProducto extends StatelessWidget {
                 BoxShadow(color: Colors.black54, blurRadius: 5, spreadRadius: -5),
               ],
             ),
-            child: Dismissible(
-              key: UniqueKey(),
-              onDismissed: (direction) {},
-              confirmDismiss: (direction) async {
-                if (direction == DismissDirection.startToEnd) {
-                  return false;
-                }
-                if (direction == DismissDirection.endToStart) {
-                  context.read<ListenerBloc>().add(
-                        ListenerEvent.updateEstadoPedido(
-                          mesa: itemPedidos[index].mesa,
-                          idPedido: itemPedidos[index].id,
-                          nuevoEstado: EstadoPedidoEnum.cocinado.name,
-                        ),
-                      );
-                }
-
-                return rst;
-              },
-              background: Container(
-                color: Colors.redAccent,
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(Icons.cancel_outlined, color: Colors.white, size: 22),
-                      Gap.w12,
-                      Text(context.l10n.cancelOrder,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 22,
-                          )),
-                    ],
-                  ),
-                ),
-              ),
-              secondaryBackground: Container(
-                color: Colors.green,
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(context.l10n.served,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 22,
-                          )),
-                      Gap.w12,
-                      Icon(Icons.check_sharp, color: Colors.white, size: 22)
-                    ],
-                  ),
-                ),
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: colorLineaCocina,
-                  border: Border.all(
-                    width: (itemPedidos[index].enMarcha == false) ? 2 : 4,
-                    color: (itemPedidos[index].enMarcha == true) ? Color.fromARGB(255, 7, 255, 19) : Colors.white,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: <BoxShadow>[BoxShadow(blurRadius: 5, spreadRadius: -5)],
-                ),
-                height: alto * 0.05,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(5),
-                        bottomLeft: Radius.circular(5),
-                      ),
-                      child: Container(
-                        width: (ancho > 450) ? 60 : 42,
-                        height: double.infinity,
-                        margin: EdgeInsets.only(top: 0),
-                        color: Colors.red[200],
-                        child: Center(
-                          child: Text(
-                            ' x$listSelCant ',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.notoSans(
-                              fontSize: (ancho > 450) ? 28 : 20,
-                              fontWeight: FontWeight.w500,
-                              // backgroundColor: Colors.red[200],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      fit: FlexFit.tight,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Text(
-                          ' $listSelName',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          textAlign: TextAlign.left,
-                          style: GoogleFonts.notoSans(
-                            color: const Color.fromARGB(255, 255, 255, 255),
-                            fontSize: (ancho > 450) ? 26 : 18,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        nav.mesaActual = itemPedidos[index].mesa;
-                        nav.idPedidoSelected = itemPedidos[index].numPedido;
-                        nav.categoriaSelected = SelectionTypeEnum.generalScreen.name;
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(5),
-                          bottomRight: Radius.circular(5),
-                        ),
-                        child: Container(
-                          height: double.infinity,
-                          width: (ancho > 450) ? 120 : 80,
-                          // padding: const EdgeInsets.symmetric(horizontal: 2),
-                          color: Colors.red[300],
-                          child: Icon(Icons.list_sharp, color: Colors.white, size: 26),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            child: PedidoDismissible(
+              itemPedido: itemPedidos[index],
+              listSelCant: listSelCant,
+              listSelName: listSelName,
+              pedidoNum: pedidoNum,
+              mesaVar: mesaVar,
+              enMarcha: itemPedidos[index].enMarcha,
+              ancho: ancho,
+              alto: alto,
+              colorLineaCocina: colorLineaCocina,
+              marchando: marchando,
             ),
           ),
           ModifiersOptions(

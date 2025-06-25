@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:qribar_cocina/app/enums/snack_bar_enum.dart';
 import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
 
@@ -95,5 +96,26 @@ void main() {
       expect(result, AppLocalizations.of(context).wrongPassword);
     });
 
+    testWidgets('unknownError returns localized string (en)', (tester) async {
+      await _pumpWithContext(tester, const Locale('en'));
+      final result = RepositoryError.badRequest().translateError(context);
+      expect(result, AppLocalizations.of(context).badRequest);
+    });
+
+    testWidgets('unknownError returns localized string (es)', (tester) async {
+      await _pumpWithContext(tester, const Locale('es'));
+      final result = RepositoryError.badRequest().translateError(context);
+      expect(result, AppLocalizations.of(context).badRequest);
+    });
+
+    test('snackBarType returns correct type', () {
+      final userNotFoundError = RepositoryError.userNotFound();
+      final wrongPasswordError = RepositoryError.wrongPassword();
+      final defaultError = RepositoryError.serverError();
+
+      expect(userNotFoundError.snackBarType, SnackBarType.warning);
+      expect(wrongPasswordError.snackBarType, SnackBarType.warning);
+      expect(defaultError.snackBarType, SnackBarType.error);
+    });
   });
 }

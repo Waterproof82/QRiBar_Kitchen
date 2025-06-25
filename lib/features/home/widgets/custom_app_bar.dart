@@ -4,7 +4,7 @@ import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
 import 'package:qribar_cocina/app/extensions/build_context_extension.dart';
 import 'package:qribar_cocina/app/extensions/selection_type_enum_extension.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
-import 'package:qribar_cocina/features/login/presentation/widgets/language_dropdown.dart';
+import 'package:qribar_cocina/shared/utils/language_dropdown.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override

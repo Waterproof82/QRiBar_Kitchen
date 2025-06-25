@@ -4,7 +4,7 @@ import 'package:qribar_cocina/data/data_sources/local/localization_local_datasou
 import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
 
 class LanguageDropdown extends StatelessWidget {
-  const LanguageDropdown({Key? key}) : super(key: key);
+  const LanguageDropdown({super.key});
 
   @override
   Widget build(BuildContext context) {
