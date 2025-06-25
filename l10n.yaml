@@ -5,4 +5,4 @@ output-dir: lib/app/l10n/arb
 nullable-getter: false
 untranslated-messages-file: untranslated_messages.json
 preferred-supported-locales: [es, en]
-synthetic-package: false            # <- Hace que genere en lib/ y no .dart_tool/
+synthetic-package: false
