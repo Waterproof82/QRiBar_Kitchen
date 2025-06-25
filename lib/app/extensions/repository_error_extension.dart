@@ -1,24 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:qribar_cocina/app/enums/snack_bar_enum.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
-import 'package:qribar_cocina/app/l10n/l10n.dart';
 
 extension RepositoryErrorExtension on RepositoryError {
   String translateError(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return maybeWhen(
-      authExpired: () => context.l10n.authenticationExpired,
-      badRequest: () => context.l10n.badRequest,
+      authExpired: () => l10n.authenticationExpired,
+      badRequest: () => l10n.badRequest,
       badRequestListErrors: (listErrors) => listErrors.join('\n'),
-      infoNotMatching: () => context.l10n.infoNotMatch,
-      noAccess: () => context.l10n.noAccess,
-      noInternetConnection: () => context.l10n.noInternetConnection,
-      notFoundResource: () => context.l10n.notFound,
-      serverError: () => context.l10n.internalServerError,
-      securityError: () => context.l10n.securityError,
+      infoNotMatching: () => l10n.infoNotMatch,
+      noAccess: () => l10n.noAccess,
+      noInternetConnection: () => l10n.noInternetConnection,
+      notFoundResource: () => l10n.notFound,
+      serverError: () => l10n.internalServerError,
+      securityError: () => l10n.securityError,
       listErrors: (listErrors) => listErrors.join('\n'),
-      //Login errors
-      userNotFound: () => context.l10n.userNotFound,
-      wrongPassword: () => context.l10n.wrongPassword,
-      orElse: () => context.l10n.unknownError,
+      userNotFound: () => l10n.userNotFound,
+      wrongPassword: () => l10n.wrongPassword,
+      orElse: () => l10n.unknownError,
+    );
+  }
+
+  SnackBarType get snackBarType {
+    return maybeWhen(
+      userNotFound: () => SnackBarType.warning,
+      wrongPassword: () => SnackBarType.warning,
+      orElse: () => SnackBarType.error,
     );
   }
 }
