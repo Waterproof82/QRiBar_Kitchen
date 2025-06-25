@@ -1,51 +1,75 @@
 name: qribar_cocina
 description: Tu carta digital inteligente.
-publish_to: 'none'
+publish_to: 'none'  # Prevent publishing to pub.dev
 version: 1.6.0+4
 
 environment:
-  sdk: ">=3.8.0 <4.0.0"
+  sdk: ">=3.8.0 <4.0.0"  # Dart SDK version constraint
 
+# Runtime dependencies required by the app
 dependencies:
-  audioplayers: ^6.4.0
-  bloc_test: ^10.0.0
-  dio: ^5.8.0+1
-  firebase_auth: ^5.5.2
-  firebase_core: ^3.13.0
-  firebase_database: ^11.3.5
   flutter:
     sdk: flutter
-  flutter_bloc: ^9.1.1
+
+  # --- Firebase packages ---
+  firebase_core: ^3.13.0          # Core Firebase SDK
+  firebase_auth: ^5.5.2           # Firebase Authentication
+  firebase_database: ^11.3.5      # Firebase Realtime Database
+
+  # --- State Management ---
+  flutter_bloc: ^9.1.1            # BLoC pattern for state management
+  provider: ^6.1.4                # Provider for dependency injection & state
+
+  # --- UI and Fonts ---
+  flutter_svg: ^2.1.0             # SVG rendering support
+  google_fonts: ^6.2.1            # Google Fonts support
+  intl: ^0.20.2                   # Internationalization and localization
+
+  # --- Media and Audio ---
+  audioplayers: ^6.4.0            # Audio playback package
+
+  # --- Networking ---
+  dio: ^5.8.0+1                   # HTTP client for REST APIs
+
+  # --- Permissions ---
+  permission_handler: ^12.0.0+1   # Handling permissions (camera, storage, etc.)
+
+  # --- Local Storage ---
+  shared_preferences: ^2.5.3      # Key-value local storage
+
+  # --- Utilities ---
+  freezed_annotation: ^2.4.1      # Annotations for freezed code generation
+  get_it: ^8.0.3                  # Service locator for dependency injection
+  wakelock_plus: ^1.2.10          # Prevent screen from sleeping
+
+  # --- Localization support ---
   flutter_localizations:
     sdk: flutter
-  flutter_svg: ^2.1.0
-  freezed_annotation: ^2.4.1
-  get_it: ^8.0.3
-  google_fonts: ^6.2.1
-  intl: ^0.20.2
-  json_annotation: ^4.9.0
-  mockito: ^5.4.6
-  mocktail: ^1.0.4
-  permission_handler: ^12.0.0+1
-  provider: ^6.1.4
-  shared_preferences: ^2.5.3
-  test: ^1.25.15
-  wakelock_plus: ^1.2.10
 
+# Development dependencies used for testing, code generation, and build tooling
 dev_dependencies:
-  build_runner: ^2.4.6
   flutter_test:
-    sdk: flutter
-  freezed: ^2.4.5
-  json_serializable: ^6.9.0
+    sdk: flutter                 # Flutter's test framework
 
+  # --- Code generation ---
+  build_runner: ^2.4.6           # Run code generators
+  freezed: ^2.4.5                # Code generation for immutable classes and unions
+  json_serializable: ^6.9.0      # JSON serialization generator
+
+  # --- Testing & Mocking ---
+  bloc_test: ^10.0.0             # Utilities for testing BLoCs
+  mocktail: ^1.0.4               # Alternative mocking framework
+  test: ^1.25.15                 # Core Dart test package
+
+# Flutter Icons configuration for app launcher icons
 flutter_icons:
   image_path: "assets/svg/logo_cut.png"
   android: true
   ios: true
 
+# Flutter project configuration
 flutter:
-  generate: true
+  generate: true           # Enables flutter_gen code generation for assets
   uses-material-design: true
 
   assets:
@@ -53,5 +77,6 @@ flutter:
     - assets/svg/
     - assets/sounds/
 
+# flutter_gen configuration for asset generation
 flutter_gen:
   synthetic-package: false
