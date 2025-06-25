@@ -27,6 +27,13 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
   final FirebaseDatabase _database;
   final NavegacionProvider _navegacionProvider;
 
+  String get _idBar {
+    if (!IdBarDataSource.instance.hasIdBar) {
+      throw StateError('idBar no inicializado en ListenersRemoteDataSource');
+    }
+    return IdBarDataSource.instance.idBar;
+  }
+
   // 🔸 Controlador de eventos
   final StreamController<ListenerEvent> _eventController = StreamController.broadcast();
   Stream<ListenerEvent> get eventsStream => _eventController.stream;
@@ -44,7 +51,6 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
   List<Product> products = [];
   List<Pedido> itemPedidos = [];
 
-  String get idBar => IdBarDataSource.instance.getIdBar();
   @override
   Future<Result<void>> addProduct() async {
     // 1️⃣ Cancelamos la suscripción previa (si existe)
@@ -53,7 +59,7 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
 
     try {
       // 2️⃣ Suscripción a productos nuevos y modificados
-      final ref = _database.ref('productos/$idBar/');
+      final ref = _database.ref('productos/$_idBar/');
 
       _dataStreamProductos = ref.onChildAdded.listen(
         (event) => _handleProductoEvent(event, isChanged: false),
@@ -145,7 +151,7 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
     _dataStreamCategoria = null;
 
     try {
-      final ref = _database.ref('ficha_local/$idBar/categoria_productos');
+      final ref = _database.ref('ficha_local/$_idBar/categoria_productos');
 
       // 2️⃣ Procesar categorías ya existentes de una vez
       final snapshot = await ref.get();
@@ -232,7 +238,7 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
     _dataStreamCategoria = null;
 
     try {
-      _dataStreamCategoria = _database.ref('ficha_local/$idBar/categoria_productos').onChildChanged.listen(
+      _dataStreamCategoria = _database.ref('ficha_local/$_idBar/categoria_productos').onChildChanged.listen(
         (event) {
           final raw = event.snapshot.value;
 
@@ -281,7 +287,7 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
   Future<Result<void>> addSalaMesas() async {
     try {
       // 1️⃣ Obtenemos snapshot único de salas
-      final ref = _database.ref('gestion_local/$idBar/');
+      final ref = _database.ref('gestion_local/$_idBar/');
       final snapshot = await ref.get();
 
       // 2️⃣ Si no existe, limpiamos cache
@@ -358,7 +364,7 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
         if (_dataStreamGestionPedidosMap.containsKey(addedKey)) continue;
         if (_dataStreamGestionPedidosMap.containsKey(changedKey)) continue;
 
-        final path = 'gestion_pedidos/$idBar/$mesaId';
+        final path = 'gestion_pedidos/$_idBar/$mesaId';
         final ref = _database.ref(path);
 
         // 3️⃣ onChildAdded
@@ -546,7 +552,7 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
         final mesaId = sala.mesa;
         if (mesaId == null || mesaId.isEmpty) continue;
 
-        final path = 'gestion_pedidos/$idBar/$mesaId';
+        final path = 'gestion_pedidos/$_idBar/$mesaId';
         final ref = _database.ref(path);
 
         // 3️⃣ onChildRemoved
