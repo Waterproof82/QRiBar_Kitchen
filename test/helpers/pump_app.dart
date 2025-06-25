@@ -30,7 +30,7 @@ extension PumpApp on WidgetTester {
 
     return pumpWidget(
       MaterialApp(
-        scaffoldMessengerKey: Globals.rootScaffoldMessengerKey,
+        navigatorKey: Globals.navigatorKey,
         locale: locale,
         localizationsDelegates: const [
           AppLocalizations.delegate,

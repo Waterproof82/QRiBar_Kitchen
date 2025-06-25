@@ -4,17 +4,17 @@ import 'package:qribar_cocina/app/const/globals.dart';
 
 void main() {
   test('Globals.rootScaffoldMessengerKey should not be null', () {
-    expect(Globals.rootScaffoldMessengerKey, isNotNull);
+    expect(Globals.navigatorKey, isNotNull);
   });
 
   test('Globals.rootScaffoldMessengerKey should be a GlobalKey of ScaffoldMessengerState', () {
-    expect(Globals.rootScaffoldMessengerKey, isA<GlobalKey<ScaffoldMessengerState>>());
+    expect(Globals.navigatorKey, isA<GlobalKey<ScaffoldMessengerState>>());
   });
 
   testWidgets('Snackbar shows using Globals.rootScaffoldMessengerKey', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
-        scaffoldMessengerKey: Globals.rootScaffoldMessengerKey,
+        navigatorKey: Globals.navigatorKey,
         home: Scaffold(
           body: Center(
             child: Builder(

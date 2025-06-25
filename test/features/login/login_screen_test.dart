@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:qribar_cocina/features/login/login_screen.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/auth_background.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/login_container.dart';
-import 'package:qribar_cocina/features/login/presentation/widgets/language_dropdown.dart';
+import 'package:qribar_cocina/shared/utils/language_dropdown.dart';
 import 'package:qribar_cocina/features/login/presentation/widgets/login_form.dart';
 
 class Gap {
