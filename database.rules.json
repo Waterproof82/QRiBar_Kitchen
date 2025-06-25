@@ -1,0 +1,76 @@
+{
+  "rules": {
+    "mesas": {
+      "$uid": {
+        ".read": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')",
+        ".write": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')"
+      }
+    },
+    "mesas_bar": {
+      "$uid": {
+        ".read": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')",
+        ".write": "auth.uid != null && (auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password')"
+      }
+    },
+    "productos": {
+      "$uid": {
+        ".read": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')",
+        ".write": "auth.uid != null && (auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password')"
+      }
+    },
+    "pedidos_activos": {
+      "$uid": {
+        ".read": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')",
+        ".write": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')"
+      }
+    },
+    "gestion_pedidos": {
+      "$uid": {
+        ".read": "auth.uid != null && (auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password')",
+        ".write": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')"
+      }
+    },
+    "gestion_local": {
+      "$uid": {
+        ".read": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')",
+        ".write": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')"
+      }
+    },
+    "ficha_local": {
+      "$uid": {
+        ".read": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')",
+        ".write": "auth.uid != null && (auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password')"
+      }
+    },
+    "pedidos_procesados": {
+      "$uid": {
+        ".read": "auth.uid != null && (auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password')",
+        ".write": "auth.uid != null && (auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password')"
+      }
+    },
+    "pedidos_cancelados": {
+      "$uid": {
+        ".read": "auth.uid != null && (auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password')",
+        ".write": "auth.uid != null && (auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password')"
+      }
+    },
+    "anuncios": {
+      "$uid": {
+        ".read": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')",
+        ".write": "auth.uid != null && (auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password')"
+      }
+    },
+    "usuarios": {
+      "$uid": {
+        ".read": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')",
+        ".write": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')"
+      }
+    },
+    "cuentas": {
+      "$uid": {
+        ".read": "auth.uid != null && ((auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password') || auth.token.firebase.sign_in_provider == 'anonymous')",
+        ".write": "auth.uid != null && (auth.token.email != '' && auth.token.firebase.sign_in_provider == 'password')"
+      }
+    }
+  }
+}
