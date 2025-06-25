@@ -2,30 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qribar_cocina/app/const/app_constants.dart';
 import 'package:qribar_cocina/app/const/app_sizes.dart';
-import 'package:qribar_cocina/app/const/globals.dart';
-import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
 import 'package:qribar_cocina/app/l10n/l10n.dart';
-import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/input_decoration.dart';
 
 class LoginForm extends StatelessWidget {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  const LoginForm({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
     return BlocListener<LoginFormBloc, LoginFormState>(
-      listenWhen: (previous, current) => previous.loginSuccess != current.loginSuccess && current.loginSuccess,
+      listenWhen: (previous, current) => previous.loginSuccess != current.loginSuccess,
       listener: (context, state) {
         if (state.loginSuccess) {
-          Navigator.pushReplacementNamed(context, 'home');
+           Navigator.pushReplacementNamed(context, 'home');
         }
       },
-      child: BlocSelector<LoginFormBloc, LoginFormState, bool>(
-        selector: (state) => state.isLoading,
-        builder: (context, isLoading) {
+      child: BlocBuilder<LoginFormBloc, LoginFormState>(
+        buildWhen: (previous, current) => previous.isLoading != current.isLoading,
+        builder: (context, state) {
           final bloc = context.read<LoginFormBloc>();
 
           return Container(
@@ -48,7 +47,7 @@ class LoginForm extends StatelessWidget {
                       final regExp = RegExp(AppConstants.emailPattern);
                       return regExp.hasMatch(value ?? '') ? null : context.l10n.emailError;
                     },
-                    style: TextStyle(fontSize: 22),
+                    style: const TextStyle(fontSize: 22),
                   ),
                   Gap.h32,
                   TextFormField(
@@ -64,40 +63,28 @@ class LoginForm extends StatelessWidget {
                     validator: (value) {
                       return (value != null && value.length >= 6) ? null : context.l10n.passwordError;
                     },
-                    style: TextStyle(fontSize: 22),
+                    style: const TextStyle(fontSize: 22),
                   ),
                   Gap.h32,
-                  BlocSelector<LoginFormBloc, LoginFormState, RepositoryError?>(
-                      selector: (state) => state.failure,
-                      builder: (context, failure) {
-                        if (failure != null) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            Globals.rootScaffoldMessengerKey.currentState?.showSnackBar(
-                              SnackBar(content: Text(failure.translateError(context))),
-                            );
-                          });
-                        }
-                        return const SizedBox.shrink();
-                      }),
                   MaterialButton(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     disabledColor: Colors.grey,
                     elevation: 0,
-                    color: Colors.black26,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
-                      child: Text(
-                        isLoading ? context.l10n.wait : context.l10n.enter,
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                    ),
-                    onPressed: isLoading
+                    color: Colors.black87,
+                    onPressed: state.isLoading
                         ? null
                         : () {
                             if (_formKey.currentState?.validate() ?? false) {
-                              context.read<LoginFormBloc>().add(const LoginSubmitted());
+                              bloc.add(const LoginSubmitted());
                             }
                           },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                      child: Text(
+                        state.isLoading ? context.l10n.wait : context.l10n.enter,
+                        style: const TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    ),
                   ),
                 ],
               ),
