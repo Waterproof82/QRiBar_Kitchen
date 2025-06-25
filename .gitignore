@@ -49,6 +49,9 @@ app.*.map.json
 
 key.properties
 
+# Localizations Auto-Generated
+/lib/app/l10n/arb/
+
 # Freezed generated files
 lib/**/*.freezed.dart
 lib/**/*.g.dart
