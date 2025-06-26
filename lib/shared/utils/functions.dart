@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qribar_cocina/app/l10n/l10n.dart';
+import 'package:qribar_cocina/app/extensions/l10n.dart';
 import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/shared/utils/audio_manager.dart';
