@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/app/l10n/l10n.dart';
+import 'package:qribar_cocina/app/extensions/l10n.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/shared/app_exports.dart';

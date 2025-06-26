@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
-import 'package:qribar_cocina/app/l10n/l10n.dart';
+import 'package:qribar_cocina/app/extensions/l10n.dart';
 
 extension SelectionTypeEnumL10n on SelectionTypeEnum {
   String localizedLabel(BuildContext context) {

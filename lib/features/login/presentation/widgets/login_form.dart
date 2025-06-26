@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qribar_cocina/app/const/app_constants.dart';
 import 'package:qribar_cocina/app/const/app_sizes.dart';
-import 'package:qribar_cocina/app/l10n/l10n.dart';
+import 'package:qribar_cocina/app/extensions/l10n.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:qribar_cocina/app/const/globals.dart';
-import 'package:qribar_cocina/app/l10n/arb/app_localizations.dart';
+import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 
 extension PumpApp on WidgetTester {
   Future<void> pumpApp(Widget child, {List<RepositoryProvider<dynamic>> repositories = const [], List<BlocProvider<dynamic>> blocs = const [], Locale? locale}) {

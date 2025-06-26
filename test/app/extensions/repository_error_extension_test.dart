@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:qribar_cocina/app/enums/snack_bar_enum.dart';
 import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
-import 'package:qribar_cocina/app/l10n/arb/app_localizations.dart';
+import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
 
 import '../../helpers/pump_app.dart';
