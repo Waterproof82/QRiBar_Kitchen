@@ -15,7 +15,8 @@ import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/data/models/sala_estado.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
-import 'package:qribar_cocina/shared/utils/functions.dart';
+import 'package:qribar_cocina/shared/utils/audio_helpers.dart';
+import 'package:qribar_cocina/shared/utils/product_utils.dart';
 
 class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
   ListenersRemoteDataSource({
@@ -554,7 +555,7 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
         itemPedidos.add(nuevoPedido);
 
         if (estado == EstadoPedidoEnum.pendiente.name) {
-          timbre();
+          reproducirTimbre();
         }
       }
 

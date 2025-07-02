@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qribar_cocina/features/home/widgets/custom_app_bar.dart';
-import 'package:qribar_cocina/shared/utils/functions.dart';
+import 'package:qribar_cocina/shared/utils/ui_helpers.dart';
 import 'package:qribar_cocina/shared/widgets/header_wave.dart';
 import 'package:qribar_cocina/shared/widgets/menu_lateral.dart';
 
