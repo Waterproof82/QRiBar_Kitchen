@@ -9,8 +9,8 @@ import 'package:qribar_cocina/app/enums/svg_enum.dart';
 import 'package:qribar_cocina/app/extensions/app_route_extension.dart';
 import 'package:qribar_cocina/app/extensions/l10n.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
-import 'package:qribar_cocina/shared/utils/functions.dart';
 import 'package:qribar_cocina/shared/utils/svg_loader.dart';
+import 'package:qribar_cocina/shared/utils/ui_helpers.dart';
 
 class MenuLateral extends StatelessWidget {
   const MenuLateral({super.key});
