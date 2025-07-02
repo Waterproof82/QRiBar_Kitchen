@@ -3,13 +3,13 @@ import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:qribar_cocina/app/extensions/string_casing_extension.dart';
 import 'package:qribar_cocina/app/types/errors/network_error.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
-import 'package:qribar_cocina/data/data_sources/local/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/repositories/remote/listener_repository_impl.dart';
 import 'package:qribar_cocina/features/login/data/data_sources/remote/auth_remote_data_source_contract.dart';
+import 'package:qribar_cocina/shared/utils/auth_service.dart';
+import 'package:qribar_cocina/shared/utils/event_stream_manager.dart';
 
 part 'listener_bloc.freezed.dart';
 part 'listener_event.dart';
@@ -17,14 +17,17 @@ part 'listener_state.dart';
 
 class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
   final ListenerRepositoryImpl _repository;
+  final AuthService _authService;
+  final EventStreamManager _eventStream;
   final AuthRemoteDataSourceContract _authRemoteDataSourceContract;
-  StreamSubscription? _eventSubscription;
 
   ListenerBloc({
     required ListenerRepositoryImpl repository,
     required AuthRemoteDataSourceContract authRemoteDataSourceContract,
   }) : _repository = repository,
        _authRemoteDataSourceContract = authRemoteDataSourceContract,
+       _authService = AuthService(authRemoteDataSourceContract),
+       _eventStream = EventStreamManager(repository),
        super(const ListenerState.initial()) {
     on<_StartListening>(_onStartListening);
     on<_PedidosUpdated>(_onPedidosUpdated);
@@ -40,49 +43,32 @@ class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
     emit(const ListenerState.loading());
 
     try {
-      final email = _authRemoteDataSourceContract.getCurrentEmail();
+      final authResult = await _authService.checkAuth();
 
-      if (email == null) {
-        emit(ListenerState.failure(RepositoryError.authExpired()));
-        return;
-      }
-
-      final userName = email.contains('@')
-          ? email.split('@').first.toTitleCase()
-          : email.toTitleCase();
-
-      IdBarDataSource.instance.setIdBar(userName);
-
-      final result = await _repository.initializeListeners();
-
-      await result.when(
-        success: (_) async {
-          await _eventSubscription?.cancel();
-
-          _eventSubscription = _repository.dataSource.eventsStream.listen(
-            (event) {
-              event.mapOrNull(
-                pedidosUpdated: (e) =>
-                    add(ListenerEvent.pedidosUpdated(e.pedidos)),
-                pedidoRemoved: (e) =>
-                    add(ListenerEvent.pedidoRemoved(e.pedido)),
-              );
-            },
-            onError: (e, stackTrace) {
+      await authResult.when(
+        failure: (error) {
+          emit(ListenerState.failure(error));
+          return;
+        },
+        success: (userName) async {
+          final initResult = await _eventStream.initializeListeners(
+            onEvent: (event) => add(event),
+            onError: (error, stackTrace) {
               add(
                 ListenerEvent.streamError(
                   RepositoryError.fromDataSourceError(
-                    NetworkError.fromException(e),
+                    NetworkError.fromException(error),
                   ),
                 ),
               );
+              log('Stream error: $error', stackTrace: stackTrace);
             },
           );
 
-          emit(const ListenerState.success());
-        },
-        failure: (error) {
-          emit(ListenerState.failure(error));
+          initResult.when(
+            failure: (error) => emit(ListenerState.failure(error)),
+            success: (_) => emit(const ListenerState.success()),
+          );
         },
       );
     } catch (e, stackTrace) {
@@ -91,10 +77,15 @@ class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
           RepositoryError.fromDataSourceError(NetworkError.fromException(e)),
         ),
       );
-      log(stackTrace.toString());
+      log(
+        'ListenerBloc _onStartListening error:',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
+  // Event handlers
   void _onPedidosUpdated(_PedidosUpdated event, Emitter<ListenerState> emit) {
     emit(ListenerState.pedidosUpdated(event.pedidos));
   }
@@ -129,7 +120,7 @@ class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
 
   @override
   Future<void> close() async {
-    await _eventSubscription?.cancel();
+    await _eventStream.dispose();
     await _repository.dispose();
     await _authRemoteDataSourceContract.signOut();
     return super.close();

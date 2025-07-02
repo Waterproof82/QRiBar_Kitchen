@@ -7,6 +7,7 @@ import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/data/data_sources/local/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/data_sources/remote/listeners_remote_data_source_contract.dart';
 import 'package:qribar_cocina/data/repositories/remote/listener_repository.dart';
+import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 
 class ListenerRepositoryImpl implements ListenerRepository {
   final FirebaseDatabase _database;
@@ -18,15 +19,15 @@ class ListenerRepositoryImpl implements ListenerRepository {
   }) : _database = database,
        _dataSource = dataSource;
 
-  String get _idBar {
-    if (!IdBarDataSource.instance.hasIdBar) {
-      throw StateError('idBar no inicializado en ListenersRemoteDataSource');
-    }
-    return IdBarDataSource.instance.idBar;
-  }
+  String get _idBar => IdBarDataSource.instance.idBar;
 
-  @override
+  Stream<ListenerEvent> get eventsStream => _dataSource.eventsStream;
+
   Future<Result<void>> initializeListeners() async {
+    if (!IdBarDataSource.instance.hasIdBar) {
+      return Result.failure(error: RepositoryError.authExpired());
+    }
+
     try {
       await _dataSource.addSalaMesas();
       await _dataSource.addProduct();
@@ -86,7 +87,4 @@ class ListenerRepositoryImpl implements ListenerRepository {
   Future<void> dispose() async {
     await _dataSource.dispose();
   }
-
-  // Expones el dataSource solo si es necesario para el Bloc
-  ListenersRemoteDataSourceContract get dataSource => _dataSource;
 }
