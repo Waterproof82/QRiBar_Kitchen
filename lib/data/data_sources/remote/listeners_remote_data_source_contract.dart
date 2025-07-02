@@ -9,5 +9,5 @@ abstract class ListenersRemoteDataSourceContract {
   Future<void> addSalaMesas();
   Future<void> addAndChangedPedidos();
   Future<void> removePedidos();
-  void dispose();
+  Future<void> dispose();
 }

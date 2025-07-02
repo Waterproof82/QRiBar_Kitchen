@@ -12,20 +12,17 @@ class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
   LoginFormBloc({
     required LoginUseCase loginUseCase,
     required ListenerBloc listenerBloc,
-  })  : _loginUseCase = loginUseCase,
-        _listenerBloc = listenerBloc,
-        super(const LoginFormState()) {
-    on<EmailChanged>(
-      (event, emit) => emit(
-        state.copyWith(email: event.email),
-      ),
-    );
+  }) : _loginUseCase = loginUseCase,
+       _listenerBloc = listenerBloc,
+
+       super(const LoginFormState()) {
+    on<EmailChanged>((event, emit) => emit(state.copyWith(email: event.email)));
     on<PasswordChanged>(
-      (event, emit) => emit(
-        state.copyWith(password: event.password),
-      ),
+      (event, emit) => emit(state.copyWith(password: event.password)),
     );
     on<LoginSubmitted>(_handleLogin);
+
+    on<SessionRestored>(_handleSessionRestored);
   }
 
   Future<void> _handleLogin(
@@ -41,13 +38,22 @@ class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
 
     result.when(
       success: (_) {
-        emit(state.copyWith(isLoading: false, loginSuccess: true));
         _listenerBloc.add(const ListenerEvent.startListening());
+        emit(state.copyWith(isLoading: false, loginSuccess: true));
       },
-      failure: (error) => emit(state.copyWith(
-        isLoading: false,
-        failure: error,
-      )),
+      failure: (error) =>
+          emit(state.copyWith(isLoading: false, failure: error)),
     );
+  }
+
+  Future<void> _handleSessionRestored(
+    SessionRestored event,
+    Emitter<LoginFormState> emit,
+  ) async {
+    //emit(state.copyWith(isLoading: true, failure: null));
+
+    _listenerBloc.add(const ListenerEvent.startListening());
+
+    emit(state.copyWith(isLoading: false, loginSuccess: true));
   }
 }

@@ -3,26 +3,15 @@ import 'package:qribar_cocina/app/const/app_sizes.dart';
 import 'package:qribar_cocina/app/const/globals.dart';
 import 'package:qribar_cocina/app/enums/snack_bar_enum.dart';
 
-
 class CustomSnackBar extends StatefulWidget {
   final String message;
   final SnackBarType type;
   final Duration duration;
   final VoidCallback? onDismissed;
 
-  const CustomSnackBar({
-    super.key,
-    required this.message,
-    this.type = SnackBarType.warning,
-    this.duration = const Duration(seconds: 4),
-    this.onDismissed,
-  });
+  const CustomSnackBar({super.key, required this.message, this.type = SnackBarType.warning, this.duration = const Duration(seconds: 4), this.onDismissed});
 
-  static void show(
-    String message, {
-    SnackBarType type = SnackBarType.warning,
-    Duration duration = const Duration(seconds: 4),
-  }) {
+  static void show(String message, {SnackBarType type = SnackBarType.warning, Duration duration = const Duration(seconds: 4)}) {
     final overlayState = Globals.navigatorKey.currentState?.overlay;
     if (overlayState == null) {
       return;
@@ -78,34 +67,18 @@ class _CustomSnackBarState extends State<CustomSnackBar> with SingleTickerProvid
 
     _dismissibleKey = UniqueKey();
 
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
 
-    _offsetAnimation = Tween<Offset>(
-      begin: const Offset(0.0, -1.0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _offsetAnimation = Tween<Offset>(begin: const Offset(0.0, -1.0), end: Offset.zero).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _boxDecoration = BoxDecoration(
       color: widget.type.color.withAlpha((0.1 * 255).round()),
       border: Border.all(color: widget.type.color, width: 2),
       borderRadius: BorderRadius.circular(12),
-      boxShadow: const [
-        BoxShadow(
-          color: Colors.black26,
-          blurRadius: 8,
-          offset: Offset(0, 2),
-        ),
-      ],
+      boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2))],
     );
 
-    _textStyle = const TextStyle(
-      color: Color.fromARGB(221, 255, 255, 255),
-      fontSize: 16,
-      fontWeight: FontWeight.w500,
-    );
+    _textStyle = const TextStyle(color: Color.fromARGB(221, 255, 255, 255), fontSize: 16, fontWeight: FontWeight.w500);
 
     _controller.forward();
   }
@@ -144,12 +117,7 @@ class _CustomSnackBarState extends State<CustomSnackBar> with SingleTickerProvid
                 children: [
                   Icon(widget.type.icon, color: widget.type.color),
                   Gap.w12,
-                  Expanded(
-                    child: Text(
-                      widget.message.toUpperCase(),
-                      style: _textStyle,
-                    ),
-                  ),
+                  Expanded(child: Text(widget.message.toUpperCase(), style: _textStyle)),
                   GestureDetector(
                     onTap: _dismissSnackBar,
                     child: const Icon(Icons.close, size: 20, color: Colors.white),

@@ -33,9 +33,7 @@ class AppProviders extends StatelessWidget {
 
     return MultiProvider(
       /// 🌐 Global non-Bloc providers
-      providers: [
-        ChangeNotifierProvider(create: (_) => NavegacionProvider()),
-      ],
+      providers: [ChangeNotifierProvider(create: (_) => NavegacionProvider())],
       child: MultiRepositoryProvider(
         /// 📦 Repository and DataSource injection
         providers: [
@@ -54,9 +52,8 @@ class AppProviders extends StatelessWidget {
 
           /// 📋 UseCase for Login business logic
           RepositoryProvider<LoginUseCase>(
-            create: (context) => LoginUseCase(
-              context.read<LoginRepositoryContract>(),
-            ),
+            create: (context) =>
+                LoginUseCase(context.read<LoginRepositoryContract>()),
           ),
 
           /// 🎧 Remote DataSource and Repository for Firebase listeners
@@ -89,12 +86,15 @@ class AppProviders extends StatelessWidget {
             BlocProvider<ListenerBloc>(
               create: (context) => ListenerBloc(
                 repository: context.read<ListenerRepositoryImpl>(),
+                authRemoteDataSourceContract: context
+                    .read<AuthRemoteDataSourceContract>(),
               ),
             ),
             BlocProvider<LoginFormBloc>(
               create: (context) => LoginFormBloc(
                 loginUseCase: context.read<LoginUseCase>(),
                 listenerBloc: context.read<ListenerBloc>(),
+              
               ),
             ),
             BlocProvider<LanguageCubit>(

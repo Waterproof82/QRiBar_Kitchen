@@ -19,6 +19,9 @@ dependencies:
   # --- State Management ---
   flutter_bloc: ^9.1.1            # BLoC pattern for state management
   provider: ^6.1.4                # Provider for dependency injection & state
+  
+  # --- Routes Management ---
+  go_router: ^15.2.4
 
   # --- UI and Fonts ---
   flutter_svg: ^2.1.0             # SVG rendering support

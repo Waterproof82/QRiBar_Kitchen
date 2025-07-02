@@ -16,7 +16,8 @@ class GlobalErrorListener extends StatelessWidget {
     return MultiBlocListener(
       listeners: [
         BlocListener<LoginFormBloc, LoginFormState>(
-          listenWhen: (previous, current) => previous.failure != current.failure,
+          listenWhen: (previous, current) =>
+              previous.failure != current.failure,
           listener: (context, state) {
             final error = state.failure;
             if (error != null) {
@@ -28,10 +29,8 @@ class GlobalErrorListener extends StatelessWidget {
           },
         ),
         BlocListener<ListenerBloc, ListenerState>(
-          listenWhen: (_, current) => current.maybeWhen(
-            failure: (_) => true,
-            orElse: () => false,
-          ),
+          listenWhen: (_, current) =>
+              current.maybeWhen(failure: (_) => true, orElse: () => false),
           listener: (context, state) {
             state.maybeWhen(
               failure: (error) {
