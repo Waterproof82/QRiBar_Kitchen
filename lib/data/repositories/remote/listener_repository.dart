@@ -13,5 +13,5 @@ abstract class ListenerRepository {
     required bool enMarcha,
   });
 
-  void dispose();
+  Future<void> dispose();
 }

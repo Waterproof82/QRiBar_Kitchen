@@ -14,4 +14,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceContract {
       password: password.trim(),
     );
   }
+
+  @override
+  Future<void> signOut() async {
+    await _auth.signOut();
+  }
+
+  @override
+  String? getCurrentEmail() {
+    return _auth.currentUser?.email;
+  }
 }

@@ -3,4 +3,8 @@ abstract class AuthRemoteDataSourceContract {
     required String email,
     required String password,
   });
+
+  Future<void> signOut();
+
+  String? getCurrentEmail();
 }

@@ -15,8 +15,8 @@ class ListenerRepositoryImpl implements ListenerRepository {
   ListenerRepositoryImpl({
     required FirebaseDatabase database,
     required ListenersRemoteDataSourceContract dataSource,
-  })  : _database = database,
-        _dataSource = dataSource;
+  }) : _database = database,
+       _dataSource = dataSource;
 
   String get _idBar {
     if (!IdBarDataSource.instance.hasIdBar) {
@@ -28,10 +28,10 @@ class ListenerRepositoryImpl implements ListenerRepository {
   @override
   Future<Result<void>> initializeListeners() async {
     try {
+      await _dataSource.addSalaMesas();
       await _dataSource.addProduct();
       await _dataSource.addCategoriaMenu();
       await _dataSource.changeCategoriaMenu();
-      await _dataSource.addSalaMesas();
       await _dataSource.addAndChangedPedidos();
       await _dataSource.removePedidos();
       return const Result.success(null);
@@ -83,8 +83,8 @@ class ListenerRepositoryImpl implements ListenerRepository {
   }
 
   @override
-  void dispose() {
-    _dataSource.dispose();
+  Future<void> dispose() async {
+    await _dataSource.dispose();
   }
 
   // Expones el dataSource solo si es necesario para el Bloc
