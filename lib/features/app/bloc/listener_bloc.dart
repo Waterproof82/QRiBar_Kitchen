@@ -18,7 +18,7 @@ part 'listener_state.dart';
 class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
   final ListenerRepositoryImpl _repository;
   final AuthRemoteDataSourceContract _authRemoteDataSourceContract;
-  late final StreamSubscription _eventSubscription;
+  StreamSubscription? _eventSubscription;
 
   ListenerBloc({
     required ListenerRepositoryImpl repository,
@@ -26,27 +26,9 @@ class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
   }) : _repository = repository,
        _authRemoteDataSourceContract = authRemoteDataSourceContract,
        super(const ListenerState.initial()) {
-    _eventSubscription = _repository.dataSource.eventsStream.listen(
-      (event) {
-        event.mapOrNull(
-          pedidosUpdated: (e) => add(ListenerEvent.pedidosUpdated(e.pedidos)),
-          pedidoRemoved: (e) => add(ListenerEvent.pedidoRemoved(e.pedido)),
-        );
-      },
-      onError: (e, stackTrace) {
-        add(
-          ListenerEvent.streamError(
-            RepositoryError.fromDataSourceError(NetworkError.fromException(e)),
-          ),
-        );
-      },
-    );
-
     on<_StartListening>(_onStartListening);
-
     on<_PedidosUpdated>(_onPedidosUpdated);
     on<_PedidoRemoved>(_onPedidoRemoved);
-
     on<_UpdateEstadoPedido>(_onUpdateEstadoPedido);
     on<_UpdateEnMarchaPedido>(_onUpdateEnMarchaPedido);
   }
@@ -73,9 +55,35 @@ class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
 
       final result = await _repository.initializeListeners();
 
-      result.when(
-        success: (_) => emit(const ListenerState.success()),
-        failure: (error) => emit(ListenerState.failure(error)),
+      await result.when(
+        success: (_) async {
+          await _eventSubscription?.cancel();
+
+          _eventSubscription = _repository.dataSource.eventsStream.listen(
+            (event) {
+              event.mapOrNull(
+                pedidosUpdated: (e) =>
+                    add(ListenerEvent.pedidosUpdated(e.pedidos)),
+                pedidoRemoved: (e) =>
+                    add(ListenerEvent.pedidoRemoved(e.pedido)),
+              );
+            },
+            onError: (e, stackTrace) {
+              add(
+                ListenerEvent.streamError(
+                  RepositoryError.fromDataSourceError(
+                    NetworkError.fromException(e),
+                  ),
+                ),
+              );
+            },
+          );
+
+          emit(const ListenerState.success());
+        },
+        failure: (error) {
+          emit(ListenerState.failure(error));
+        },
       );
     } catch (e, stackTrace) {
       emit(
@@ -121,7 +129,7 @@ class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
 
   @override
   Future<void> close() async {
-    await _eventSubscription.cancel();
+    await _eventSubscription?.cancel();
     await _repository.dispose();
     await _authRemoteDataSourceContract.signOut();
     return super.close();

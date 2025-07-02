@@ -13,14 +13,14 @@ import 'package:qribar_cocina/shared/app_exports.dart';
 class CocinaPedidosScreen extends StatelessWidget {
   const CocinaPedidosScreen({Key? key, this.extra}) : super(key: key);
 
-  final String? extra;
+  final dynamic extra;
   @override
   Widget build(BuildContext context) {
     final navegacionModel = Provider.of<NavegacionProvider>(
       context,
       listen: true,
     );
-
+    print(extra);
     return BlocBuilder<ListenerBloc, ListenerState>(
       builder: (context, state) {
         return state.maybeWhen(
