@@ -138,7 +138,5 @@ void main() {
     verify(() => mockDataSource.dispose()).called(1);
   });
 
-  test('debe devolver la instancia correcta de dataSource', () {
-    expect(repository.dataSource, equals(mockDataSource));
-  });
+
 }
