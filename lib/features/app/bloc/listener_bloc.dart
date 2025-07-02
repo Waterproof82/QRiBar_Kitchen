@@ -17,9 +17,9 @@ part 'listener_state.dart';
 
 class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
   final ListenerRepositoryImpl _repository;
+  final AuthRemoteDataSourceContract _authRemoteDataSourceContract;
   final AuthService _authService;
   final EventStreamManager _eventStream;
-  final AuthRemoteDataSourceContract _authRemoteDataSourceContract;
 
   ListenerBloc({
     required ListenerRepositoryImpl repository,
