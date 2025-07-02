@@ -14,14 +14,12 @@ class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
     required ListenerBloc listenerBloc,
   }) : _loginUseCase = loginUseCase,
        _listenerBloc = listenerBloc,
-
        super(const LoginFormState()) {
     on<EmailChanged>((event, emit) => emit(state.copyWith(email: event.email)));
     on<PasswordChanged>(
       (event, emit) => emit(state.copyWith(password: event.password)),
     );
     on<LoginSubmitted>(_handleLogin);
-
     on<SessionRestored>(_handleSessionRestored);
   }
 
@@ -50,7 +48,7 @@ class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
     SessionRestored event,
     Emitter<LoginFormState> emit,
   ) async {
-    //emit(state.copyWith(isLoading: true, failure: null));
+    emit(state.copyWith(isLoading: true, failure: null));
 
     _listenerBloc.add(const ListenerEvent.startListening());
 

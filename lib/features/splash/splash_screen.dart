@@ -17,6 +17,7 @@ class Splash extends StatefulWidget {
 class SplashState extends State<Splash> with SingleTickerProviderStateMixin {
   late final AnimationController _animationController;
   late final Animation<double> _animation;
+  bool _navigated = false;
 
   @override
   void initState() {
@@ -39,14 +40,17 @@ class SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     });
   }
 
-  void _checkSessionAndNavigate() async {
-    await Future.delayed(const Duration(seconds: 1));
+  Future<void> _checkSessionAndNavigate() async {
+    await Future.delayed(const Duration(seconds: 2));
+
     final user = FirebaseAuth.instance.currentUser;
 
+    if (!mounted || _navigated) return;
+
     if (user != null) {
-      final bloc = context.read<LoginFormBloc>();
-      bloc.add(const LoginFormEvent.sessionRestored());
+      context.read<LoginFormBloc>().add(const LoginFormEvent.sessionRestored());
     } else {
+      _navigated = true;
       context.goTo(AppRoute.login);
     }
   }
@@ -63,7 +67,8 @@ class SplashState extends State<Splash> with SingleTickerProviderStateMixin {
       listenWhen: (previous, current) =>
           previous.loginSuccess != current.loginSuccess,
       listener: (context, state) {
-        if (state.loginSuccess) {
+        if (state.loginSuccess && !_navigated) {
+          _navigated = true;
           context.goTo(AppRoute.cocinaGeneral);
         }
       },
@@ -71,7 +76,7 @@ class SplashState extends State<Splash> with SingleTickerProviderStateMixin {
         backgroundColor: Colors.white,
         body: Stack(
           fit: StackFit.expand,
-          children: <Widget>[
+          children: [
             Align(
               alignment: Alignment.bottomCenter,
               child: Padding(

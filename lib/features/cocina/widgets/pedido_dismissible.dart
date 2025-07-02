@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/app/enums/app_route_enum.dart';
+import 'package:qribar_cocina/app/extensions/app_route_extension.dart';
 import 'package:qribar_cocina/app/extensions/l10n.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
@@ -32,15 +34,21 @@ class PedidoDismissible extends StatelessWidget {
     required this.marchando,
   });
 
-  void _toggleCategoria(NavegacionProvider nav) {
-    nav.mesaActual = itemPedido.mesa;
-    nav.idPedidoSelected = itemPedido.numPedido;
+  void _toggleCategoria(BuildContext context, NavegacionProvider nav) {
+    final isGeneral =
+        nav.categoriaSelected == SelectionTypeEnum.generalScreen.name;
 
-    if (nav.categoriaSelected == SelectionTypeEnum.generalScreen.name) {
-      nav.categoriaSelected = SelectionTypeEnum.pedidosScreen.name;
-    } else {
-      nav.categoriaSelected = SelectionTypeEnum.generalScreen.name;
-    }
+    nav
+      ..mesaActual = itemPedido.mesa
+      ..idPedidoSelected = itemPedido.numPedido
+      ..categoriaSelected = isGeneral
+          ? SelectionTypeEnum.pedidosScreen.name
+          : SelectionTypeEnum.generalScreen.name;
+
+    context.goTo(
+      isGeneral ? AppRoute.cocinaPedidos : AppRoute.cocinaGeneral,
+      extra: isGeneral ? itemPedido.numPedido : null,
+    );
   }
 
   @override
@@ -53,12 +61,12 @@ class PedidoDismissible extends StatelessWidget {
         if (direction == DismissDirection.startToEnd) return false;
         if (direction == DismissDirection.endToStart) {
           context.read<ListenerBloc>().add(
-                ListenerEvent.updateEstadoPedido(
-                  mesa: itemPedido.mesa,
-                  idPedido: itemPedido.id,
-                  nuevoEstado: EstadoPedidoEnum.cocinado.name,
-                ),
-              );
+            ListenerEvent.updateEstadoPedido(
+              mesa: itemPedido.mesa,
+              idPedido: itemPedido.id,
+              nuevoEstado: EstadoPedidoEnum.cocinado.name,
+            ),
+          );
           return true;
         }
         return false;
@@ -164,7 +172,7 @@ class PedidoDismissible extends StatelessWidget {
                 child: Row(
                   children: [
                     GestureDetector(
-                      onTap: () => _toggleCategoria(nav),
+                      onTap: () => _toggleCategoria(context, nav),
                       child: Container(
                         width: ancho > 450 ? 120 : 90,
                         alignment: Alignment.center,

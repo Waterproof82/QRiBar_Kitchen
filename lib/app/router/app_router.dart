@@ -45,14 +45,38 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           name: AppRoute.cocinaGeneral.name,
           path: AppRoute.cocinaGeneral.path,
-          builder: (context, state) => const CocinaGeneralScreen(),
+          pageBuilder: (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: const CocinaGeneralScreen(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+          ),
         ),
         GoRoute(
           name: AppRoute.cocinaPedidos.name,
           path: AppRoute.cocinaPedidos.path,
-          builder: (context, state) {
-            final extra = state.extra as String?;
-            return CocinaPedidosScreen(extra: extra);
+          pageBuilder: (context, state) {
+            final extra = state.extra as dynamic;
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: CocinaPedidosScreen(extra: extra),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(1.0, 0.0);
+                    const end = Offset.zero;
+                    final tween = Tween(
+                      begin: begin,
+                      end: end,
+                    ).chain(CurveTween(curve: Curves.easeInOut));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+            );
           },
         ),
       ],
