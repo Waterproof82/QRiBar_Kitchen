@@ -274,10 +274,15 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
                 cat.imgVertical =
                     data['img_vertical'] as bool? ?? cat.imgVertical;
                 cat.orden = (data['orden'] as num?)?.toInt() ?? cat.orden;
-
                 print(
                   '🔄 [changeCategoriaMenu] Categoría actualizada: ${cat.categoria}',
                 );
+                final result = asignarEnviosPorPedidos(
+                  pedidos: itemPedidos,
+                  productos: products,
+                  categorias: categoriasProdLocal,
+                );
+                _eventController.add(ListenerEvent.pedidos(result));
               }
             },
             onError: (err) {
@@ -477,7 +482,6 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
       );
       if (envio != 'cocina') return;
 
-      // Llamamos a la función _handleDataChange para procesar el cambio de datos
       final result = await _handleDataChange(
         dataMesas,
         snapshot.key,
