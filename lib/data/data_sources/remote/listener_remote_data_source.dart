@@ -14,19 +14,14 @@ import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/data/models/sala_estado.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
-import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/shared/utils/audio_helpers.dart';
 import 'package:qribar_cocina/shared/utils/product_utils.dart';
 
 class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
-  ListenersRemoteDataSource({
-    required FirebaseDatabase database,
-    required NavegacionProvider navegacionProvider,
-  }) : _database = database,
-       _navegacionProvider = navegacionProvider;
+  ListenersRemoteDataSource({required FirebaseDatabase database})
+    : _database = database;
 
   final FirebaseDatabase _database;
-  final NavegacionProvider _navegacionProvider;
 
   String get _idBar {
     if (!IdBarDataSource.instance.hasIdBar) {
@@ -135,14 +130,11 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
     final index = products.indexWhere((p) => p.id == producto.id);
 
     if (index == -1) {
-      // Producto nuevo
       products.add(producto);
-      _navegacionProvider.addProducto(producto);
     } else if (isChanged) {
-      // Producto modificado
       products[index] = producto;
-      _navegacionProvider.updateProducto(producto);
     }
+    _eventController.add(ListenerEvent.productos(products));
   }
 
   /// 🧾 Log de errores
@@ -559,9 +551,7 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
         }
       }
 
-      _eventController.add(
-        ListenerEvent.pedidosUpdated(List.from(itemPedidos)),
-      );
+      _eventController.add(ListenerEvent.pedidos(List.from(itemPedidos)));
 
       return const Result.success(null);
     } catch (error) {
@@ -599,9 +589,7 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
             if (pedidoId == null) return;
 
             itemPedidos.removeWhere((p) => p.id == pedidoId);
-            _eventController.add(
-              ListenerEvent.pedidoRemoved(List.from(itemPedidos)),
-            );
+            _eventController.add(ListenerEvent.pedidos(itemPedidos));
           },
           onError: (err) {
             final netErr = NetworkError.fromException(err);

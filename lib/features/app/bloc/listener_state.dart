@@ -7,8 +7,8 @@ class ListenerState with _$ListenerState {
   const factory ListenerState.success() = _Success;
   const factory ListenerState.failure(RepositoryError error) = _Failure;
 
-  const factory ListenerState.pedidosUpdated(List<Pedido> pedidos) =
-      _PedidosUpdatedState;
-  const factory ListenerState.pedidoRemoved(List<Pedido> pedido) =
-      _PedidoRemovedState;
+  const factory ListenerState.data({
+    required List<Product> productos,
+    required List<Pedido> pedidos,
+  }) = _DataState;
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
-import 'package:qribar_cocina/data/models/product.dart';
 
 class NavegacionProvider extends ChangeNotifier {
   final PageController _pageController = PageController();
@@ -8,20 +7,6 @@ class NavegacionProvider extends ChangeNotifier {
   String _categoriaSelected = SelectionTypeEnum.generalScreen.name;
   int _idPedidoSelected = 1;
   String _mesaActual = '0';
-
-  final List<Product> _productos = [];
-  List<Product> get productos => List.unmodifiable(_productos);
-
-  void addProducto(Product producto) {
-    _productos.add(producto);
-    notifyListeners();
-  }
-
-  void updateProducto(Product productoActualizado) {
-    final index = _productos.indexWhere((p) => p.id == productoActualizado.id);
-    _productos[index] = productoActualizado;
-    notifyListeners();
-  }
 
   String get categoriaSelected => _categoriaSelected;
   set categoriaSelected(String name) {

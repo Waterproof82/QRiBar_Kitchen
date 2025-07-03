@@ -24,10 +24,8 @@ class EventStreamManager {
         _eventSubscription = _repository.eventsStream.listen(
           (event) {
             event.mapOrNull(
-              pedidosUpdated: (e) =>
-                  onEvent(ListenerEvent.pedidosUpdated(e.pedidos)),
-              pedidoRemoved: (e) =>
-                  onEvent(ListenerEvent.pedidoRemoved(e.pedido)),
+              productos: (e) => onEvent(ListenerEvent.productos(e.productos)),
+              pedidos: (e) => onEvent(ListenerEvent.pedidos(e.pedidos)),
             );
           },
           onError: onError,
