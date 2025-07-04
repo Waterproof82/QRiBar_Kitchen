@@ -502,8 +502,6 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
         return;
       }
 
-      if (maybeEnvio != 'cocina') return;
-
       final result = await _handleDataChange(
         dataMesas,
         snapshot.key,
