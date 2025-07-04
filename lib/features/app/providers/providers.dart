@@ -61,7 +61,6 @@ class AppProviders extends StatelessWidget {
             create: (context) {
               final _listenerDataSource = ListenersRemoteDataSource(
                 database: _database,
-                navegacionProvider: context.read<NavegacionProvider>(),
               );
               return ListenerRepositoryImpl(
                 database: _database,
@@ -94,7 +93,6 @@ class AppProviders extends StatelessWidget {
               create: (context) => LoginFormBloc(
                 loginUseCase: context.read<LoginUseCase>(),
                 listenerBloc: context.read<ListenerBloc>(),
-              
               ),
             ),
             BlocProvider<LanguageCubit>(

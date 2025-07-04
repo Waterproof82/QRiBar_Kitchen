@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart'; // <-- nuevo import
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:qribar_cocina/data/models/modifier/modifier.dart';
-import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
+import 'package:qribar_cocina/data/models/product.dart';
+import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/shared/utils/product_utils.dart';
 
 class ModifiersOptions extends StatelessWidget {
@@ -11,7 +12,6 @@ class ModifiersOptions extends StatelessWidget {
     required double ancho,
     required List<Modifier> modifiers,
     String? mainModifierName,
-    int? tipo,
   }) : _ancho = ancho,
        _modifiers = modifiers,
        _mainModifierName = mainModifierName,
@@ -23,27 +23,29 @@ class ModifiersOptions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final navegacionProvider = Provider.of<NavegacionProvider>(
-      context,
-      listen: false,
-    );
+    return BlocSelector<ListenerBloc, ListenerState, List<Product>>(
+      selector: (state) => state.maybeWhen(
+        data: (productos, pedidos, categorias) => productos,
+        orElse: () => const [],
+      ),
+      builder: (context, productos) {
+        final filteredModifiers = _modifiers
+            .where((opcion) => _shouldShowModifier(opcion, productos))
+            .toList(growable: false);
 
-    return Column(
-      children: _modifiers
-          .where((opcion) => _shouldShowModifier(opcion, navegacionProvider))
-          .map((opcion) => _buildModifierBox(opcion))
-          .toList(),
+        return Column(
+          children: filteredModifiers
+              .map(_buildModifierBox)
+              .toList(growable: false),
+        );
+      },
     );
   }
 
-  bool _shouldShowModifier(Modifier opcion, NavegacionProvider provider) {
+  bool _shouldShowModifier(Modifier opcion, List<Product> productos) {
     return opcion.mainProduct.isEmpty ||
         (_mainModifierName == null ||
-            obtenerNombreProducto(
-                  provider.productos,
-                  opcion.mainProduct,
-                  true,
-                ) ==
+            obtenerNombreProducto(productos, opcion.mainProduct, true) ==
                 _mainModifierName);
   }
 

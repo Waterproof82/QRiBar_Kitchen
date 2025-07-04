@@ -21,25 +21,28 @@ class CocinaGeneralScreen extends StatelessWidget {
     return Stack(
       children: [
         BarraSuperiorTiempo(ancho: ancho),
-        BlocBuilder<ListenerBloc, ListenerState>(
-          builder: (context, state) => _handleState(context, state),
+
+        /// BlocBuilder ahora escucha únicamente cambios en pedidos
+        BlocSelector<ListenerBloc, ListenerState, List<Pedido>>(
+          selector: (state) => state.maybeWhen(
+            data: (productos, pedidos, categorias) => pedidos,
+            orElse: () => [],
+          ),
+          builder: (context, pedidos) {
+            if (pedidos.isEmpty) return const SizedBox.shrink();
+            return _buildPedidos(pedidos);
+          },
         ),
       ],
-    );
-  }
-
-  Widget _handleState(BuildContext context, ListenerState state) {
-    return state.maybeWhen(
-      pedidosUpdated: _buildPedidos,
-      pedidoRemoved: _buildPedidos,
-      orElse: () => const SizedBox.shrink(),
     );
   }
 
   Widget _buildPedidos(List<Pedido> pedidos) {
     final pedidosFiltrados = pedidos
         .where(
-          (p) => p.estadoLinea != EstadoPedidoEnum.bloqueado.name,
+          (p) =>
+              (p.estadoLinea != EstadoPedidoEnum.bloqueado.name) &&
+              p.envio == 'cocina',
         )
         .toList();
 
@@ -48,10 +51,8 @@ class CocinaGeneralScreen extends StatelessWidget {
 }
 
 class ListaProductosPedidos extends StatelessWidget {
-  const ListaProductosPedidos({
-    Key? key,
-    required this.itemPedidos,
-  }) : super(key: key);
+  const ListaProductosPedidos({Key? key, required this.itemPedidos})
+    : super(key: key);
 
   final List<Pedido> itemPedidos;
 
@@ -60,14 +61,17 @@ class ListaProductosPedidos extends StatelessWidget {
     final pageController = context.read<NavegacionProvider>().pageController;
     final ancho = context.width;
 
-    final pedidosOrdenados = [...itemPedidos]..sort((a, b) {
+    final pedidosOrdenados = [...itemPedidos]
+      ..sort((a, b) {
         final horaCompare = a.hora.compareTo(b.hora);
         if (horaCompare != 0) return horaCompare;
 
         final tituloCompare = a.titulo?.compareTo(b.titulo ?? '') ?? 0;
         if (tituloCompare != 0) return tituloCompare;
 
-        return (a.modifiers ?? []).toString().compareTo((b.modifiers ?? []).toString());
+        return (a.modifiers ?? []).toString().compareTo(
+          (b.modifiers ?? []).toString(),
+        );
       });
 
     return Container(
@@ -89,7 +93,8 @@ class ListaProductosPedidos extends StatelessWidget {
             child: Column(
               children: [
                 LineaProducto(itemPedidos: pedidosOrdenados, index: index),
-                if (pedido.nota != null && pedido.nota!.trim().isNotEmpty) _NotaBar(pedido.nota!, ancho),
+                if (pedido.nota != null && pedido.nota!.trim().isNotEmpty)
+                  _NotaBar(pedido.nota!, ancho),
               ],
             ),
           );
@@ -201,28 +206,40 @@ class _LineaProductoState extends State<LineaProducto> {
     final String mesaVar = itemPedido.mesa;
     final bool enMarcha = itemPedido.enMarcha;
 
-    final DateTime rstHora = DateTimeExtension.combineNowWithTime(itemPedido.hora);
+    final DateTime rstHora = DateTimeExtension.combineNowWithTime(
+      itemPedido.hora,
+    );
     final Duration diff = _now.difference(rstHora);
     final Color colorLineaCocina = _getColorLineaCocina(diff);
-    final Color marchando = enMarcha ? const Color.fromARGB(255, 7, 255, 19) : Colors.white;
+    final Color marchando = enMarcha
+        ? const Color.fromARGB(255, 7, 255, 19)
+        : Colors.white;
     return GestureDetector(
       onTap: () {
         context.read<ListenerBloc>().add(
-              ListenerEvent.updateEnMarchaPedido(
-                mesa: itemPedido.mesa,
-                idPedido: itemPedido.id,
-                enMarcha: !enMarcha,
-              ),
-            );
+          ListenerEvent.updateEnMarchaPedido(
+            mesa: itemPedido.mesa,
+            idPedido: itemPedido.id,
+            enMarcha: !enMarcha,
+          ),
+        );
       },
       child: Column(
         children: [
           Container(
             width: ancho,
             decoration: BoxDecoration(
-              color: estadoLinea != EstadoPedidoEnum.cocinado.name ? Colors.white : const Color.fromARGB(255, 23, 82, 47),
+              color: estadoLinea != EstadoPedidoEnum.cocinado.name
+                  ? Colors.white
+                  : const Color.fromARGB(255, 23, 82, 47),
               borderRadius: BorderRadius.circular(100),
-              boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 5, spreadRadius: -5)],
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black54,
+                  blurRadius: 5,
+                  spreadRadius: -5,
+                ),
+              ],
             ),
             child: PedidoDismissible(
               itemPedido: itemPedido,

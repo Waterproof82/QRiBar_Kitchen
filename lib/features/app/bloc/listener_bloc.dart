@@ -5,11 +5,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:qribar_cocina/app/types/errors/network_error.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
+import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/pedido/pedido.dart';
+import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/data/repositories/remote/listener_repository_impl.dart';
 import 'package:qribar_cocina/features/login/data/data_sources/remote/auth_remote_data_source_contract.dart';
 import 'package:qribar_cocina/shared/utils/auth_service.dart';
 import 'package:qribar_cocina/shared/utils/event_stream_manager.dart';
+import 'package:qribar_cocina/shared/utils/product_utils.dart';
 
 part 'listener_bloc.freezed.dart';
 part 'listener_event.dart';
@@ -30,10 +33,16 @@ class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
        _eventStream = EventStreamManager(repository),
        super(const ListenerState.initial()) {
     on<_StartListening>(_onStartListening);
-    on<_PedidosUpdated>(_onPedidosUpdated);
-    on<_PedidoRemoved>(_onPedidoRemoved);
+
+    on<_Productos>(_onProductos);
+    on<_Pedidos>(_onPedidos);
+
+    on<_Categorias>(_onCategorias);
+
     on<_UpdateEstadoPedido>(_onUpdateEstadoPedido);
     on<_UpdateEnMarchaPedido>(_onUpdateEnMarchaPedido);
+
+    on<_StreamError>(_onStreamError);
   }
 
   Future<void> _onStartListening(
@@ -85,13 +94,58 @@ class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
     }
   }
 
-  // Event handlers
-  void _onPedidosUpdated(_PedidosUpdated event, Emitter<ListenerState> emit) {
-    emit(ListenerState.pedidosUpdated(event.pedidos));
+  void _onProductos(_Productos event, Emitter<ListenerState> emit) {
+    emit(
+      ListenerState.data(
+        productos: List.unmodifiable(event.productos),
+        pedidos: state.maybeWhen(
+          data: (_, pedidos, __) => pedidos,
+          orElse: () => [],
+        ),
+        categorias: state.maybeWhen(
+          data: (_, __, categorias) => categorias,
+          orElse: () => [],
+        ),
+      ),
+    );
   }
 
-  void _onPedidoRemoved(_PedidoRemoved event, Emitter<ListenerState> emit) {
-    emit(ListenerState.pedidoRemoved(event.pedido));
+  void _onPedidos(_Pedidos event, Emitter<ListenerState> emit) {
+    state.maybeMap(
+      data: (dataState) {
+        final nuevosPedidos = asignarEnviosPorPedidos(
+          pedidos: event.pedidos,
+          productos: dataState.productos,
+          categorias: dataState.categorias,
+        );
+
+        emit(dataState.copyWith(pedidos: nuevosPedidos));
+      },
+      orElse: () {},
+    );
+  }
+
+  Future<void> _onCategorias(
+    _Categorias event,
+    Emitter<ListenerState> emit,
+  ) async {
+    state.maybeMap(
+      data: (dataState) {
+        final nuevosPedidos = asignarEnviosPorPedidos(
+          pedidos: dataState.pedidos,
+          productos: dataState.productos,
+          categorias: event.categorias,
+        );
+
+        emit(
+          dataState.copyWith(
+            pedidos: nuevosPedidos,
+            categorias: event.categorias,
+          ),
+        );
+      },
+      orElse: () {},
+    );
   }
 
   Future<void> _onUpdateEstadoPedido(
@@ -116,6 +170,10 @@ class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
       enMarcha: event.enMarcha,
     );
     result.whenOrNull(failure: (error) => emit(ListenerState.failure(error)));
+  }
+
+  void _onStreamError(_StreamError event, Emitter<ListenerState> emit) {
+    emit(ListenerState.failure(event.error));
   }
 
   @override

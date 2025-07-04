@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:qribar_cocina/app/enums/estado_pedido_enum.dart';
@@ -14,19 +15,14 @@ import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/models/product.dart';
 import 'package:qribar_cocina/data/models/sala_estado.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
-import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/shared/utils/audio_helpers.dart';
 import 'package:qribar_cocina/shared/utils/product_utils.dart';
 
 class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
-  ListenersRemoteDataSource({
-    required FirebaseDatabase database,
-    required NavegacionProvider navegacionProvider,
-  }) : _database = database,
-       _navegacionProvider = navegacionProvider;
+  ListenersRemoteDataSource({required FirebaseDatabase database})
+    : _database = database;
 
   final FirebaseDatabase _database;
-  final NavegacionProvider _navegacionProvider;
 
   String get _idBar {
     if (!IdBarDataSource.instance.hasIdBar) {
@@ -41,40 +37,67 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
   Stream<ListenerEvent> get eventsStream => _eventController.stream;
 
   // 🔸 Subscripciones Firebase
-  StreamSubscription? _dataStreamProductos;
-  StreamSubscription? _dataStreamCategoria;
+  final Map<String, StreamSubscription> _dataStreamProductosMap = {};
+  final Map<String, StreamSubscription> _dataStreamCategoriasMap = {};
 
   final Map<String, StreamSubscription> _dataStreamGestionPedidosMap = {};
   final Map<String, StreamSubscription> _dataStreamRemovedPedidosMap = {};
 
   // 🔸 Estado interno (cache local)
-  final List<CategoriaProducto> categoriasProdLocal = [];
   final List<SalaEstado> salasMesa = [];
+  final List<CategoriaProducto> categoriasProdLocal = [];
   List<Product> products = [];
   List<Pedido> itemPedidos = [];
 
   @override
   Future<Result<void>> addProduct() async {
-    // 1️⃣ Cancelamos la suscripción previa (si existe)
-    await _dataStreamProductos?.cancel();
-    _dataStreamProductos = null;
+    // 1️⃣ Cancel previous subscriptions and clear them
+    for (var sub in _dataStreamProductosMap.values) {
+      try {
+        await sub.cancel();
+      } catch (_) {}
+    }
+    _dataStreamProductosMap.clear();
 
     try {
-      // 2️⃣ Suscripción a productos nuevos y modificados
       final ref = _database.ref('productos/$_idBar/');
 
-      _dataStreamProductos = ref.onChildAdded.listen(
+      // 2️⃣ Obtener todos los datos iniciales primero
+      final DataSnapshot initialSnapshot = await ref.get();
+      if (initialSnapshot.value != null) {
+        final Map<dynamic, dynamic> rawData =
+            initialSnapshot.value as Map<dynamic, dynamic>;
+        final List<Product> initialProducts = [];
+        rawData.forEach((key, value) {
+          if (value is Map<dynamic, dynamic>) {
+            final data = Map<String, dynamic>.from(value);
+            final product = _parseProduct(key, data);
+            initialProducts.add(product);
+          }
+        });
+        products = initialProducts;
+        _eventController.add(ListenerEvent.productos(products));
+      }
+
+      // 3️⃣ Luego, configurar los listeners para cambios futuros
+      final String baseKey = _idBar;
+
+      _dataStreamProductosMap['$baseKey-added'] = ref.onChildAdded.listen(
         (event) => _handleProductoEvent(event, isChanged: false),
         onError: (err) => _handleProductoError(err, 'onChildAdded'),
       );
 
-      // Añadimos también el onChildChanged
-      ref.onChildChanged.listen(
+      _dataStreamProductosMap['$baseKey-changed'] = ref.onChildChanged.listen(
         (event) => _handleProductoEvent(event, isChanged: true),
         onError: (err) => _handleProductoError(err, 'onChildChanged'),
       );
 
-      // 3️⃣ Éxito
+      _dataStreamProductosMap['$baseKey-removed'] = ref.onChildRemoved.listen(
+        (event) => _handleProductoRemoved(event),
+        onError: (err) => _handleProductoError(err, 'onChildRemoved'),
+      );
+
+      // 4️⃣ Éxito
       return const Result.success(null);
     } catch (error) {
       return Result.failure(
@@ -85,19 +108,9 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
     }
   }
 
-  /// 🔁 Manejador común para onChildAdded y onChildChanged
-  void _handleProductoEvent(DatabaseEvent event, {required bool isChanged}) {
-    final snap = event.snapshot;
-    final raw = snap.value;
-
-    if (raw is! Map<dynamic, dynamic>) {
-      print('⚠️ Formato inesperado o nulo en snapshot: $raw');
-      return;
-    }
-
-    final data = Map<String, dynamic>.from(raw);
-    final key = snap.key!;
-    final producto = Product(
+  /// Helper to parse product data
+  Product _parseProduct(String key, Map<String, dynamic> data) {
+    return Product(
       id: key,
       alergogenos:
           (data['alergogenos'] as Map?)?.keys.cast<String>().toList() ?? [],
@@ -131,113 +144,106 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
           }).toList() ??
           [],
     );
+  }
+
+  /// 🔁 Manejador común para onChildAdded y onChildChanged
+  void _handleProductoEvent(DatabaseEvent event, {required bool isChanged}) {
+    final snap = event.snapshot;
+    final raw = snap.value;
+
+    if (raw is! Map<dynamic, dynamic>) {
+      print('⚠️ Formato inesperado o nulo en snapshot: $raw');
+      return;
+    }
+
+    final data = Map<String, dynamic>.from(raw);
+    final key = snap.key!;
+    final producto = _parseProduct(key, data);
 
     final index = products.indexWhere((p) => p.id == producto.id);
 
     if (index == -1) {
-      // Producto nuevo
-      products.add(producto);
-      _navegacionProvider.addProducto(producto);
+      if (!isChanged) {
+        products.add(producto);
+      }
     } else if (isChanged) {
-      // Producto modificado
       products[index] = producto;
-      _navegacionProvider.updateProducto(producto);
+    }
+    _eventController.add(ListenerEvent.productos(products));
+  }
+
+  void _handleProductoRemoved(DatabaseEvent event) {
+    final key = event.snapshot.key;
+    if (key != null) {
+      products.removeWhere((p) => p.id == key);
+      _eventController.add(ListenerEvent.productos(products));
     }
   }
 
-  /// 🧾 Log de errores
-  void _handleProductoError(Object err, String source) {
-    final netErr = NetworkError.fromException(err);
-    final repoErr = RepositoryError.fromDataSourceError(netErr);
-    print('❌ Error en listener de productos [$source]: $repoErr');
+  void _handleProductoError(Object error, String listenerType) {
+    print('Error en listener de productos ($listenerType): $error');
+    _eventController.addError(error); // Propagate error to stream
   }
 
+  // --- CATEGORY LISTENERS ---
   @override
   Future<Result<void>> addCategoriaMenu() async {
-    // 1️⃣ Cancelar cualquier suscripción previa
-    await _dataStreamCategoria?.cancel();
-    _dataStreamCategoria = null;
+    // 1️⃣ Consolidate previous listeners and ensure cleanup
+    for (var sub in _dataStreamCategoriasMap.values) {
+      try {
+        await sub.cancel();
+      } catch (_) {}
+    }
+    _dataStreamCategoriasMap.clear();
 
     try {
       final ref = _database.ref('ficha_local/$_idBar/categoria_productos');
 
-      // 2️⃣ Procesar categorías ya existentes de una vez
-      final snapshot = await ref.get();
-      if (snapshot.exists) {
-        final raw = snapshot.value;
-        if (raw is Map) {
-          // Si es un map de hijos, iteramos
-          (raw).forEach((key, value) {
-            try {
-              final m = Map<String, dynamic>.from(value);
-              final categoria = CategoriaProducto(
-                id: key,
-                categoria: m['categoria'] ?? '',
-                categoriaEn: m['categoria_en'] ?? '',
-                categoriaDe: m['categoria_de'] ?? '',
-                envio: m['envio'] ?? '',
-                icono: m['icono'] ?? '',
-                imgVertical: m['img_vertical'] as bool? ?? false,
-                orden: (m['orden'] as num?)?.toInt() ?? 0,
-              );
-              categoriasProdLocal.add(categoria);
-            } catch (e) {
-              // Log formateado
-              final repoErr = RepositoryError.fromDataSourceError(
-                NetworkError.fromException(e),
-              );
-              print(
-                '❌ [addCategoriaMenu] Error al parsear existente: $repoErr',
-              );
+      // 2️⃣ Get all existing categories first
+      final DataSnapshot initialSnapshot = await ref.get();
+      if (initialSnapshot.exists && initialSnapshot.value is Map) {
+        final Map<dynamic, dynamic> rawCategories =
+            initialSnapshot.value as Map<dynamic, dynamic>;
+        rawCategories.forEach((key, value) {
+          try {
+            if (value is Map) {
+              final CategoriaProducto category = _parseCategoria(key, value);
+              categoriasProdLocal.add(category);
             }
-          });
-        }
+          } catch (e, stackTrace) {
+            _logError(e, stackTrace, 'Error al parsear categoría existente');
+          }
+        });
+        // Emit the complete initial list of categories
+        _eventController.add(
+          ListenerEvent.categorias(List.from(categoriasProdLocal)),
+        );
       }
 
-      // 3️⃣ Luego suscribimos onChildAdded para futuros insert
-      _dataStreamCategoria = ref.onChildAdded.listen(
-        (event) {
-          try {
-            final raw = event.snapshot.value;
-            if (raw is! Map) {
-              throw Exception(
-                'Formato inesperado o nulo al leer categoría: $raw',
-              );
-            }
-            final m = Map<String, dynamic>.from(raw);
-            final nueva = CategoriaProducto(
-              id: event.snapshot.key!,
-              categoria: m['categoria'] ?? '',
-              categoriaEn: m['categoria_en'] ?? '',
-              categoriaDe: m['categoria_de'] ?? '',
-              envio: m['envio'] ?? '',
-              icono: m['icono'] ?? '',
-              imgVertical: m['img_vertical'] as bool? ?? false,
-              orden: (m['orden'] as num?)?.toInt() ?? 0,
-            );
-            categoriasProdLocal.add(nueva);
-            print(
-              '✅ [addCategoriaMenu] Categoría añadida (nuevo): ${nueva.categoria}',
-            );
-          } catch (e) {
-            final repoErr = RepositoryError.fromDataSourceError(
-              NetworkError.fromException(e),
-            );
-            print('❌ [addCategoriaMenu] Error al procesar nuevo: $repoErr');
-          }
-        },
-        onError: (err) {
-          final repoErr = RepositoryError.fromDataSourceError(
-            NetworkError.fromException(err),
-          );
-          print('❌ [addCategoriaMenu] Error del listener: $repoErr');
-        },
+      // 3️⃣ Set up listeners for future changes and assign them
+      final String baseKey = _idBar;
+
+      _dataStreamCategoriasMap['$baseKey-added'] = ref.onChildAdded.listen(
+        (event) => _handleCategoriaEvent(event, isChanged: false),
+        onError: (err, stackTrace) =>
+            _logError(err, stackTrace, 'onChildAdded Categoría'),
       );
 
-      // 4️⃣ Al final, devolvemos éxito
+      _dataStreamCategoriasMap['$baseKey-changed'] = ref.onChildChanged.listen(
+        (event) => _handleCategoriaEvent(event, isChanged: true),
+        onError: (err, stackTrace) =>
+            _logError(err, stackTrace, 'onChildChanged Categoría'),
+      );
+
+      _dataStreamCategoriasMap['$baseKey-removed'] = ref.onChildRemoved.listen(
+        (event) => _handleCategoriaRemoved(event),
+        onError: (err, stackTrace) =>
+            _logError(err, stackTrace, 'onChildRemoved Categoría'),
+      );
+
       return const Result.success(null);
-    } catch (error) {
-      // 5️⃣ Si la creación de la suscripción falla
+    } catch (error, stackTrace) {
+      _logError(error, stackTrace, 'Error al iniciar listener de categorías');
       return Result.failure(
         error: RepositoryError.fromDataSourceError(
           NetworkError.fromException(error),
@@ -246,64 +252,76 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
     }
   }
 
-  @override
-  Future<Result<void>> changeCategoriaMenu() async {
-    await _dataStreamCategoria?.cancel();
-    _dataStreamCategoria = null;
+  // Helper method to parse CategoriaProducto
+  CategoriaProducto _parseCategoria(String key, Map<dynamic, dynamic> rawData) {
+    final m = Map<String, dynamic>.from(rawData);
+    return CategoriaProducto(
+      id: key,
+      categoria: m['categoria'] ?? '',
+      categoriaEn: m['categoria_en'] ?? '',
+      categoriaDe: m['categoria_de'] ?? '',
+      envio: m['envio'] ?? '',
+      icono: m['icono'] ?? '',
+      imgVertical: m['img_vertical'] as bool? ?? false,
+      orden: (m['orden'] as num?)?.toInt() ?? 0,
+    );
+  }
 
-    try {
-      _dataStreamCategoria = _database
-          .ref('ficha_local/$_idBar/categoria_productos')
-          .onChildChanged
-          .listen(
-            (event) {
-              final raw = event.snapshot.value;
+  // Handle category added/changed events
+  void _handleCategoriaEvent(DatabaseEvent event, {required bool isChanged}) {
+    final snap = event.snapshot;
+    final raw = snap.value;
 
-              if (raw is! Map<dynamic, dynamic>) {
-                final msg =
-                    '⚠️ Formato inesperado o nulo al cambiar categoría: $raw';
-                final netErr = NetworkError.fromException(Exception(msg));
-                final repoErr = RepositoryError.fromDataSourceError(netErr);
-                print('❌ [changeCategoriaMenu] Error de datos: $repoErr');
-                return;
-              }
-
-              final data = Map<String, dynamic>.from(raw);
-              final key = event.snapshot.key!;
-              final idx = categoriasProdLocal.indexWhere((c) => c.id == key);
-
-              if (idx >= 0) {
-                final cat = categoriasProdLocal[idx];
-                cat.categoria = data['categoria'] ?? cat.categoria;
-                cat.categoriaEn = data['categoria_en'] ?? cat.categoriaEn;
-                cat.categoriaDe = data['categoria_de'] ?? cat.categoriaDe;
-                cat.envio = data['envio'] ?? cat.envio;
-                cat.icono = data['icono'] ?? cat.icono;
-                cat.imgVertical =
-                    data['img_vertical'] as bool? ?? cat.imgVertical;
-                cat.orden = (data['orden'] as num?)?.toInt() ?? cat.orden;
-
-                print(
-                  '🔄 [changeCategoriaMenu] Categoría actualizada: ${cat.categoria}',
-                );
-              }
-            },
-            onError: (err) {
-              final repoErr = RepositoryError.fromDataSourceError(
-                NetworkError.fromException(err),
-              );
-              print('❌ [changeCategoriaMenu] Error del listener: $repoErr');
-            },
-          );
-
-      return const Result.success(null);
-    } catch (error) {
-      return Result.failure(
-        error: RepositoryError.fromDataSourceError(
-          NetworkError.fromException(error),
-        ),
-      );
+    if (raw is! Map<dynamic, dynamic>) {
+      print('⚠️ Formato inesperado o nulo en snapshot de categoría: $raw');
+      return;
     }
+
+    final String key = snap.key!;
+    final CategoriaProducto newCategory = _parseCategoria(key, raw);
+
+    final int index = categoriasProdLocal.indexWhere((c) => c.id == key);
+
+    if (index == -1) {
+      if (!isChanged) {
+        categoriasProdLocal.add(newCategory);
+      }
+    } else if (isChanged) {
+      categoriasProdLocal[index] = newCategory;
+    }
+
+    categoriasProdLocal.sort((a, b) => a.orden.compareTo(b.orden));
+
+    _eventController.add(
+      ListenerEvent.categorias(List.from(categoriasProdLocal)),
+    );
+    print(
+      '✅ Categoría ${isChanged ? 'actualizada' : 'añadida'}: ${newCategory.categoria}',
+    );
+  }
+
+  // Handle category removed events
+  void _handleCategoriaRemoved(DatabaseEvent event) {
+    final String? key = event.snapshot.key;
+    if (key != null) {
+      categoriasProdLocal.removeWhere((c) => c.id == key);
+      categoriasProdLocal.sort((a, b) => a.orden.compareTo(b.orden));
+
+      _eventController.add(
+        ListenerEvent.categorias(List.from(categoriasProdLocal)),
+      );
+      print('🗑️ Categoría eliminada: $key');
+    }
+  }
+
+  // Consolidated error logging
+  void _logError(Object error, StackTrace stackTrace, String message) {
+    final repoErr = RepositoryError.fromDataSourceError(
+      NetworkError.fromException(error),
+    );
+    print('❌ [Categorias] $message: $repoErr');
+    log('$message error:', error: error, stackTrace: stackTrace);
+    _eventController.addError(repoErr);
   }
 
   @override
@@ -385,11 +403,6 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
       for (final sala in salasMesa) {
         final mesaId = sala.mesa;
         if (mesaId == null || mesaId.isEmpty) continue;
-        final addedKey = '$mesaId-added';
-        final changedKey = '$mesaId-changed';
-        // si ya existían, saltamos
-        if (_dataStreamGestionPedidosMap.containsKey(addedKey)) continue;
-        if (_dataStreamGestionPedidosMap.containsKey(changedKey)) continue;
 
         final path = 'gestion_pedidos/$_idBar/$mesaId';
         final ref = _database.ref(path);
@@ -441,8 +454,8 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
         );
 
         // 5️⃣ Guardar suscripciones
-        _dataStreamGestionPedidosMap[addedKey] = addedSub;
-        _dataStreamGestionPedidosMap[changedKey] = changedSub;
+        _dataStreamGestionPedidosMap['$mesaId-added'] = addedSub;
+        _dataStreamGestionPedidosMap['$mesaId-changed'] = changedSub;
         print('✅ [addAndChangedPedidos] Listeners creados para mesa $mesaId');
       }
 
@@ -478,18 +491,21 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
       final idProd = dataMesas['idProducto'] as String?;
       if (idProd == null) return;
 
-      final envio = await obtenerEnvioPorProducto(
+      final maybeEnvio = await obtenerEnvioPorProducto(
         categoriasProdLocal,
         idProd,
         products,
       );
-      if (envio != 'cocina') return;
 
-      // Llamamos a la función _handleDataChange para procesar el cambio de datos
+      if (maybeEnvio == null) {
+        print('⚠️ [processPedido] Envío no encontrado para producto $idProd');
+        return;
+      }
+
       final result = await _handleDataChange(
         dataMesas,
         snapshot.key,
-        envio ?? 'barra',
+        maybeEnvio,
         isUpdate,
       );
 
@@ -559,9 +575,7 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
         }
       }
 
-      _eventController.add(
-        ListenerEvent.pedidosUpdated(List.from(itemPedidos)),
-      );
+      _eventController.add(ListenerEvent.pedidos(List.from(itemPedidos)));
 
       return const Result.success(null);
     } catch (error) {
@@ -599,9 +613,7 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
             if (pedidoId == null) return;
 
             itemPedidos.removeWhere((p) => p.id == pedidoId);
-            _eventController.add(
-              ListenerEvent.pedidoRemoved(List.from(itemPedidos)),
-            );
+            _eventController.add(ListenerEvent.pedidos(itemPedidos));
           },
           onError: (err) {
             final netErr = NetworkError.fromException(err);
@@ -628,11 +640,15 @@ class ListenersRemoteDataSource implements ListenersRemoteDataSourceContract {
 
   @override
   Future<void> dispose() async {
-    await _dataStreamProductos?.cancel();
-    _dataStreamProductos = null;
+    for (final subscription in _dataStreamProductosMap.values) {
+      await subscription.cancel();
+    }
+    _dataStreamProductosMap.clear();
 
-    await _dataStreamCategoria?.cancel();
-    _dataStreamCategoria = null;
+    for (final subscription in _dataStreamCategoriasMap.values) {
+      await subscription.cancel();
+    }
+    _dataStreamCategoriasMap.clear();
 
     for (final subscription in _dataStreamGestionPedidosMap.values) {
       await subscription.cancel();
