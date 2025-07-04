@@ -26,6 +26,8 @@ class EventStreamManager {
             event.mapOrNull(
               productos: (e) => onEvent(ListenerEvent.productos(e.productos)),
               pedidos: (e) => onEvent(ListenerEvent.pedidos(e.pedidos)),
+              categorias: (e) =>
+                  onEvent(ListenerEvent.categorias(e.categorias)),
             );
           },
           onError: onError,

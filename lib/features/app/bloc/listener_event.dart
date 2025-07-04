@@ -8,6 +8,9 @@ class ListenerEvent with _$ListenerEvent {
 
   const factory ListenerEvent.pedidos(List<Pedido> pedidos) = _Pedidos;
 
+  const factory ListenerEvent.categorias(List<CategoriaProducto> categorias) =
+      _Categorias;
+
   const factory ListenerEvent.updateEstadoPedido({
     required String mesa,
     required String idPedido,

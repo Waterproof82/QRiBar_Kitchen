@@ -21,25 +21,29 @@ class CocinaGeneralScreen extends StatelessWidget {
     return Stack(
       children: [
         BarraSuperiorTiempo(ancho: ancho),
-        BlocBuilder<ListenerBloc, ListenerState>(
-          builder: (context, state) => _handleState(context, state),
+
+        /// BlocBuilder ahora escucha únicamente cambios en pedidos
+        BlocSelector<ListenerBloc, ListenerState, List<Pedido>>(
+          selector: (state) => state.maybeWhen(
+            data: (productos, pedidos, categorias) => pedidos,
+            orElse: () => [],
+          ),
+          builder: (context, pedidos) {
+            if (pedidos.isEmpty) return const SizedBox.shrink();
+            return _buildPedidos(pedidos);
+          },
         ),
       ],
     );
   }
 
-  Widget _handleState(BuildContext context, ListenerState state) {
-    return state.maybeWhen(
-      data: (productos, pedidos) {
-        return _buildPedidos(pedidos);
-      },
-      orElse: () => const SizedBox.shrink(),
-    );
-  }
-
   Widget _buildPedidos(List<Pedido> pedidos) {
     final pedidosFiltrados = pedidos
-        .where((p) => p.estadoLinea != EstadoPedidoEnum.bloqueado.name)
+        .where(
+          (p) =>
+              (p.estadoLinea != EstadoPedidoEnum.bloqueado.name) &&
+              p.envio == 'cocina',
+        )
         .toList();
 
     return ListaProductosPedidos(itemPedidos: pedidosFiltrados);

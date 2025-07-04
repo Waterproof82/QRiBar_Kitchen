@@ -32,7 +32,6 @@ class ListenerRepositoryImpl implements ListenerRepository {
       await _dataSource.addSalaMesas();
       await _dataSource.addProduct();
       await _dataSource.addCategoriaMenu();
-      await _dataSource.changeCategoriaMenu();
       await _dataSource.addAndChangedPedidos();
       await _dataSource.removePedidos();
       return const Result.success(null);

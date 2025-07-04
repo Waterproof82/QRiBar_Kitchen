@@ -25,16 +25,18 @@ class ModifiersOptions extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<ListenerBloc, ListenerState, List<Product>>(
       selector: (state) => state.maybeWhen(
-        data: (productos, _) => productos,
+        data: (productos, pedidos, categorias) => productos,
         orElse: () => const [],
       ),
       builder: (context, productos) {
         final filteredModifiers = _modifiers
             .where((opcion) => _shouldShowModifier(opcion, productos))
-            .toList();
+            .toList(growable: false);
 
         return Column(
-          children: filteredModifiers.map(_buildModifierBox).toList(),
+          children: filteredModifiers
+              .map(_buildModifierBox)
+              .toList(growable: false),
         );
       },
     );

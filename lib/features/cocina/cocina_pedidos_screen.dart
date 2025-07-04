@@ -24,7 +24,7 @@ class CocinaPedidosScreen extends StatelessWidget {
     return BlocBuilder<ListenerBloc, ListenerState>(
       builder: (context, state) {
         return state.maybeWhen(
-          data: (productos, pedidos) =>
+          data: (productos, pedidos, categorias) =>
               _buildFromPedidos(pedidos, navegacionModel),
           orElse: () => const SizedBox.shrink(),
         );
@@ -48,7 +48,8 @@ class CocinaPedidosScreen extends StatelessWidget {
           (pedido) =>
               pedido.mesa == idMesaActual &&
               pedido.numPedido == idPedidoSelected &&
-              pedido.estadoLinea != EstadoPedidoEnum.bloqueado.name,
+              pedido.estadoLinea != EstadoPedidoEnum.bloqueado.name &&
+              pedido.envio == 'cocina',
         )
         .toList();
 

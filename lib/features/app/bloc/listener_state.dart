@@ -10,5 +10,6 @@ class ListenerState with _$ListenerState {
   const factory ListenerState.data({
     required List<Product> productos,
     required List<Pedido> pedidos,
+    required List<CategoriaProducto> categorias,
   }) = _DataState;
 }

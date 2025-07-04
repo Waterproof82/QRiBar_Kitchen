@@ -52,30 +52,21 @@ List<Pedido> asignarEnviosPorPedidos({
   required List<Product> productos,
   required List<CategoriaProducto> categorias,
 }) {
-  final categoriaMap = {
-    for (var categoria in categorias) categoria.categoria: categoria,
-  };
-
-  final productoMap = {for (var producto in productos) producto.id: producto};
+  final categoriaMap = {for (final c in categorias) c.categoria: c};
+  final productoMap = {for (final p in productos) p.id!: p};
 
   return pedidos
-      .where((pedido) {
+      .map((pedido) {
         final producto = productoMap[pedido.idProducto];
-        if (producto == null) return false;
+        if (producto == null) return pedido;
 
         final categoria = categoriaMap[producto.categoriaProducto];
-        if (categoria == null) return false;
-
-        return categoria.envio == 'cocina';
-      })
-      .map((pedido) {
-        final producto = productoMap[pedido.idProducto]!;
-        final categoria = categoriaMap[producto.categoriaProducto]!;
+        if (categoria == null) return pedido;
 
         if (pedido.envio != categoria.envio) {
           return pedido.copyWith(envio: categoria.envio);
         }
         return pedido;
       })
-      .toList();
+      .toList(growable: false);
 }
