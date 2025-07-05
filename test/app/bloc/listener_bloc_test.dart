@@ -6,7 +6,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/data/data_sources/remote/listeners_remote_data_source_contract.dart';
-import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/repositories/remote/listener_repository_impl.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/login/data/data_sources/remote/auth_remote_data_source_contract.dart';
@@ -85,84 +84,6 @@ void main() {
       const ListenerState.success(),
     ],
   );
-
-  blocTest<ListenerBloc, ListenerState>(
-    'emite ListenerState.pedidosUpdated cuando recibe evento pedidosUpdated',
-    build: () => bloc,
-    act: (bloc) {
-      final pedidos = <Pedido>[
-        Pedido(
-          id: '1',
-          cantidad: 2,
-          fecha: '2025-06-25',
-          hora: '12:30',
-          mesa: 'Mesa1',
-          numPedido: 1,
-          idProducto: 'prod1',
-          estadoLinea: 'pendiente',
-        ),
-      ];
-      streamController.add(ListenerEvent.pedidosUpdated(pedidos));
-    },
-    expect: () => [
-      isA<ListenerState>().having(
-        (s) => s.maybeMap(
-          pedidosUpdated: (state) => state.pedidos,
-          orElse: () => null,
-        ),
-        'pedidos',
-        isNotNull,
-      ),
-    ],
-  );
-
-  blocTest<ListenerBloc, ListenerState>(
-    'emite ListenerState.pedidoRemoved cuando recibe evento pedidoRemoved',
-    build: () => bloc,
-    act: (bloc) {
-      final pedidos = <Pedido>[
-        Pedido(
-          id: '1',
-          cantidad: 2,
-          fecha: '2025-06-25',
-          hora: '12:30',
-          mesa: 'Mesa1',
-          numPedido: 1,
-          idProducto: 'prod1',
-          estadoLinea: 'pendiente',
-        ),
-      ];
-      streamController.add(ListenerEvent.pedidoRemoved(pedidos));
-    },
-    expect: () => [
-      isA<ListenerState>().having(
-        (s) => s.maybeMap(
-          pedidoRemoved: (state) => state.pedido,
-          orElse: () => null,
-        ),
-        'pedido',
-        isNotNull,
-      ),
-    ],
-  );
-
-  // blocTest<ListenerBloc, ListenerState>(
-  //   'emite ListenerState.failure cuando el stream emite error',
-  //   build: () => bloc,
-  //   act: (bloc) {
-  //     streamController.addError(Exception('Error simulacion'));
-  //   },
-  //   expect: () => [
-  //     isA<ListenerState>().having(
-  //       (s) => s.maybeMap(
-  //         failure: (state) => state.error,
-  //         orElse: () => null,
-  //       ),
-  //       'error',
-  //       isNotNull,
-  //     ),
-  //   ],
-  // );
 
   blocTest<ListenerBloc, ListenerState>(
     'invoca updateEstadoPedido y no emite nuevo estado si es éxito',

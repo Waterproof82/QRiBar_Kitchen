@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/data/repositories/remote/listener_repository_impl.dart';
@@ -46,4 +47,18 @@ class EventStreamManager {
     await _eventSubscription?.cancel();
     _eventSubscription = null;
   }
+}
+
+/// Cancels all subscriptions in the provided [listenersMap] and clears the map.
+Future<void> cancelAndClearListeners(
+  Map<String, StreamSubscription> listenersMap,
+) async {
+  for (final sub in listenersMap.values) {
+    try {
+      await sub.cancel();
+    } catch (e) {
+      log('Error cancelando listener: $e');
+    }
+  }
+  listenersMap.clear();
 }
