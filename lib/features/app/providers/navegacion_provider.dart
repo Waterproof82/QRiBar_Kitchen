@@ -5,7 +5,7 @@ import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
 ///
 /// This provider manages the selected category, order ID, current table,
 /// and a [PageController] for screen navigation.
-final class NavegacionProvider extends ChangeNotifier {
+final class NavigationProvider extends ChangeNotifier {
   /// Controller for managing page views in a [PageView] widget.
   /// It's initialized here as part of the provider's state.
   final PageController _pageController = PageController();

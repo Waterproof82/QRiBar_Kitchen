@@ -16,7 +16,7 @@ final class CocinaPedidosScreen extends StatelessWidget {
   final dynamic extra;
   @override
   Widget build(BuildContext context) {
-    final navegacionModel = Provider.of<NavegacionProvider>(
+    final navegacionModel = Provider.of<NavigationProvider>(
       context,
       listen: true,
     );
@@ -34,7 +34,7 @@ final class CocinaPedidosScreen extends StatelessWidget {
 
   Widget _buildFromPedidos(
     List<Pedido> pedidos,
-    NavegacionProvider navegacionModel,
+    NavigationProvider navegacionModel,
   ) {
     if (pedidos.isEmpty) return const SizedBox.shrink();
 
@@ -73,7 +73,7 @@ final class CocinaPedidosScreen extends StatelessWidget {
   Widget _buildStack(
     List<String> resultMesas,
     int contadorNumPedido,
-    NavegacionProvider navegacionModel,
+    NavigationProvider navegacionModel,
     List<Pedido> itemPedidosSelected,
   ) {
     return Stack(
@@ -91,7 +91,7 @@ final class CocinaPedidosScreen extends StatelessWidget {
 
 class PedidosListMenu extends StatelessWidget {
   PedidosListMenu(this.navegacionModel, this.count);
-  final NavegacionProvider navegacionModel;
+  final NavigationProvider navegacionModel;
   final int count;
   final ScrollController _controller = ScrollController();
 
@@ -156,7 +156,7 @@ class PedidosListMenu extends StatelessWidget {
 class PedidosMesasListMenu extends StatelessWidget {
   PedidosMesasListMenu(this.navegacionModel, this.resultMesas);
 
-  final NavegacionProvider navegacionModel;
+  final NavigationProvider navegacionModel;
   final List<String> resultMesas;
 
   final ScrollController _controller = ScrollController();
@@ -226,7 +226,7 @@ class ListaProductosPedidos extends StatelessWidget {
     required this.itemPedidos,
   }) : super(key: key);
 
-  final NavegacionProvider navegacionModel;
+  final NavigationProvider navegacionModel;
   final List<Pedido> itemPedidos;
 
   @override
