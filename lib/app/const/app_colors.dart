@@ -34,4 +34,7 @@ final class AppColors {
   static const Color blackSoft2 = Color.fromRGBO(0, 0, 0, 0.6);
   static const Color greySoft = Color(0xFF757575);
   static const Color greyBackGround = Color(0xFFF6F6F6);
+
+  // Transparent color for overlays, spacing, etc.
+  static const Color transparent = Colors.transparent;
 }
