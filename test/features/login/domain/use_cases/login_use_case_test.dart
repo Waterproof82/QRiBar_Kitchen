@@ -3,6 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/features/login/domain/repositories/login_repository_contract.dart';
 import 'package:qribar_cocina/features/login/domain/use_cases/login_use_case.dart';
+import 'package:qribar_cocina/features/login/domain/use_cases/login_use_case_impl.dart';
 
 // Mock del repositorio
 class MockLoginRepository extends Mock implements LoginRepositoryContract {}
@@ -13,7 +14,7 @@ void main() {
 
   setUp(() {
     mockRepository = MockLoginRepository();
-    useCase = LoginUseCase(mockRepository);
+    useCase = LoginUseCaseImpl(mockRepository);
   });
 
   test('should call loginWithEmailAndPassword and return Result<void>', () async {
