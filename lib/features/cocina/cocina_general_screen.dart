@@ -86,7 +86,7 @@ final class ListaProductosPedidos extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PageController pageController = context
-        .read<NavegacionProvider>()
+        .read<NavigationProvider>()
         .pageController;
 
     // Create a mutable copy for sorting.
