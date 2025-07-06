@@ -10,7 +10,7 @@ import 'package:qribar_cocina/features/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/features/cocina/widgets/pedido_dismissible.dart';
 import 'package:qribar_cocina/shared/app_exports.dart';
 
-class CocinaPedidosScreen extends StatelessWidget {
+final class CocinaPedidosScreen extends StatelessWidget {
   const CocinaPedidosScreen({Key? key, this.extra}) : super(key: key);
 
   final dynamic extra;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:qribar_cocina/app/const/app_colors.dart';
 import 'package:qribar_cocina/app/const/app_sizes.dart';
 import 'package:qribar_cocina/app/enums/app_route_enum.dart';
 import 'package:qribar_cocina/app/enums/assets_enum.dart';
@@ -12,22 +13,33 @@ import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/shared/utils/svg_loader.dart';
 import 'package:qribar_cocina/shared/utils/ui_helpers.dart';
 
-class MenuLateral extends StatelessWidget {
+/// A final [StatelessWidget] that represents the application's side navigation menu (Drawer).
+/// It provides navigation options to different sections of the kitchen app
+/// and handles app exit functionality.
+final class MenuLateral extends StatelessWidget {
+  /// Creates a constant instance of [MenuLateral].
   const MenuLateral({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final nav = Provider.of<NavegacionProvider>(context, listen: false);
+    final NavegacionProvider nav = Provider.of<NavegacionProvider>(
+      context,
+      listen: false,
+    );
 
     return Drawer(
-      backgroundColor: Colors.black,
-      elevation: 10,
+      backgroundColor: AppColors.black,
+      elevation: AppSizes.p10,
       child: ListView(
         children: <Widget>[
+          // Drawer header with an image and app logo.
           DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.black,
-              border: Border.all(width: 1, color: Colors.white60),
+              color: AppColors.black,
+              border: Border.all(
+                width: AppSizes.p2,
+                color: AppColors.onPrimary,
+              ),
             ),
             child: Stack(
               children: [
@@ -43,67 +55,82 @@ class MenuLateral extends StatelessWidget {
               ],
             ),
           ),
-          Gap.h10,
+          Gap.h10, // Vertical spacing
+          // ListTile for navigating to the General View.
           ListTile(
             leading: const Icon(
               Icons.kitchen_sharp,
-              size: 40,
-              color: Color.fromARGB(255, 212, 176, 0),
+              size: AppSizes.p40,
+              color: AppColors.onPrimary,
             ),
             title: Text(
               context.l10n.generalView,
-              style: const TextStyle(fontSize: 20, color: Colors.white),
+              style: const TextStyle(
+                fontSize: AppSizes.p20,
+                color: AppColors.onPrimary,
+              ),
             ),
             onTap: () {
               context.pop();
-              context.goTo(AppRoute.cocinaGeneral);
+              context.goTo(
+                AppRoute.cocinaGeneral,
+              ); // Navigate to general kitchen view
               nav.categoriaSelected = SelectionTypeEnum.generalScreen.name;
             },
           ),
           Gap.h10,
+          // ListTile for navigating to the Tables View (Pedidos).
           ListTile(
             leading: const Icon(
               Icons.soup_kitchen,
-              size: 40,
-              color: Colors.deepOrange,
+              size: AppSizes.p40,
+              color: AppColors.secondary,
             ),
             title: Text(
               context.l10n.tablesView,
-              style: const TextStyle(fontSize: 20, color: Colors.white),
+              style: const TextStyle(
+                fontSize: AppSizes.p20,
+                color: AppColors.onPrimary,
+              ),
             ),
             onTap: () {
               context.pop();
 
-              context.goTo(AppRoute.cocinaPedidos, extra: '12345');
-
+              context.goTo(AppRoute.cocinaPedidos, extra: 1);
               nav.categoriaSelected = SelectionTypeEnum.pedidosScreen.name;
             },
           ),
+          // Divider for visual separation.
           const Divider(
-            thickness: 5,
-            indent: 20,
-            endIndent: 20,
-            color: Colors.black,
+            thickness: AppSizes.p2,
+            indent: AppSizes.p20,
+            endIndent: AppSizes.p20,
+            color: AppColors.onPrimary,
           ),
+          // ListTile for exiting the application.
           ListTile(
             leading: const Icon(
               Icons.login_outlined,
-              color: Color.fromARGB(255, 255, 0, 0),
-              size: 40,
+              color: AppColors.error,
+              size: AppSizes.p40,
             ),
             title: Text(
               context.l10n.exitApp,
-              style: const TextStyle(fontSize: 20, color: Colors.red),
+              style: const TextStyle(
+                fontSize: AppSizes.p20,
+                color: AppColors.error,
+              ),
             ),
             onTap: () {
               onBackPressed(context);
             },
           ),
-          const Divider(
-            thickness: 5,
-            indent: 20,
-            endIndent: 20,
-            color: Color.fromARGB(137, 255, 0, 0),
+          // Another divider.
+          Divider(
+            thickness: AppSizes.p2,
+            indent: AppSizes.p20,
+            endIndent: AppSizes.p20,
+            color: AppColors.error,
           ),
           Gap.h10,
         ],

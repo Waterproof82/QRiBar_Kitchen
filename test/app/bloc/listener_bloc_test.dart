@@ -6,13 +6,13 @@ import 'package:mocktail/mocktail.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/data/data_sources/remote/listeners_remote_data_source_contract.dart';
-import 'package:qribar_cocina/data/repositories/remote/listener_repository_impl.dart';
+import 'package:qribar_cocina/data/repositories/remote/listener_repository.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
+import 'package:qribar_cocina/features/app/bloc/listener_bloc_impl.dart';
 import 'package:qribar_cocina/features/login/data/data_sources/remote/auth_remote_data_source_contract.dart';
 
 // Mocks
-class MockListenerRepositoryImpl extends Mock
-    implements ListenerRepositoryImpl {}
+class MockListenerRepositoryImpl extends Mock implements ListenerRepository {}
 
 class MockDataSource extends Mock
     implements ListenersRemoteDataSourceContract {}
@@ -60,7 +60,7 @@ void main() {
       ),
     ).thenAnswer((_) async => const Result.success(null));
 
-    bloc = ListenerBloc(
+    bloc = ListenerBlocImpl(
       repository: mockRepository,
       authRemoteDataSourceContract: mockAuthDataSource,
     );

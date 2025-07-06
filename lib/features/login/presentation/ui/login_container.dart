@@ -1,42 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:qribar_cocina/app/const/app_colors.dart';
 
-class LoginContainer extends StatelessWidget {
+/// A final [StatelessWidget] that provides a styled container for login forms.
+/// It applies padding, a white background with rounded corners, and a shadow.
+final class LoginContainer extends StatelessWidget {
+  /// The child widget to be displayed inside the container.
   final Widget _child;
 
-  const LoginContainer({Key? key, required Widget child})
-      : _child = child,
-        super(key: key);
+  /// Creates a constant instance of [LoginContainer].
+  ///
+  /// [child]: The content to be placed within the styled container.
+  const LoginContainer({super.key, required Widget child}) : _child = child;
 
   @override
   Widget build(BuildContext context) {
-    return _buildPadding(
-      child: _buildContainer(),
-    );
-  }
-
-  Padding _buildPadding({required Widget child}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
-      child: child,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: _cardDecoration(),
+        child: _child,
+      ),
     );
   }
 
-  Container _buildContainer() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: _cardDecoration(),
-      child: _child,
-    );
-  }
-
+  /// Builds the [BoxDecoration] for the container, giving it a card-like appearance.
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
-      color: Colors.white,
+      color: AppColors.onPrimary,
       borderRadius: BorderRadius.circular(25),
       boxShadow: const [
         BoxShadow(
-          color: Colors.black12,
+          color: AppColors.blackSoft2,
           blurRadius: 15,
           offset: Offset(0, 10),
         ),
