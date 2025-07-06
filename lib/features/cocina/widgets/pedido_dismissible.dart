@@ -62,12 +62,12 @@ final class PedidoDismissible extends StatelessWidget {
     required this.marchando,
   });
 
-  /// Toggles the category selection in [NavegacionProvider] and navigates
+  /// Toggles the category selection in [NavigationProvider] and navigates
   /// to the appropriate screen ([AppRoute.cocinaPedidos] or [AppRoute.cocinaGeneral]).
   ///
   /// [context]: The current build context.
-  /// [nav]: The [NavegacionProvider] instance.
-  void _toggleCategoria(BuildContext context, NavegacionProvider nav) {
+  /// [nav]: The [NavigationProvider] instance.
+  void _toggleCategoria(BuildContext context, NavigationProvider nav) {
     final isGeneral =
         nav.categoriaSelected == SelectionTypeEnum.generalScreen.name;
 
@@ -92,7 +92,7 @@ final class PedidoDismissible extends StatelessWidget {
   Widget build(BuildContext context) {
     // Access NavegacionProvider without listening for changes within build,
     // as changes are handled by _toggleCategoria.
-    final nav = Provider.of<NavegacionProvider>(context, listen: false);
+    final nav = Provider.of<NavigationProvider>(context, listen: false);
 
     return Dismissible(
       // Use ValueKey for better performance in lists, assuming itemPedido.id is unique and stable.
