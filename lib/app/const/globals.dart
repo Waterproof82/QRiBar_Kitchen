@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// Class to store global variables
-class Globals {
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final class Globals {
+  const Globals._();
+
+  /// A global key for accessing the NavigatorState.
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 }

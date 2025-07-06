@@ -2,24 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/app/enums/app_route_enum.dart';
+import 'package:qribar_cocina/app/enums/estado_pedido_enum.dart';
+import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
 import 'package:qribar_cocina/app/extensions/app_route_extension.dart';
 import 'package:qribar_cocina/app/extensions/l10n.dart';
+import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
-import 'package:qribar_cocina/shared/app_exports.dart';
 
-class PedidoDismissible extends StatelessWidget {
+/// A final [StatelessWidget] that represents a dismissible order item in a list.
+///
+/// This widget allows users to dismiss an order to change its status (e.g., "cocinado").
+/// It displays order details and provides navigation functionality.
+final class PedidoDismissible extends StatelessWidget {
+  /// The order item data.
   final Pedido itemPedido;
+
+  /// The quantity of the selected item in the order.
   final int listSelCant;
+
+  /// The name of the selected item in the order.
   final String listSelName;
+
+  /// The order number.
   final int pedidoNum;
+
+  /// The table variable associated with the order.
   final String mesaVar;
+
+  /// Indicates if the order is currently "in progress".
   final bool enMarcha;
+
+  /// The available width for the widget.
   final double ancho;
+
+  /// The available height for the widget.
   final double alto;
+
+  /// The background color of the order line.
   final Color colorLineaCocina;
+
+  /// The color indicating if the order is "in progress".
   final Color marchando;
 
+  /// Creates a constant instance of [PedidoDismissible].
+  ///
+  /// All parameters are required to build the order item display.
   const PedidoDismissible({
     super.key,
     required this.itemPedido,
@@ -34,10 +62,16 @@ class PedidoDismissible extends StatelessWidget {
     required this.marchando,
   });
 
+  /// Toggles the category selection in [NavegacionProvider] and navigates
+  /// to the appropriate screen ([AppRoute.cocinaPedidos] or [AppRoute.cocinaGeneral]).
+  ///
+  /// [context]: The current build context.
+  /// [nav]: The [NavegacionProvider] instance.
   void _toggleCategoria(BuildContext context, NavegacionProvider nav) {
     final isGeneral =
         nav.categoriaSelected == SelectionTypeEnum.generalScreen.name;
 
+    // Update navigation provider state
     nav
       ..mesaActual = itemPedido.mesa
       ..idPedidoSelected = itemPedido.numPedido
@@ -45,45 +79,60 @@ class PedidoDismissible extends StatelessWidget {
           ? SelectionTypeEnum.pedidosScreen.name
           : SelectionTypeEnum.generalScreen.name;
 
+    // Navigate to the corresponding route
     context.goTo(
       isGeneral ? AppRoute.cocinaPedidos : AppRoute.cocinaGeneral,
-      extra: isGeneral ? itemPedido.numPedido : null,
+      extra: isGeneral
+          ? itemPedido.numPedido
+          : null, // Pass order number as extra if going to pedidos screen
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    // Access NavegacionProvider without listening for changes within build,
+    // as changes are handled by _toggleCategoria.
     final nav = Provider.of<NavegacionProvider>(context, listen: false);
 
     return Dismissible(
-      key: UniqueKey(),
+      // Use ValueKey for better performance in lists, assuming itemPedido.id is unique and stable.
+      key: ValueKey(itemPedido.id),
+      // Confirms if the dismiss action should proceed.
       confirmDismiss: (direction) async {
-        if (direction == DismissDirection.startToEnd) return false;
+        if (direction == DismissDirection.startToEnd) {
+          // Swipe from left to right (e.g., cancel/block)
+          return false; // Do not dismiss for this direction (or implement cancel logic)
+        }
         if (direction == DismissDirection.endToStart) {
+          // Swipe from right to left (e.g., mark as cooked/served)
           context.read<ListenerBloc>().add(
             ListenerEvent.updateEstadoPedido(
               mesa: itemPedido.mesa,
               idPedido: itemPedido.id,
-              nuevoEstado: EstadoPedidoEnum.cocinado.name,
+              nuevoEstado: EstadoPedidoEnum.cocinado.name, // Mark as cooked
             ),
           );
-          return true;
+          return true; // Allow dismiss
         }
-        return false;
+        return false; // Default: do not dismiss
       },
+      // onDismissed is called after the dismiss animation completes.
+      // The actual state update is handled in confirmDismiss.
       onDismissed: (_) {},
+      // Background for swipe from left to right (e.g., cancel)
       background: Container(
         color: Colors.redAccent,
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const SizedBox(width: 12),
             const Icon(Icons.cancel_outlined, color: Colors.white, size: 24),
             const SizedBox(width: 12),
             Text(
               context.l10n.cancelOrder,
               style: const TextStyle(
-                color: Colors.black,
+                color: Colors.white,
                 fontWeight: FontWeight.w400,
                 fontSize: 22,
               ),
@@ -91,25 +140,28 @@ class PedidoDismissible extends StatelessWidget {
           ],
         ),
       ),
+      // Background for swipe from right to left (e.g., served)
       secondaryBackground: Container(
         color: Colors.green,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(
               context.l10n.served,
-              style: TextStyle(
-                color: Colors.black,
+              style: const TextStyle(
+                color: Colors.white,
                 fontWeight: FontWeight.w400,
                 fontSize: 22,
               ),
             ),
-            SizedBox(width: 12),
-            Icon(Icons.check_sharp, color: Colors.white, size: 24),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
+            const Icon(Icons.check_sharp, color: Colors.white, size: 24),
           ],
         ),
       ),
+      // The actual content of the dismissible item
       child: Container(
         decoration: BoxDecoration(
           color: colorLineaCocina,
@@ -117,17 +169,18 @@ class PedidoDismissible extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           boxShadow: const [BoxShadow(blurRadius: 5, spreadRadius: -5)],
         ),
-        height: alto * 0.05,
+        height: alto * 0.05, // Responsive height
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            // Quantity display on the left
             ClipRRect(
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(5),
                 bottomLeft: Radius.circular(5),
               ),
               child: Container(
-                width: ancho > 450 ? 65 : 45,
+                width: ancho > 450 ? 65 : 45, // Responsive width
                 height: double.infinity,
                 color: Colors.red[200],
                 child: Center(
@@ -144,10 +197,10 @@ class PedidoDismissible extends StatelessWidget {
                 ),
               ),
             ),
-            Flexible(
-              fit: FlexFit.tight,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
+            // Product name in the middle, takes available space
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Text(
                   ' $listSelName',
                   maxLines: 1,
@@ -161,6 +214,7 @@ class PedidoDismissible extends StatelessWidget {
                 ),
               ),
             ),
+            // Order and table number on the right
             ClipRRect(
               borderRadius: const BorderRadius.only(
                 topRight: Radius.circular(5),

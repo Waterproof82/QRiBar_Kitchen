@@ -11,62 +11,91 @@ import 'package:qribar_cocina/features/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/features/cocina/widgets/pedido_dismissible.dart';
 import 'package:qribar_cocina/shared/app_exports.dart';
 
-class CocinaGeneralScreen extends StatelessWidget {
+/// A final [StatelessWidget] representing the main kitchen general view.
+/// This screen displays a time bar and a list of filtered orders,
+/// reacting to changes in the [ListenerBloc] state for orders.
+final class CocinaGeneralScreen extends StatelessWidget {
+  /// Creates a constant instance of [CocinaGeneralScreen].
   const CocinaGeneralScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ancho = context.width;
+    final double ancho = context.width;
+    final double alto = context.height;
 
     return Stack(
       children: [
+        // Top bar displaying time information.
         BarraSuperiorTiempo(ancho: ancho),
 
-        /// BlocBuilder ahora escucha únicamente cambios en pedidos
+        /// Listens to changes in the 'pedidos' list from the [ListenerBloc]'s data state.
         BlocSelector<ListenerBloc, ListenerState, List<Pedido>>(
           selector: (state) => state.maybeWhen(
             data: (productos, pedidos, categorias) => pedidos,
-            orElse: () => [],
+            orElse: () => const [],
           ),
           builder: (context, pedidos) {
-            if (pedidos.isEmpty) return const SizedBox.shrink();
-            return _buildPedidos(pedidos);
+            if (pedidos.isEmpty) {
+              return const SizedBox.shrink();
+            }
+            return _buildPedidos(pedidos, ancho, alto);
           },
         ),
       ],
     );
   }
 
-  Widget _buildPedidos(List<Pedido> pedidos) {
-    final pedidosFiltrados = pedidos
+  /// Filters the list of [Pedido]s for display in the general kitchen view.
+  Widget _buildPedidos(List<Pedido> pedidos, double ancho, double alto) {
+    final List<Pedido> pedidosFiltrados = pedidos
         .where(
           (p) =>
               (p.estadoLinea != EstadoPedidoEnum.bloqueado.name) &&
               p.envio == 'cocina',
         )
-        .toList();
+        .toList(growable: false);
 
-    return ListaProductosPedidos(itemPedidos: pedidosFiltrados);
+    return ListaProductosPedidos(
+      itemPedidos: pedidosFiltrados,
+      ancho: ancho,
+      alto: alto,
+    );
   }
 }
 
-class ListaProductosPedidos extends StatelessWidget {
-  const ListaProductosPedidos({Key? key, required this.itemPedidos})
-    : super(key: key);
-
+/// A final [StatelessWidget] that displays a scrollable list of order items.
+/// It sorts the orders and renders each one using [LineaProducto].
+final class ListaProductosPedidos extends StatelessWidget {
+  /// The list of order items to display.
   final List<Pedido> itemPedidos;
+
+  /// The available width for responsive calculations.
+  final double ancho;
+
+  /// The available height for responsive calculations.
+  final double alto;
+
+  /// Creates a constant instance of [ListaProductosPedidos].
+  const ListaProductosPedidos({
+    super.key,
+    required this.itemPedidos,
+    required this.ancho,
+    required this.alto,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final pageController = context.read<NavegacionProvider>().pageController;
-    final ancho = context.width;
+    final PageController pageController = context
+        .read<NavegacionProvider>()
+        .pageController;
 
-    final pedidosOrdenados = [...itemPedidos]
+    // Create a mutable copy for sorting.
+    final List<Pedido> pedidosOrdenados = [...itemPedidos]
       ..sort((a, b) {
-        final horaCompare = a.hora.compareTo(b.hora);
+        final int horaCompare = a.hora.compareTo(b.hora);
         if (horaCompare != 0) return horaCompare;
 
-        final tituloCompare = a.titulo?.compareTo(b.titulo ?? '') ?? 0;
+        final int tituloCompare = a.titulo?.compareTo(b.titulo ?? '') ?? 0;
         if (tituloCompare != 0) return tituloCompare;
 
         return (a.modifiers ?? []).toString().compareTo(
@@ -81,8 +110,8 @@ class ListaProductosPedidos extends StatelessWidget {
         controller: pageController,
         physics: const BouncingScrollPhysics(),
         itemCount: pedidosOrdenados.length,
-        itemBuilder: (_, index) {
-          final pedido = pedidosOrdenados[index];
+        itemBuilder: (_, int index) {
+          final Pedido pedido = pedidosOrdenados[index];
 
           if (pedido.estadoLinea == EstadoPedidoEnum.cocinado.name) {
             return const SizedBox.shrink();
@@ -92,7 +121,7 @@ class ListaProductosPedidos extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
             child: Column(
               children: [
-                LineaProducto(itemPedidos: pedidosOrdenados, index: index),
+                LineaProducto(itemPedido: pedido, ancho: ancho, alto: alto),
                 if (pedido.nota != null && pedido.nota!.trim().isNotEmpty)
                   _NotaBar(pedido.nota!, ancho),
               ],
@@ -104,10 +133,15 @@ class ListaProductosPedidos extends StatelessWidget {
   }
 }
 
-class _NotaBar extends StatelessWidget {
+/// A final [StatelessWidget] that displays a note bar for an order.
+final class _NotaBar extends StatelessWidget {
+  /// The note text to display.
   final String nota;
+
+  /// The available width for the widget.
   final double ancho;
 
+  /// Creates a constant instance of [_NotaBar].
   const _NotaBar(this.nota, this.ancho);
 
   @override
@@ -123,13 +157,13 @@ class _NotaBar extends StatelessWidget {
           BoxShadow(color: Colors.black, blurRadius: 5, spreadRadius: 0),
         ],
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            const Icon(Icons.note_alt_outlined, size: 20, color: Colors.red),
-            Text(
-              ' $nota',
+      child: Row(
+        children: [
+          const Icon(Icons.note_alt_outlined, size: 20, color: Colors.red),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              nota,
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
               style: GoogleFonts.notoSans(
@@ -138,27 +172,39 @@ class _NotaBar extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class LineaProducto extends StatefulWidget {
-  const LineaProducto({
-    Key? key,
-    required this.index,
-    required this.itemPedidos,
-  }) : super(key: key);
+/// A final [StatefulWidget] that represents a single product line in an order.
+/// This widget displays order details, handles the "in progress" status toggle,
+/// and calculates dynamic colors based on time elapsed.
+final class LineaProducto extends StatefulWidget {
+  /// The single order item data for this line.
+  final Pedido itemPedido;
 
-  final List<Pedido> itemPedidos;
-  final int index;
+  /// The available width for responsive calculations.
+  final double ancho;
+
+  /// The available height for responsive calculations.
+  final double alto;
+
+  /// Creates a constant instance of [LineaProducto].
+  const LineaProducto({
+    super.key,
+    required this.itemPedido,
+    required this.ancho,
+    required this.alto,
+  });
 
   @override
   State<LineaProducto> createState() => _LineaProductoState();
 }
 
+/// The state class for [LineaProducto].
 class _LineaProductoState extends State<LineaProducto> {
   late DateTime _now;
   late Timer _timer;
@@ -182,6 +228,7 @@ class _LineaProductoState extends State<LineaProducto> {
     super.dispose();
   }
 
+  /// Determines the color of the order line based on the time difference.
   Color _getColorLineaCocina(Duration diff) {
     if (diff.inMinutes > 30) {
       return const Color.fromARGB(255, 255, 0, 0);
@@ -195,10 +242,10 @@ class _LineaProductoState extends State<LineaProducto> {
 
   @override
   Widget build(BuildContext context) {
-    final ancho = context.width;
-    final alto = context.height;
+    final double ancho = widget.ancho;
+    final double alto = widget.alto;
 
-    final Pedido itemPedido = widget.itemPedidos[widget.index];
+    final Pedido itemPedido = widget.itemPedido;
     final int listSelCant = itemPedido.cantidad;
     final String listSelName = itemPedido.titulo ?? '';
     final String estadoLinea = itemPedido.estadoLinea;
@@ -214,6 +261,7 @@ class _LineaProductoState extends State<LineaProducto> {
     final Color marchando = enMarcha
         ? const Color.fromARGB(255, 7, 255, 19)
         : Colors.white;
+
     return GestureDetector(
       onTap: () {
         context.read<ListenerBloc>().add(

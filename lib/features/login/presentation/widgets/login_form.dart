@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:qribar_cocina/app/const/app_colors.dart';
 import 'package:qribar_cocina/app/const/app_constants.dart';
+import 'package:qribar_cocina/app/const/app_sizes.dart';
 import 'package:qribar_cocina/app/enums/app_route_enum.dart';
 import 'package:qribar_cocina/app/extensions/app_route_extension.dart';
 import 'package:qribar_cocina/app/extensions/l10n.dart';
@@ -8,16 +10,20 @@ import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.d
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/input_decoration.dart';
-import 'package:qribar_cocina/shared/app_exports.dart';
 
-class LoginForm extends StatelessWidget {
+/// A final [StatelessWidget] that represents the login form.
+/// It handles user input, form validation, and dispatches login events to the [LoginFormBloc].
+final class LoginForm extends StatelessWidget {
+  /// Creates a constant instance of [LoginForm].
   const LoginForm({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    // GlobalKey for accessing and validating the FormState.
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     return BlocListener<LoginFormBloc, LoginFormState>(
+      // Listen only when loginSuccess state changes.
       listenWhen: (previous, current) =>
           previous.loginSuccess != current.loginSuccess,
       listener: (context, state) {
@@ -26,18 +32,21 @@ class LoginForm extends StatelessWidget {
         }
       },
       child: BlocBuilder<LoginFormBloc, LoginFormState>(
+        // Rebuild only when isLoading state changes to optimize performance.
         buildWhen: (previous, current) =>
             previous.isLoading != current.isLoading,
         builder: (context, state) {
-          final bloc = context.read<LoginFormBloc>();
+          // Access the LoginFormBloc instance.
+          final LoginFormBloc bloc = context.read<LoginFormBloc>();
 
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
             child: Form(
-              key: _formKey,
+              key: formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 children: [
+                  // Email input field.
                   TextFormField(
                     autocorrect: false,
                     keyboardType: TextInputType.emailAddress,
@@ -48,7 +57,7 @@ class LoginForm extends StatelessWidget {
                     ),
                     onChanged: (value) => bloc.add(EmailChanged(value)),
                     validator: (value) {
-                      final regExp = RegExp(AppConstants.emailPattern);
+                      final RegExp regExp = RegExp(AppConstants.emailPattern);
                       return regExp.hasMatch(value ?? '')
                           ? null
                           : context.l10n.emailError;
@@ -56,6 +65,7 @@ class LoginForm extends StatelessWidget {
                     style: const TextStyle(fontSize: 22),
                   ),
                   Gap.h32,
+                  // Password input field.
                   TextFormField(
                     autocorrect: false,
                     obscureText: true,
@@ -74,31 +84,33 @@ class LoginForm extends StatelessWidget {
                     style: const TextStyle(fontSize: 22),
                   ),
                   Gap.h32,
+                  // Login button.
                   MaterialButton(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(AppSizes.p10),
                     ),
-                    disabledColor: Colors.grey,
+                    disabledColor: AppColors.greySoft,
                     elevation: 0,
-                    color: Colors.black87,
+                    color: AppColors.blackSoft,
                     onPressed: state.isLoading
-                        ? null
+                        ? null // Disable button when loading
                         : () {
-                            if (_formKey.currentState?.validate() ?? false) {
+                            // Validate form and dispatch LoginSubmitted event.
+                            if (formKey.currentState?.validate() ?? false) {
                               bloc.add(const LoginSubmitted());
                             }
                           },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 60,
-                        vertical: 15,
+                        horizontal: AppSizes.p64 - 4,
+                        vertical: AppSizes.p16 - 1,
                       ),
                       child: Text(
                         state.isLoading
                             ? context.l10n.wait
                             : context.l10n.enter,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.onPrimary,
                           fontSize: 18,
                         ),
                       ),
