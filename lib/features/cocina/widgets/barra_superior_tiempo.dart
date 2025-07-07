@@ -1,45 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:qribar_cocina/app/const/app_constants.dart';
 
-/// A final [StatelessWidget] that displays a responsive time bar.
+/// A final [StatelessWidget] that displays a responsive time bar with horizontal scroll.
 ///
-/// This widget dynamically adjusts its layout and text size based on the
+/// This widget dynamically adjusts layout, text size, and spacing based on the
 /// provided `ancho` (width), and renders time boxes using constants from [AppConstants].
 final class BarraSuperiorTiempo extends StatelessWidget {
   /// The width constraint used for responsive adjustments.
   final double _ancho;
 
   /// Creates a constant instance of [BarraSuperiorTiempo].
-  ///
-  /// [ancho]: The width available for the bar, used for responsive calculations.
   const BarraSuperiorTiempo({super.key, required double ancho})
     : _ancho = ancho;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: _mainAxisAlignment(),
-      // Map over the list of times from AppConstants and build a box for each.
-      children: AppConstants.tiempos.map((tiempo) {
-        final String texto = tiempo['texto'] as String;
-        final Color color = tiempo['color'] as Color;
-        return _buildTiempoBox(texto, color);
-      }).toList(),
+    final tiempoWidgets = AppConstants.tiempos.map((tiempo) {
+      final String texto = tiempo['texto'] as String;
+      final Color color = tiempo['color'] as Color;
+      return _buildTiempoBox(texto, color);
+    }).toList();
+
+    final childrenWithSpacing = <Widget>[];
+    for (int i = 0; i < tiempoWidgets.length; i++) {
+      childrenWithSpacing.add(tiempoWidgets[i]);
+      if (i != tiempoWidgets.length - 1) {
+        childrenWithSpacing.add(SizedBox(width: _spacing()));
+      }
+    }
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: _horizontalPadding()),
+      child: Row(children: childrenWithSpacing),
     );
   }
 
-  /// Determines the main axis alignment for the [Row] based on the width.
-  ///
-  /// Uses `MainAxisAlignment.spaceEvenly` for wider screens and
-  /// `MainAxisAlignment.spaceBetween` for narrower screens.
-  MainAxisAlignment _mainAxisAlignment() => _ancho > 420
-      ? MainAxisAlignment.spaceEvenly
-      : MainAxisAlignment.spaceBetween;
+  double _spacing() => _ancho > 420 ? 24 : 12;
 
-  /// Builds a single time box widget.
-  ///
-  /// [texto]: The text to display inside the box.
-  /// [color]: The background color of the box.
+  double _horizontalPadding() => _ancho > 420 ? 16 : 8;
+
   Widget _buildTiempoBox(String texto, Color color) {
     return Container(
       decoration: _buildBoxDecoration(color),
