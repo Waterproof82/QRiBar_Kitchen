@@ -9,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 // This directive indicates that part of this file's content is defined in 'modules/preferences_module.dart'.
-// It's a way to split a single library into multiple files.
 part 'modules/preferences_module.dart';
 
 /// Global instance of GetIt, the service locator for dependency injection.
@@ -40,7 +39,6 @@ Future<void> initDi() async {
     // Initialize date formatting data for 'es_ES' locale, used for internationalization.
     initializeDateFormatting('es_ES'),
     // Enable Wakelock to prevent the screen from turning off automatically,
-    // which can be useful for kitchen display applications.
     WakelockPlus.enable(),
     // Set preferred device orientations to portrait mode only, ensuring consistent UI.
     SystemChrome.setPreferredOrientations(const [
@@ -56,7 +54,6 @@ Future<void> initDi() async {
   _preferencesModule(sharedPreferences);
 
   // Configure the system UI mode, specifically enabling only the bottom overlay (e.g., navigation bar).
-  // This helps in creating a more immersive full-screen experience.
   SystemChrome.setEnabledSystemUIMode(
     SystemUiMode.manual,
     overlays: const [SystemUiOverlay.bottom],
