@@ -12,8 +12,12 @@ import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/shared/utils/svg_loader.dart';
 import 'package:qribar_cocina/shared/utils/ui_helpers.dart';
 
-part 'custom_navigation_rail_helper.dart';
+part 'helpers/custom_navigation_rail_helper.dart';
+part 'helpers/custom_navigation_rail_leading_helper.dart';
+part 'helpers/custom_navigation_rail_state_helper.dart';
 
+/// A custom NavigationRail widget that integrates with a [NavigationProvider]
+/// to manage navigation state and UI updates.
 final class CustomNavigationRail extends StatefulWidget {
   const CustomNavigationRail({super.key});
 
@@ -22,108 +26,74 @@ final class CustomNavigationRail extends StatefulWidget {
 }
 
 class _CustomNavigationRailState extends State<CustomNavigationRail> {
+  // Controls the expansion state of the navigation rail.
   bool _isExpanded = false;
+
+  // The currently animated index, which drives the visual selection and transitions.
+  // - 0: General Screen
+  // - 1: Pedidos Screen
+  // - 2: Exit state (when navigating away from 0 or 1)
   int _currentAnimatedIndex = 0;
 
-  // These remember the LAST *valid (non-exit)* selected index/category.
-  // They SHOULD always reflect the currently selected item if it's 0 or 1.
+  // These store the LAST *valid (non-exit)* selected index and category.
+  // They are used to revert to the correct state if an "exit" route is selected.
   int _lastActiveSelectedIndex = 0;
   String _lastActiveCategoriaSelected = SelectionTypeEnum.generalScreen.name;
-
-  // --- Helper Method for State Updates ---
-
-  void _updateInternalState({
-    required int newCurrentAnimatedIndex,
-    int? newLastActiveIndex,
-    String? newLastActiveCategory,
-  }) {
-    if (mounted) {
-      setState(() {
-        _currentAnimatedIndex = newCurrentAnimatedIndex;
-
-        if (newLastActiveIndex != null) {
-          _lastActiveSelectedIndex = newLastActiveIndex;
-        }
-        if (newLastActiveCategory != null) {
-          _lastActiveCategoriaSelected = newLastActiveCategory;
-        }
-      });
-    }
-  }
 
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateAnimationAndLastSelection(
         Provider.of<NavigationProvider>(context, listen: false),
         (newCurrentIndex, newLastIndex, newLastCategory) {
-          _updateInternalState(
-            newCurrentAnimatedIndex: newCurrentIndex,
-            newLastActiveIndex: newLastIndex,
-            newLastActiveCategory: newLastCategory,
-          );
+
+          setState(() {
+            _currentAnimatedIndex = newCurrentIndex;
+            _lastActiveSelectedIndex = newLastIndex;
+            _lastActiveCategoriaSelected = newLastCategory;
+          });
         },
       );
     });
   }
 
   @override
-  void didUpdateWidget(covariant CustomNavigationRail oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final nav = Provider.of<NavigationProvider>(context, listen: false);
+    _updateStateBasedOnNavigationProviderInHelper(
+      nav,
+      (newCurrentIndex, newLastIndex, newLastCategory) {
+
+        if (!mounted) return;
+        setState(() {
+          _currentAnimatedIndex = newCurrentIndex;
+          if (newLastIndex != null) {
+            _lastActiveSelectedIndex = newLastIndex;
+          }
+          if (newLastCategory != null) {
+            _lastActiveCategoriaSelected = newLastCategory;
+          }
+        });
+      },
+      _currentAnimatedIndex, // Pass current state values
+      _lastActiveSelectedIndex,
+      _lastActiveCategoriaSelected,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final NavigationProvider nav = Provider.of<NavigationProvider>(context);
 
-    int targetAnimatedIndex;
-    String targetCategoriaSelected;
-
-    if (nav.categoriaSelected == SelectionTypeEnum.pedidosScreen.name) {
-      targetAnimatedIndex = 1;
-      targetCategoriaSelected = SelectionTypeEnum.pedidosScreen.name;
-    } else if (nav.categoriaSelected == SelectionTypeEnum.generalScreen.name) {
-      targetAnimatedIndex = 0;
-      targetCategoriaSelected = SelectionTypeEnum.generalScreen.name;
-    } else {
-      targetAnimatedIndex = -1;
-      targetCategoriaSelected = nav.categoriaSelected;
-    }
-
-    final bool isCurrentlyExiting = _currentAnimatedIndex == 2;
-    final bool currentAnimatedIndexNeedsUpdate =
-        _currentAnimatedIndex != targetAnimatedIndex;
-    final bool lastActiveCategoryNeedsUpdate =
-        _lastActiveCategoriaSelected != targetCategoriaSelected;
-
-    if (!isCurrentlyExiting &&
-        (currentAnimatedIndexNeedsUpdate || lastActiveCategoryNeedsUpdate)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _updateInternalState(
-          newCurrentAnimatedIndex: targetAnimatedIndex,
-
-          newLastActiveIndex:
-              (targetAnimatedIndex == 0 || targetAnimatedIndex == 1)
-              ? targetAnimatedIndex
-              : _lastActiveSelectedIndex,
-          newLastActiveCategory:
-              (targetAnimatedIndex == 0 || targetAnimatedIndex == 1)
-              ? targetCategoriaSelected
-              : _lastActiveCategoriaSelected,
-        );
-      });
-    }
-
-    // Determine the visual selected index for the NavigationRail itself (built-in highlighting)
-    int? visualSelectedIndex;
-    if (nav.categoriaSelected == SelectionTypeEnum.pedidosScreen.name) {
-      visualSelectedIndex = 1;
-    } else if (nav.categoriaSelected == SelectionTypeEnum.generalScreen.name) {
-      visualSelectedIndex = 0;
-    } else {
-      visualSelectedIndex = null;
-    }
+    final int? visualSelectedIndex =
+        nav.categoriaSelected == SelectionTypeEnum.pedidosScreen.name
+        ? 1
+        : nav.categoriaSelected == SelectionTypeEnum.generalScreen.name
+        ? 0
+        : null;
 
     const double dividerWidth = 1.0;
 
@@ -148,19 +118,19 @@ class _CustomNavigationRailState extends State<CustomNavigationRail> {
                       _handleNavigationDestination(
                         context,
                         index,
-                        _lastActiveSelectedIndex, // Pass current _lastActiveSelectedIndex
-                        _lastActiveCategoriaSelected, // Pass current _lastActiveCategoriaSelected
-                        (
-                          newCurrentIndex,
-                          newLastIndex,
-                          newLastCategory,
-                          shouldSetState,
-                        ) {
-                          _updateInternalState(
-                            newCurrentAnimatedIndex: newCurrentIndex,
-                            newLastActiveIndex: newLastIndex,
-                            newLastActiveCategory: newLastCategory,
-                          );
+                        _lastActiveSelectedIndex,
+                        _lastActiveCategoriaSelected,
+                        (newCurrentIndex, newLastIndex, newLastCategory) {
+                          if (!mounted) return;
+                          setState(() {
+                            _currentAnimatedIndex = newCurrentIndex;
+                            if (newLastIndex != null) {
+                              _lastActiveSelectedIndex = newLastIndex;
+                            }
+                            if (newLastCategory != null) {
+                              _lastActiveCategoriaSelected = newLastCategory;
+                            }
+                          });
                         },
                       );
                     },
