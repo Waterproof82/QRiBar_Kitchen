@@ -2,8 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/login/domain/use_cases/login_use_case.dart';
 
-import 'login_form_event.dart';
-import 'login_form_state.dart';
+import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
+import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 
 /// An [abstract class] that serves as the contract for a Bloc responsible
 /// for managing the login form's state and logic.

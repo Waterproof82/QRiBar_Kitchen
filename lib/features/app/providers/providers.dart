@@ -41,12 +41,7 @@ final class AppProviders extends StatelessWidget {
 
     return MultiProvider(
       /// 🌐 Global non-Bloc providers
-      providers: [
-        ChangeNotifierProvider(create: (_) => NavigationProvider()),
-        ChangeNotifierProvider<ValueNotifier<bool>>(
-          create: (_) => ValueNotifier<bool>(false),
-        ),
-      ],
+      providers: [ChangeNotifierProvider(create: (_) => NavigationProvider())],
       child: MultiRepositoryProvider(
         /// 📦 Repository and DataSource injection
         providers: [

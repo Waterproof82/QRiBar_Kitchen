@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-
-import '../modifier/modifier.dart';
+import 'package:qribar_cocina/data/models/modifier/modifier.dart';
 
 part 'pedido.freezed.dart';
 part 'pedido.g.dart';

@@ -19,6 +19,9 @@ final class NavigationProvider extends ChangeNotifier {
   /// The ID of the current table, initialized to a default value.
   String _mesaActual = '0';
 
+  /// A boolean that indicates whether the navigation rail is visible.
+  bool _isRailVisible = true;
+
   /// Gets the currently selected category.
   String get categoriaSelected => _categoriaSelected;
 
@@ -51,6 +54,15 @@ final class NavigationProvider extends ChangeNotifier {
   set mesaActual(String index) {
     if (_mesaActual != index) {
       _mesaActual = index;
+      notifyListeners();
+    }
+  }
+
+  bool get isRailVisible => _isRailVisible;
+
+  set isRailVisible(bool value) {
+    if (_isRailVisible != value) {
+      _isRailVisible = value;
       notifyListeners();
     }
   }

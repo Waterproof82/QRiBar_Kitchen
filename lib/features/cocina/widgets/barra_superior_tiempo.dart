@@ -64,7 +64,6 @@ final class BarraSuperiorTiempo extends StatelessWidget {
     borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(10)),
     boxShadow: const [
       BoxShadow(
-        color: Colors.black,
         blurRadius: 15,
         spreadRadius: -5,
         offset: Offset(1, 5),

@@ -18,7 +18,6 @@ final class CocinaPedidosScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final navegacionModel = Provider.of<NavigationProvider>(
       context,
-      listen: true,
     );
 
     return BlocBuilder<ListenerBloc, ListenerState>(
@@ -106,20 +105,19 @@ class PedidosListMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 70),
+      margin: const EdgeInsets.only(top: 70),
       height: 50,
       child: ListView.builder(
         itemCount: count,
         controller: _controller,
-        reverse: false,
         scrollDirection: Axis.horizontal,
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         itemBuilder: (BuildContext context, int index) {
           return Container(
             width: 100,
-            margin: EdgeInsets.only(right: 5, left: 10),
+            margin: const EdgeInsets.only(right: 5, left: 10),
             decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.black26),
+              border: Border.all(color: Colors.black26),
               borderRadius: BorderRadius.circular(10),
             ),
             child: FloatingActionButton(
@@ -127,7 +125,7 @@ class PedidosListMenu extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               backgroundColor: (navegacionModel.idPedidoSelected == index + 1)
-                  ? Color.fromARGB(255, 30, 62, 97)
+                  ? const Color.fromARGB(255, 30, 62, 97)
                   : Colors.white,
               elevation: 1,
               heroTag: 'ListPedido$index',
@@ -172,20 +170,19 @@ class PedidosMesasListMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 5),
+      margin: const EdgeInsets.only(top: 5),
       height: 50,
       child: ListView.builder(
         itemCount: resultMesas.length,
         controller: _controller,
-        reverse: false,
         scrollDirection: Axis.horizontal,
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         itemBuilder: (BuildContext context, int index) {
           return Container(
             width: 100,
-            margin: EdgeInsets.only(right: 5, left: 10),
+            margin: const EdgeInsets.only(right: 5, left: 10),
             decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.black26),
+              border: Border.all(color: Colors.black26),
               borderRadius: BorderRadius.circular(10),
             ),
             child: FloatingActionButton(
@@ -220,7 +217,7 @@ class PedidosMesasListMenu extends StatelessWidget {
 }
 
 class ListaProductosPedidos extends StatelessWidget {
-  ListaProductosPedidos({
+  const ListaProductosPedidos({
     Key? key,
     required this.navegacionModel,
     required this.itemPedidos,
@@ -234,14 +231,14 @@ class ListaProductosPedidos extends StatelessWidget {
     final ancho = context.width;
     // ignore: unused_local_variable
     bool notaBar = false;
-    double resultPrecio = 0;
+    const double resultPrecio = 0;
 
     return Container(
       color: Colors.black,
-      margin: EdgeInsets.only(top: 140),
+      margin: const EdgeInsets.only(top: 140),
       child: ListView.builder(
         controller: navegacionModel.pageController,
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         itemCount: itemPedidos.length,
         itemBuilder: (_, int index) {
           itemPedidos.sort((a, b) {
@@ -272,14 +269,12 @@ class ListaProductosPedidos extends StatelessWidget {
                           itemPedidos[index].nota != '')
                         Container(
                           width: ancho,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Color.fromARGB(255, 255, 255, 255),
                             borderRadius: BorderRadius.all(Radius.circular(5)),
                             boxShadow: <BoxShadow>[
                               BoxShadow(
-                                color: Colors.black,
                                 blurRadius: 5,
-                                spreadRadius: 0,
                               ),
                             ],
                           ),
@@ -310,7 +305,7 @@ class ListaProductosPedidos extends StatelessWidget {
                     ],
                   ),
                 )
-              : SizedBox.shrink();
+              : const SizedBox.shrink();
         },
       ),
     );
@@ -352,7 +347,7 @@ class LineaProducto extends StatelessWidget {
     envioProd = itemPedidos[index].envio;
     hora = (itemPedidos[index].hora.isNotEmpty)
         ? itemPedidos[index].hora.split(':').sublist(0, 2).join(':')
-        : "--:--";
+        : '--:--';
     pedidoNum = itemPedidos[index].numPedido;
     mesaVar = itemPedidos[index].mesa;
 
@@ -370,7 +365,7 @@ class LineaProducto extends StatelessWidget {
         children: [
           Container(
             width: ancho,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(100)),
               boxShadow: <BoxShadow>[
                 BoxShadow(

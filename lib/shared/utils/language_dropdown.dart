@@ -37,7 +37,7 @@ final class LanguageDropdown extends StatelessWidget {
                   child: Icon(
                     Icons.language,
                     size: 30,
-                    color: AppColors.onSurface,
+                    color: AppColors.onPrimary,
                   ),
                 ),
                 style: const TextStyle(

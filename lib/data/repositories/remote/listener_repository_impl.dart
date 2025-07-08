@@ -50,7 +50,7 @@ final class ListenerRepositoryImpl implements ListenerRepository {
       log(
         '❌ [ListenerRepositoryImpl] idBar no inicializado. Fallo en la inicialización de listeners.',
       );
-      return Result.failure(error: RepositoryError.authExpired());
+      return const Result.failure(error: RepositoryError.authExpired());
     }
 
     try {

@@ -157,7 +157,6 @@ final class _CustomSnackBarState extends State<CustomSnackBar>
         position: _offsetAnimation,
         child: Dismissible(
           key: _dismissibleKey,
-          direction: DismissDirection.horizontal,
           onDismissed: (_) => _dismissSnackBar(triggeredByDismissible: true),
           child: Material(
             color: Colors.transparent,

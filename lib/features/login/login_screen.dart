@@ -14,7 +14,7 @@ final class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       // The background for the authentication screen.
       body: AuthBackground(
         child: SingleChildScrollView(
@@ -23,11 +23,11 @@ final class LoginScreen extends StatelessWidget {
               // Row containing the language dropdown, aligned to the end.
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [const Flexible(child: LanguageDropdown())],
+                children: [Flexible(child: LanguageDropdown())],
               ),
               Gap.h248,
               // Container for the login form with a card-like style.
-              const LoginContainer(
+              LoginContainer(
                 // Use const for LoginContainer
                 child: Column(
                   children: [

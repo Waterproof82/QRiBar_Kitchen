@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // Importar provider
 import 'package:qribar_cocina/app/const/app_colors.dart';
 import 'package:qribar_cocina/features/home/widgets/custom_app_bar.dart';
 import 'package:qribar_cocina/shared/utils/ui_helpers.dart';
-import 'package:qribar_cocina/shared/widgets/navigation_rail/custom_navigation_rail.dart';
 import 'package:qribar_cocina/shared/widgets/header_wave.dart';
+import 'package:qribar_cocina/shared/widgets/navigation_rail/custom_navigation_rail.dart';
 
 /// A final [StatelessWidget] that serves as the main layout for the home screen.
 /// It includes a custom app bar, a persistent side navigation rail, and dynamic content.
@@ -18,10 +17,6 @@ final class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    final ValueNotifier<bool> isRailVisibleNotifier =
-        Provider.of<ValueNotifier<bool>>(context);
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -31,15 +26,12 @@ final class HomeScreen extends StatelessWidget {
       },
       child: Scaffold(
         backgroundColor: AppColors.black,
-        appBar: CustomAppBar(isRailVisible: isRailVisibleNotifier),
+        appBar: const CustomAppBar(),
         body: Row(
           children: [
-            // Pass the ValueNotifier to control its overall visibility.
-            CustomNavigationRail(isRailVisible: isRailVisibleNotifier),
-            // A vertical divider for visual separation between the rail and content.
-            const VerticalDivider(thickness: 1, width: 1),
+            const CustomNavigationRail(),
             // The dynamic child content, expanded to fill the remaining space.
-            Expanded(child: Stack(children: [HeaderWave(), child])),
+            Expanded(child: Stack(children: [const HeaderWave(), child])),
           ],
         ),
       ),

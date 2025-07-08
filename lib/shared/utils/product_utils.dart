@@ -28,7 +28,7 @@ Future<String?> obtenerEnvioPorProducto(
   List<Product> productos,
 ) async {
   final categoriaMap = {
-    for (var categoria in categorias) categoria.categoria: categoria,
+    for (final categoria in categorias) categoria.categoria: categoria,
   };
 
   final categoria = categoriaMap[obtenerCategoriaProducto(productos, idProd)];
