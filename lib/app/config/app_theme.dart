@@ -18,14 +18,10 @@ final class AppTheme {
       // Color scheme configuration for light theme
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
-        onPrimary: AppColors.onPrimary,
         secondary: AppColors.secondary,
         onSecondary: AppColors.onPrimary,
         surface: AppColors.background,
-        onSurface: AppColors.onSurface,
         error: AppColors.error,
-        onError: AppColors.onPrimary,
-        brightness: Brightness.light,
       ),
 
       // Scaffold background color

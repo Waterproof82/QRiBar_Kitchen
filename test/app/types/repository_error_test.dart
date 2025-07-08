@@ -6,7 +6,7 @@ void main() {
   group('RepositoryError', () {
     test('should create RepositoryError from NetworkError with mapping', () {
       final badRequestList = RepositoryError.fromDataSourceError(
-        NetworkError.badRequestListErrors(['error1', 'error2']),
+        const NetworkError.badRequestListErrors(['error1', 'error2']),
       );
       expect(
         badRequestList,
@@ -17,28 +17,28 @@ void main() {
         ['error1', 'error2'],
       );
 
-      final infoNotMatching = RepositoryError.fromDataSourceError(NetworkError.infoNotMatching());
+      final infoNotMatching = RepositoryError.fromDataSourceError(const NetworkError.infoNotMatching());
       expect(infoNotMatching, isA<InfoNotMatching>());
 
-      final badRequest = RepositoryError.fromDataSourceError(NetworkError.badRequest());
+      final badRequest = RepositoryError.fromDataSourceError(const NetworkError.badRequest());
       expect(badRequest, isA<BadRequest>());
 
-      final forbidden = RepositoryError.fromDataSourceError(NetworkError.forbidden());
+      final forbidden = RepositoryError.fromDataSourceError(const NetworkError.forbidden());
       expect(forbidden, isA<NoAccess>());
 
-      final notFound = RepositoryError.fromDataSourceError(NetworkError.notFound('resource'));
+      final notFound = RepositoryError.fromDataSourceError(const NetworkError.notFound('resource'));
       expect(notFound, isA<NotFoundResource>());
 
-      final serverError = RepositoryError.fromDataSourceError(NetworkError.internalServerError());
+      final serverError = RepositoryError.fromDataSourceError(const NetworkError.internalServerError());
       expect(serverError, isA<ServerError>());
 
-      final noInternet = RepositoryError.fromDataSourceError(NetworkError.noInternetConnection());
+      final noInternet = RepositoryError.fromDataSourceError(const NetworkError.noInternetConnection());
       expect(noInternet, isA<NoInternetConnection>());
 
-      final unauthorized = RepositoryError.fromDataSourceError(NetworkError.unauthorizedRequest());
+      final unauthorized = RepositoryError.fromDataSourceError(const NetworkError.unauthorizedRequest());
       expect(unauthorized, isA<AuthExpired>());
 
-      final unknownError = RepositoryError.fromDataSourceError(NetworkError.unexpectedError());
+      final unknownError = RepositoryError.fromDataSourceError(const NetworkError.unexpectedError());
       expect(unknownError, isA<ServerError>());
     });
 
@@ -86,7 +86,7 @@ void main() {
     });
 
     test('should create different RepositoryError constructors', () {
-      final listErrors = RepositoryError.listErrors(['error1', 'error2']);
+      const listErrors = RepositoryError.listErrors(['error1', 'error2']);
       expect(listErrors, isA<ListErrorsM>());
       expect((listErrors as ListErrorsM).errorList, ['error1', 'error2']);
 

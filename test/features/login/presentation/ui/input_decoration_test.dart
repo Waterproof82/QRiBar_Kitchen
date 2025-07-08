@@ -43,7 +43,6 @@ void main() {
       final decoration = InputDecorations.authInputDecoration(
         hintText: hint,
         labelText: label,
-        prefixIcon: null,
       );
 
       expect(decoration.hintText, hint);

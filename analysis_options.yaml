@@ -1,0 +1,33 @@
+linter:
+  rules:
+
+    avoid_print: true
+    prefer_final_locals: true
+    prefer_final_in_for_each: true
+    avoid_unused_constructor_parameters: true
+
+    # Const
+    prefer_const_constructors: true
+    prefer_const_constructors_in_immutables: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+
+    # Clean Code
+    avoid_unnecessary_containers: true
+    unnecessary_this: true
+    sort_child_properties_last: true
+    sized_box_for_whitespace: true
+    always_use_package_imports: true
+
+    # Others
+    use_full_hex_values_for_flutter_colors: true
+    avoid_redundant_argument_values: true
+    require_trailing_commas: true
+    prefer_single_quotes: true
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.gr.dart"
+    - "**/*.gen.dart"

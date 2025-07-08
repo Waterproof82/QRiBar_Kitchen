@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:qribar_cocina/app/types/errors/network_error.dart';
 
@@ -58,7 +60,7 @@ class RepositoryError with _$RepositoryError {
   static RepositoryError fromFirebaseAuthError(String errorCode) {
     final error = _firebaseAuthErrorMap[errorCode];
     if (error == null) {
-      print('[FirebaseAuth] Código desconocido: $errorCode');
+      log('[FirebaseAuth] Código desconocido: $errorCode');
     }
     return error ?? const RepositoryError.badRequest();
   }

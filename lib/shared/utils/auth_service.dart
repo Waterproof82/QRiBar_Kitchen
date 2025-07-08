@@ -28,7 +28,7 @@ final class AuthService {
     final String? email = _authRemoteDataSourceContract.getCurrentEmail();
 
     if (email == null) {
-      return Result.failure(error: RepositoryError.authExpired());
+      return const Result.failure(error: RepositoryError.authExpired());
     }
 
     final String userName = email.split('@').first.toTitleCase();

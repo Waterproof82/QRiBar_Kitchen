@@ -18,12 +18,12 @@ class Complemento {
   String toJson() => json.encode(toMap());
 
   factory Complemento.fromMap(Map<String, dynamic> json) => Complemento(
-        activo: json["activo"],
-        incremento: json["incremento"],
+        activo: json['activo'],
+        incremento: json['incremento'],
       );
 
   Map<String, dynamic> toMap() => {
-        "activo": activo,
-        "incremento": incremento,
+        'activo': activo,
+        'incremento': incremento,
       };
 }

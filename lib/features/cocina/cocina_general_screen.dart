@@ -154,7 +154,7 @@ final class _NotaBar extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(5),
         boxShadow: const [
-          BoxShadow(color: Colors.black, blurRadius: 5, spreadRadius: 0),
+          BoxShadow(blurRadius: 5),
         ],
       ),
       child: Row(

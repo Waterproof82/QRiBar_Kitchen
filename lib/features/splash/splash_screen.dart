@@ -104,10 +104,10 @@ final class SplashState extends State<Splash>
           fit: StackFit.expand,
           children: [
             // Logo at the bottom of the screen.
-            Align(
+            const Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 30.0),
+                padding: EdgeInsets.only(bottom: 30.0),
                 child: SvgLoader(
                   SvgEnum.logo,
                   height: 25.0,

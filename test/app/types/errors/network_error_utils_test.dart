@@ -8,7 +8,7 @@ void main() {
     test('returns requestCancelled for DioExceptionType.cancel', () {
       final error = DioException(
         type: DioExceptionType.cancel,
-        requestOptions: RequestOptions(path: ''),
+        requestOptions: RequestOptions(),
       );
       final result = getErrorFromDioError(error);
       expect(result, const NetworkError.requestCancelled());
@@ -17,7 +17,7 @@ void main() {
     test('returns requestTimeout for DioExceptionType.connectionTimeout', () {
       final error = DioException(
         type: DioExceptionType.connectionTimeout,
-        requestOptions: RequestOptions(path: ''),
+        requestOptions: RequestOptions(),
       );
       final result = getErrorFromDioError(error);
       expect(result, const NetworkError.requestTimeout());
@@ -25,8 +25,7 @@ void main() {
 
     test('returns unableToProcess when unknown type contains subtype error', () {
       final error = DioException(
-        type: DioExceptionType.unknown,
-        requestOptions: RequestOptions(path: ''),
+        requestOptions: RequestOptions(),
         error: 'type \'int\' is not a subtype of type \'String\'',
       );
       final result = getErrorFromDioError(error);
@@ -35,8 +34,7 @@ void main() {
 
     test('returns noInternetConnection when unknown type without subtype error', () {
       final error = DioException(
-        type: DioExceptionType.unknown,
-        requestOptions: RequestOptions(path: ''),
+        requestOptions: RequestOptions(),
         error: 'Some other error message',
       );
       final result = getErrorFromDioError(error);
@@ -46,7 +44,7 @@ void main() {
     test('returns sendTimeout for DioExceptionType.sendTimeout', () {
       final error = DioException(
         type: DioExceptionType.sendTimeout,
-        requestOptions: RequestOptions(path: ''),
+        requestOptions: RequestOptions(),
       );
       final result = getErrorFromDioError(error);
       expect(result, const NetworkError.sendTimeout());
@@ -55,10 +53,10 @@ void main() {
     test('returns infoNotMatching when errorType is INFO_NOT_MATCHING', () {
       final error = DioException(
         type: DioExceptionType.badResponse,
-        requestOptions: RequestOptions(path: ''),
+        requestOptions: RequestOptions(),
         response: Response(
           statusCode: 400,
-          requestOptions: RequestOptions(path: ''),
+          requestOptions: RequestOptions(),
           data: {
             'error': {'error_type': 'INFO_NOT_MATCHING'}
           },
@@ -72,10 +70,10 @@ void main() {
       final errorDescription = ['error1', 'error2'];
       final error = DioException(
         type: DioExceptionType.badResponse,
-        requestOptions: RequestOptions(path: ''),
+        requestOptions: RequestOptions(),
         response: Response(
           statusCode: 400,
-          requestOptions: RequestOptions(path: ''),
+          requestOptions: RequestOptions(),
           data: {
             'error': {'error_description': errorDescription}
           },
@@ -107,10 +105,10 @@ void main() {
       for (final entry in codes.entries) {
         final error = DioException(
           type: DioExceptionType.badResponse,
-          requestOptions: RequestOptions(path: ''),
+          requestOptions: RequestOptions(),
           response: Response(
             statusCode: entry.key,
-            requestOptions: RequestOptions(path: ''),
+            requestOptions: RequestOptions(),
           ),
         );
         final result = getErrorFromDioError(error);

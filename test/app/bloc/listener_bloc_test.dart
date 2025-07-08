@@ -119,7 +119,7 @@ void main() {
           nuevoEstado: any(named: 'nuevoEstado'),
         ),
       ).thenAnswer(
-        (_) async => Result.failure(error: RepositoryError.badRequest()),
+        (_) async => const Result.failure(error: RepositoryError.badRequest()),
       );
       return bloc;
     },
@@ -175,7 +175,7 @@ void main() {
           enMarcha: any(named: 'enMarcha'),
         ),
       ).thenAnswer(
-        (_) async => Result.failure(error: RepositoryError.badRequest()),
+        (_) async => const Result.failure(error: RepositoryError.badRequest()),
       );
       return bloc;
     },

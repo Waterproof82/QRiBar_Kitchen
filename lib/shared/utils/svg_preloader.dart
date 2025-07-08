@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:qribar_cocina/app/enums/svg_enum.dart';
 

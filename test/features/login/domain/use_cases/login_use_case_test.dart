@@ -21,7 +21,7 @@ void main() {
     // Arrange
     const email = 'test@example.com';
     const password = '123456';
-    final expectedResult = const Result<void>.success(null);
+    const expectedResult = Result<void>.success(null);
 
     when(() => mockRepository.loginWithEmailAndPassword(
           email: email,

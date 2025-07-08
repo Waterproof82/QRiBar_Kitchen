@@ -125,7 +125,6 @@ final class PedidoDismissible extends StatelessWidget {
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const Icon(Icons.cancel_outlined, color: Colors.white, size: 24),
             const SizedBox(width: 12),

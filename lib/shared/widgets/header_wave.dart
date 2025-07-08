@@ -11,10 +11,10 @@ final class HeaderWave extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 220,
-      margin: const EdgeInsets.only(top: 0),
+      margin: const EdgeInsets.only(),
       width: double.infinity,
       color: AppColors.black,
-      child: CustomPaint(
+      child: const CustomPaint(
         // Paints the wave shape with a specific color.
         painter: _HeaderWavePainter(AppColors.onBackground),
       ),

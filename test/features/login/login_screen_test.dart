@@ -17,7 +17,7 @@ void main() {
   group('LoginScreen Widget Tests', () {
     testWidgets('LoginScreen renders all expected child widgets', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: LoginScreen(),
         ),
       );

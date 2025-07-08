@@ -32,7 +32,7 @@ void main() {
   setUp(() {
     mockBloc = MockLoginFormBloc();
 
-    final initialState = const LoginFormState();
+    const initialState = LoginFormState();
 
     controller = StreamController<LoginFormState>();
     controller.add(initialState);
@@ -48,7 +48,7 @@ void main() {
 
   testWidgets('LoginForm renders with 2 TextFormFields and a MaterialButton', (tester) async {
     await tester.pumpApp(
-      LoginForm(),
+      const LoginForm(),
       blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
     );
     await tester.pumpAndSettle();
@@ -59,7 +59,7 @@ void main() {
 
   testWidgets('calls PasswordChanged when password field is modified', (tester) async {
     await tester.pumpApp(
-      LoginForm(),
+      const LoginForm(),
       blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
     );
     await tester.pumpAndSettle();
@@ -67,12 +67,12 @@ void main() {
     final passwordField = find.byType(TextFormField).at(1);
     await tester.enterText(passwordField, '123456');
 
-    verify(() => mockBloc.add(PasswordChanged('123456'))).called(1);
+    verify(() => mockBloc.add(const PasswordChanged('123456'))).called(1);
   });
 
   testWidgets('calls EmailChanged when email field is modified', (tester) async {
     await tester.pumpApp(
-      LoginForm(),
+      const LoginForm(),
       blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
     );
     await tester.pumpAndSettle();
@@ -80,12 +80,12 @@ void main() {
     final emailField = find.byType(TextFormField).at(0);
     await tester.enterText(emailField, 'test@example.com');
 
-    verify(() => mockBloc.add(EmailChanged('test@example.com'))).called(1);
+    verify(() => mockBloc.add(const EmailChanged('test@example.com'))).called(1);
   });
 
   testWidgets('validator returns null if email format is valid', (tester) async {
     await tester.pumpApp(
-      LoginForm(),
+      const LoginForm(),
       blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
     );
     await tester.pumpAndSettle();
@@ -100,11 +100,11 @@ void main() {
   });
 
   testWidgets('shows SnackBar when failure is present', (tester) async {
-    final failure = const RepositoryError.userNotFound();
+    const failure = RepositoryError.userNotFound();
     final failureState = const LoginFormState().copyWith(failure: failure);
 
     await tester.pumpApp(
-      LoginForm(),
+      const LoginForm(),
       blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
     );
 
@@ -125,7 +125,7 @@ void main() {
 
   testWidgets('dispatches LoginSubmitted when form is valid and button tapped', (tester) async {
     await tester.pumpApp(
-      LoginForm(),
+      const LoginForm(),
       blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
     );
     await tester.pumpAndSettle();

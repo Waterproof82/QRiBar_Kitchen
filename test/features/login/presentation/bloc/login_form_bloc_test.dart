@@ -24,7 +24,7 @@ void main() {
     mockLoginUseCase = MockLoginUseCase();
     mockListenerBloc = MockListenerBloc();
 
-    registerFallbackValue(ListenerEvent.startListening());
+    registerFallbackValue(const ListenerEvent.startListening());
 
     bloc = LoginFormBlocImpl(
       loginUseCase: mockLoginUseCase,
@@ -68,18 +68,16 @@ void main() {
     },
     seed: () =>
         const LoginFormState(email: 'test@example.com', password: '123456'),
-    act: (bloc) => bloc.add(LoginSubmitted()),
+    act: (bloc) => bloc.add(const LoginSubmitted()),
     expect: () => [
       const LoginFormState(
         email: 'test@example.com',
         password: '123456',
         isLoading: true,
-        failure: null,
       ),
       const LoginFormState(
         email: 'test@example.com',
         password: '123456',
-        isLoading: false,
         loginSuccess: true,
       ),
     ],
@@ -102,24 +100,22 @@ void main() {
           password: any(named: 'password'),
         ),
       ).thenAnswer(
-        (_) async => Failure<void>(error: RepositoryError.userNotFound()),
+        (_) async => const Failure<void>(error: RepositoryError.userNotFound()),
       );
       return bloc;
     },
     seed: () =>
         const LoginFormState(email: 'fail@example.com', password: 'wrong'),
-    act: (bloc) => bloc.add(LoginSubmitted()),
+    act: (bloc) => bloc.add(const LoginSubmitted()),
     expect: () => [
       const LoginFormState(
         email: 'fail@example.com',
         password: 'wrong',
         isLoading: true,
-        failure: null,
       ),
-      LoginFormState(
+      const LoginFormState(
         email: 'fail@example.com',
         password: 'wrong',
-        isLoading: false,
         failure: RepositoryError.userNotFound(),
       ),
     ],
