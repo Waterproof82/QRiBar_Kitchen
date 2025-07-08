@@ -8,11 +8,11 @@ import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/models/product.dart';
-import 'package:qribar_cocina/data/repositories/remote/listener_repository.dart'; // Usar el contrato ListenerRepository
+import 'package:qribar_cocina/data/repositories/remote/listener_repository.dart';
 import 'package:qribar_cocina/features/login/data/data_sources/remote/auth_remote_data_source_contract.dart';
-import 'package:qribar_cocina/shared/utils/auth_service.dart'; // Asumo que AuthService es una clase concreta
-import 'package:qribar_cocina/shared/utils/event_stream_manager.dart'; // Asumo que EventStreamManager es una clase concreta
-import 'package:qribar_cocina/shared/utils/product_utils.dart'; // Asumo que asignarEnviosPorPedidos viene de aquí
+import 'package:qribar_cocina/shared/utils/auth_service.dart';
+import 'package:qribar_cocina/shared/utils/event_stream_manager.dart';
+import 'package:qribar_cocina/shared/utils/product_utils.dart';
 
 part 'listener_bloc.freezed.dart';
 part 'listener_event.dart';
@@ -26,7 +26,7 @@ part 'listener_state.dart';
 /// handles authentication status. Concrete implementations will extend this.
 abstract class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
   /// The repository for managing real-time data listeners.
-  final ListenerRepository _repository; // Usar el contrato
+  final ListenerRepository _repository;
 
   /// The contract for authentication-related remote data source operations.
   final AuthRemoteDataSourceContract _authRemoteDataSourceContract;
@@ -144,9 +144,8 @@ abstract class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
         emit(
           ListenerState.data(
             productos: List.unmodifiable(event.productos),
-            pedidos: [], // Initialize as empty
-            categorias: [], // Initialize as empty
-            // 'salas' is not part of ListenerState.data, so it's not included here.
+            pedidos: [],
+            categorias: [],
           ),
         );
       },
@@ -195,13 +194,13 @@ abstract class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
         final nuevosPedidos = asignarEnviosPorPedidos(
           pedidos: dataState.pedidos,
           productos: dataState.productos,
-          categorias: event.categorias, // Use the new categories
+          categorias: event.categorias,
         );
 
         emit(
           dataState.copyWith(
             pedidos: nuevosPedidos,
-            categorias: event.categorias, // Update categories in state
+            categorias: event.categorias,
           ),
         );
         log(

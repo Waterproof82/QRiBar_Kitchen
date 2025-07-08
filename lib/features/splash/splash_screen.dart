@@ -47,35 +47,9 @@ final class SplashState extends State<Splash>
     // Start the animation immediately.
     _animationController.forward();
 
-    // Schedule the session check after the first frame is rendered.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkSessionAndNavigate();
     });
-  }
-
-  /// Checks the user's Firebase session and navigates accordingly.
-  ///
-  /// Waits for an initial delay, then checks if a user is logged in.
-  /// If a user exists, it dispatches a [SessionRestored] event to [LoginFormBloc].
-  /// Otherwise, it navigates to the login screen.
-  Future<void> _checkSessionAndNavigate() async {
-    // Ensure a minimum display time for the splash screen.
-    await Future.delayed(const Duration(seconds: 2));
-
-    final User? user = FirebaseAuth.instance.currentUser;
-
-    // Prevent navigation if the widget is no longer mounted or already navigated.
-    if (!mounted || _navigated) return;
-
-    if (user != null) {
-      // If user exists, restore session via LoginFormBloc.
-      // Navigation to cocinaGeneral will be handled by LoginFormBloc's BlocListener.
-      context.read<LoginFormBloc>().add(const LoginFormEvent.sessionRestored());
-    } else {
-      // If no user, navigate to the login screen.
-      _navigated = true; // Mark as navigated to prevent further attempts
-      context.goTo(AppRoute.login);
-    }
   }
 
   @override
@@ -133,5 +107,30 @@ final class SplashState extends State<Splash>
         ),
       ),
     );
+  }
+
+  /// Checks the user's Firebase session and navigates accordingly.
+  ///
+  /// Waits for an initial delay, then checks if a user is logged in.
+  /// If a user exists, it dispatches a [SessionRestored] event to [LoginFormBloc].
+  /// Otherwise, it navigates to the login screen.
+  Future<void> _checkSessionAndNavigate() async {
+    // Ensure a minimum display time for the splash screen.
+    await Future.delayed(const Duration(seconds: 2));
+
+    final User? user = FirebaseAuth.instance.currentUser;
+
+    // Prevent navigation if the widget is no longer mounted or already navigated.
+    if (!mounted || _navigated) return;
+
+    if (user != null) {
+      // If user exists, restore session via LoginFormBloc.
+      // Navigation to cocinaGeneral will be handled by LoginFormBloc's BlocListener.
+      context.read<LoginFormBloc>().add(const LoginFormEvent.sessionRestored());
+    } else {
+      // If no user, navigate to the login screen.
+      _navigated = true; // Mark as navigated to prevent further attempts
+      context.goTo(AppRoute.login);
+    }
   }
 }
