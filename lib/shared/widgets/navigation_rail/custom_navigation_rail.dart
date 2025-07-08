@@ -48,7 +48,6 @@ class _CustomNavigationRailState extends State<CustomNavigationRail> {
       _updateAnimationAndLastSelection(
         Provider.of<NavigationProvider>(context, listen: false),
         (newCurrentIndex, newLastIndex, newLastCategory) {
-
           setState(() {
             _currentAnimatedIndex = newCurrentIndex;
             _lastActiveSelectedIndex = newLastIndex;
@@ -66,7 +65,6 @@ class _CustomNavigationRailState extends State<CustomNavigationRail> {
     _updateStateBasedOnNavigationProviderInHelper(
       nav,
       (newCurrentIndex, newLastIndex, newLastCategory) {
-
         if (!mounted) return;
         setState(() {
           _currentAnimatedIndex = newCurrentIndex;

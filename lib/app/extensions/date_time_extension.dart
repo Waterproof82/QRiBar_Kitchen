@@ -51,7 +51,9 @@ extension DateTimeExtension on DateTime {
 
   /// Combines the current date with a specific time string (e.g., 'HH:mm:ss').
   static DateTime combineNowWithTime(String time) {
-    final datePart = DateFormat('yyyy-MM-dd').format(DateTime.now()); // Extract today's date
+    final datePart = DateFormat(
+      'yyyy-MM-dd',
+    ).format(DateTime.now()); // Extract today's date
     return DateTime.parse('$datePart $time'); // Combine date and time
   }
 

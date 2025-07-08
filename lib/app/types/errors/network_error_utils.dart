@@ -16,7 +16,8 @@ NetworkError getErrorFromDioError(DioException error) {
     case DioExceptionType.sendTimeout:
       return const NetworkError.sendTimeout();
     default:
-      final errorDescription = error.response?.data?['error']?['error_description'];
+      final errorDescription =
+          error.response?.data?['error']?['error_description'];
       final errorType = error.response?.data?['error']?['error_type'];
       if (errorType != null && errorType == 'INFO_NOT_MATCHING') {
         return const NetworkError.infoNotMatching();
@@ -33,15 +34,13 @@ NetworkError getErrorFromDioError(DioException error) {
 }
 
 NetworkError _checkStatusCode(int? statusCode) => switch (statusCode) {
-      400 => const NetworkError.badRequest(),
-      401 => const NetworkError.unauthorizedRequest(),
-      403 => const NetworkError.forbidden(),
-      404 => const NetworkError.notFound('Not found'),
-      409 => const NetworkError.conflict(),
-      408 => const NetworkError.requestTimeout(),
-      500 => const NetworkError.internalServerError(),
-      503 => const NetworkError.serviceUnavailable(),
-      _ => NetworkError.defaultError(
-          'Received invalid status code: $statusCode',
-        ),
-    };
+  400 => const NetworkError.badRequest(),
+  401 => const NetworkError.unauthorizedRequest(),
+  403 => const NetworkError.forbidden(),
+  404 => const NetworkError.notFound('Not found'),
+  409 => const NetworkError.conflict(),
+  408 => const NetworkError.requestTimeout(),
+  500 => const NetworkError.internalServerError(),
+  503 => const NetworkError.serviceUnavailable(),
+  _ => NetworkError.defaultError('Received invalid status code: $statusCode'),
+};

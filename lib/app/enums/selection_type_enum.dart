@@ -1,4 +1,1 @@
-enum SelectionTypeEnum {
-  pedidosScreen,
-  generalScreen;
-}
+enum SelectionTypeEnum { pedidosScreen, generalScreen }

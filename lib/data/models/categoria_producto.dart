@@ -21,11 +21,13 @@ class CategoriaProducto {
   int orden;
   String? id;
 
-  factory CategoriaProducto.fromJson(String str) => CategoriaProducto.fromMap(json.decode(str));
+  factory CategoriaProducto.fromJson(String str) =>
+      CategoriaProducto.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory CategoriaProducto.fromMap(Map<String, dynamic> json) => CategoriaProducto(
+  factory CategoriaProducto.fromMap(Map<String, dynamic> json) =>
+      CategoriaProducto(
         categoria: json['categoria'],
         categoriaEn: json['categoria_en'] ?? '',
         categoriaDe: json['categoria_de'] ?? '',
@@ -36,12 +38,12 @@ class CategoriaProducto {
       );
 
   Map<String, dynamic> toMap() => {
-        'categoria': categoria,
-        'categoria_en': categoriaEn,
-        'categoria_de': categoriaDe,
-        'envio': envio,
-        'icono': icono,
-        'img_vertical': imgVertical,
-        'orden': orden,
-      };
+    'categoria': categoria,
+    'categoria_en': categoriaEn,
+    'categoria_de': categoriaDe,
+    'envio': envio,
+    'icono': icono,
+    'img_vertical': imgVertical,
+    'orden': orden,
+  };
 }

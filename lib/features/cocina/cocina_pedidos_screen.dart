@@ -16,9 +16,7 @@ final class CocinaPedidosScreen extends StatelessWidget {
   final dynamic extra;
   @override
   Widget build(BuildContext context) {
-    final navegacionModel = Provider.of<NavigationProvider>(
-      context,
-    );
+    final navegacionModel = Provider.of<NavigationProvider>(context);
 
     return BlocBuilder<ListenerBloc, ListenerState>(
       builder: (context, state) {
@@ -272,11 +270,7 @@ class ListaProductosPedidos extends StatelessWidget {
                           decoration: const BoxDecoration(
                             color: Color.fromARGB(255, 255, 255, 255),
                             borderRadius: BorderRadius.all(Radius.circular(5)),
-                            boxShadow: <BoxShadow>[
-                              BoxShadow(
-                                blurRadius: 5,
-                              ),
-                            ],
+                            boxShadow: <BoxShadow>[BoxShadow(blurRadius: 5)],
                           ),
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,

@@ -7,7 +7,8 @@ part 'repository_error.freezed.dart';
 
 @freezed
 class RepositoryError with _$RepositoryError {
-  const factory RepositoryError.badRequestListErrors(List<String> listErrors) = BadRequestListErrors;
+  const factory RepositoryError.badRequestListErrors(List<String> listErrors) =
+      BadRequestListErrors;
 
   const factory RepositoryError.securityError() = SecurityError;
 
@@ -25,7 +26,8 @@ class RepositoryError with _$RepositoryError {
 
   const factory RepositoryError.infoNotMatching() = InfoNotMatching;
 
-  const factory RepositoryError.listErrors(List<String> errorList) = ListErrorsM;
+  const factory RepositoryError.listErrors(List<String> errorList) =
+      ListErrorsM;
 
   const factory RepositoryError.userNotFound() = UserNotFound;
 
@@ -33,7 +35,8 @@ class RepositoryError with _$RepositoryError {
 
   static RepositoryError fromDataSourceError(NetworkError error) {
     return error.maybeWhen(
-      badRequestListErrors: (errors) => RepositoryError.badRequestListErrors(errors),
+      badRequestListErrors: (errors) =>
+          RepositoryError.badRequestListErrors(errors),
       infoNotMatching: RepositoryError.infoNotMatching,
       badRequest: () => const RepositoryError.badRequest(),
       forbidden: () => const RepositoryError.noAccess(),

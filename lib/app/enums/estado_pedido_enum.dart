@@ -1,5 +1,1 @@
-enum EstadoPedidoEnum {
-  pendiente,
-  cocinado,
-  bloqueado,
-}
+enum EstadoPedidoEnum { pendiente, cocinado, bloqueado }
