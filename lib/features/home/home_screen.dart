@@ -3,7 +3,7 @@ import 'package:qribar_cocina/app/const/app_colors.dart';
 import 'package:qribar_cocina/features/home/widgets/custom_app_bar.dart';
 import 'package:qribar_cocina/shared/utils/ui_helpers.dart';
 import 'package:qribar_cocina/shared/widgets/header_wave.dart';
-import 'package:qribar_cocina/shared/widgets/navigation_rail/custom_navigation_rail.dart';
+import 'package:qribar_cocina/shared/navigation_rail/custom_navigation_rail.dart';
 
 /// A final [StatelessWidget] that serves as the main layout for the home screen.
 /// It includes a custom app bar, a persistent side navigation rail, and dynamic content.
