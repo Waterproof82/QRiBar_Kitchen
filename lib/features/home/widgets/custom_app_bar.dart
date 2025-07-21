@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:qribar_cocina/app/const/app_colors.dart';
 import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
 import 'package:qribar_cocina/app/extensions/build_context_extension.dart';
-import 'package:qribar_cocina/app/extensions/l10n.dart';
 import 'package:qribar_cocina/app/extensions/selection_type_enum_extension.dart';
+import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/shared/utils/language_dropdown.dart';
 
@@ -22,6 +22,7 @@ final class CustomAppBar extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     final double screenWidthSize = context.width;
+    final l10n = AppLocalizations.of(context);
 
     return AppBar(
       toolbarHeight: 60,
@@ -48,7 +49,7 @@ final class CustomAppBar extends StatelessWidget
             child: Selector<NavigationProvider, String>(
               selector: (_, provider) => provider.categoriaSelected,
               builder: (context, categoriaSelected, _) {
-                String displayedLabel = context.l10n.generalView;
+                String displayedLabel = l10n.generalView;
 
                 try {
                   final selectionType = SelectionTypeEnum.values.firstWhere(
