@@ -1,0 +1,23 @@
+// fingerprint_auth_module/lib/domain/use_cases/authenticate_with_biometrics_use_case.dart
+
+import 'package:local_auth_android/local_auth_android.dart';
+import 'package:qribar_cocina/app/types/result.dart'; // Assuming this is your Result type
+
+/// Abstract contract for the use case that orchestrates biometric authentication and login.
+abstract class AuthenticateBiometricUseCase {
+  /// Checks if biometric authentication is possible (device support + enrollment)
+  /// and if secure credentials are stored.
+  /// Returns `Result<bool>` indicating if biometric login is available.
+  Future<Result<bool>> callCanAuthenticate();
+
+  /// Executes the biometric authentication and subsequent Firebase login.
+  /// Returns `Result<void>` indicating success or failure of the login attempt.
+  Future<Result<void>> callAuthenticateAndLogin({
+    required String localizedReason,
+    required AndroidAuthMessages androidAuthMessages,
+  });
+
+  /// Checks if biometric credentials (e.g., email/password) are stored locally.
+  /// Returns `Result<bool>` indicating if credentials exist.
+  Future<Result<bool>> hasStoredCredentials();
+}

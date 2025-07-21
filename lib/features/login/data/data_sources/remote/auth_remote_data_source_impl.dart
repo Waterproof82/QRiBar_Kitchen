@@ -1,4 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:qribar_cocina/app/types/repository_error.dart';
+import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/features/login/data/data_sources/remote/auth_remote_data_source_contract.dart';
 
 /// A final class that implements [AuthRemoteDataSourceContract].
@@ -27,6 +29,24 @@ final class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceContract {
       email: email.trim(),
       password: password.trim(),
     );
+  }
+
+  //Sign in with stored credentials
+  @override
+  Future<Result<void>> signInWithStoredCredentials({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return const Result.success(null);
+    } on FirebaseAuthException catch (e) {
+      return Result.failure(
+        error: RepositoryError.fromFirebaseAuthError(e.code),
+      );
+    } catch (e) {
+      return const Result.failure(error: RepositoryError.serverError());
+    }
   }
 
   @override

@@ -16,5 +16,10 @@ final class LoginFormBlocImpl extends LoginFormBloc {
   LoginFormBlocImpl({
     required LoginUseCase loginUseCase,
     required ListenerBloc listenerBloc,
-  }) : super(loginUseCase: loginUseCase, listenerBloc: listenerBloc);
+    required dynamic biometricAuthBloc,
+  }) : super(
+         loginUseCase: loginUseCase,
+         listenerBloc: listenerBloc,
+         biometricAuthBloc: biometricAuthBloc,
+       );
 }

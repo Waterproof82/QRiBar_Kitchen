@@ -9,4 +9,5 @@ class LoginFormEvent with _$LoginFormEvent {
       PasswordChanged;
   const factory LoginFormEvent.loginSubmitted() = LoginSubmitted;
   const factory LoginFormEvent.sessionRestored() = SessionRestored;
+  const factory LoginFormEvent.listenerReady() = ListenerReady;
 }

@@ -36,9 +36,12 @@ dependencies:
 
   # --- Permissions ---
   permission_handler: ^12.0.0+1   # Handling permissions (camera, storage, etc.)
+  local_auth: ^2.1.8              # Local authentication (fingerprint, face ID)
+  local_auth_android: ^1.0.50
 
   # --- Local Storage ---
   shared_preferences: ^2.5.3      # Key-value local storage
+  flutter_secure_storage: ^9.0.0
 
   # --- Utilities ---
   freezed_annotation: ^2.4.1      # Annotations for freezed code generation
