@@ -1,5 +1,3 @@
-// fingerprint_auth_module/lib/presentation/bloc/biometric_auth_bloc.dart
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qribar_cocina/app/types/errors/network_error.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
@@ -27,19 +25,16 @@ class BiometricAuthBloc extends Bloc<BiometricAuthEvent, BiometricAuthState> {
 
        _listenerBloc = listenerBloc,
        super(const BiometricAuthState.initial()) {
-    // Register specific event handlers
     on<CheckAvailabilityAndCredentials>(_onCheckAvailabilityAndCredentials);
     on<AuthenticateAndLogin>(_onAuthenticateAndLogin);
     on<PromptForSetup>(_onPromptForSetup);
-    on<SaveCredentialsRequested>(
-      _onSaveCredentialsRequested,
-    ); // Renamed event handler
+    on<SaveCredentialsRequested>(_onSaveCredentialsRequested);
     on<ClearCredentials>(_onClearCredentials);
     on<AuthenticateForSession>(_onAuthenticateForSession);
   }
 
   Future<void> _onCheckAvailabilityAndCredentials(
-    CheckAvailabilityAndCredentials event, // Concrete event type
+    CheckAvailabilityAndCredentials event,
     Emitter<BiometricAuthState> emit,
   ) async {
     emit(const BiometricAuthState.loading());
@@ -97,8 +92,11 @@ class BiometricAuthBloc extends Bloc<BiometricAuthEvent, BiometricAuthState> {
         emit(const BiometricAuthState.biometricLoginSuccess());
       },
       failure: (err) {
-         emit(BiometricAuthState.biometricLoginFailure(errorMessage: err.toString())); 
-        // You might clear credentials if authentication repeatedly fails due to invalid credentials
+        emit(
+          BiometricAuthState.biometricLoginFailure(
+            errorMessage: err.toString(),
+          ),
+        );
         // _clearCredentialsUseCase.call();
       },
     );
@@ -130,7 +128,7 @@ class BiometricAuthBloc extends Bloc<BiometricAuthEvent, BiometricAuthState> {
       emit(
         BiometricAuthState.error(
           error: RepositoryError.fromDataSourceError(
-            const NetworkError.badRequest(), // Or a more specific error for no biometric hardware/setup
+            const NetworkError.badRequest(),
           ),
         ),
       );

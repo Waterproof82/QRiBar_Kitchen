@@ -56,16 +56,18 @@ final class _PurpleBox extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      height: screenHeight * 0.8,
+      height: screenHeight,
       decoration: _buildBoxDecoration(),
       child: const Stack(
         children: [
-          // Decorative bubbles positioned throughout the box.
-          Positioned(top: 90, left: 30, child: _Burbuja()),
-          Positioned(top: -40, left: -30, child: _Burbuja()),
-          Positioned(top: -50, left: -20, child: _Burbuja()),
-          Positioned(top: -50, left: 10, child: _Burbuja()),
-          Positioned(top: 120, left: 20, child: _Burbuja()),
+          Positioned(bottom: 50, left: 30, child: _Burbuja()),
+          Positioned(bottom: 70, left: 80, child: _Burbuja()),
+          Positioned(bottom: 90, left: 50, child: _Burbuja()),
+          Positioned(top: 150, left: 10, child: _Burbuja()),
+          Positioned(top: 100, left: 120, child: _Burbuja()),
+          Positioned(top: 50, left: 180, child: _Burbuja()),
+          Positioned(top: 20, left: 230, child: _Burbuja()),
+          Positioned(top: 0, left: 100, child: _Burbuja()),
         ],
       ),
     );
@@ -81,7 +83,6 @@ final class _PurpleBox extends StatelessWidget {
 
 /// A final [StatelessWidget] that represents a single decorative bubble.
 final class _Burbuja extends StatelessWidget {
-  /// Creates a constant instance of [_Burbuja].
   const _Burbuja();
 
   @override

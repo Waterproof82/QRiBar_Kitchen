@@ -7,7 +7,7 @@ import 'package:qribar_cocina/features/biometric/data/data_sources/local/secure_
 import 'package:qribar_cocina/features/biometric/domain/repositories/biometric_auth_repository.dart';
 import 'package:qribar_cocina/features/login/domain/use_cases/login_use_case.dart';
 
-class BiometricAuthRepositoryImpl implements BiometricAuthRepository {
+final class BiometricAuthRepositoryImpl implements BiometricAuthRepository {
   final BiometricAuthDataSource _biometricDataSource;
   final SecureCredentialStorageDataSource _secureStorageDataSource;
   final LoginUseCase _loginUseCase;

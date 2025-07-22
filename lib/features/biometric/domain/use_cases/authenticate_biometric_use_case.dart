@@ -1,7 +1,5 @@
-// fingerprint_auth_module/lib/domain/use_cases/authenticate_with_biometrics_use_case.dart
-
 import 'package:local_auth_android/local_auth_android.dart';
-import 'package:qribar_cocina/app/types/result.dart'; // Assuming this is your Result type
+import 'package:qribar_cocina/app/types/result.dart';
 
 /// Abstract contract for the use case that orchestrates biometric authentication and login.
 abstract class AuthenticateBiometricUseCase {

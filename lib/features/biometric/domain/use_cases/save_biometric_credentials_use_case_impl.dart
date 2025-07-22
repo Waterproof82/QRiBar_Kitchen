@@ -3,7 +3,7 @@ import 'package:qribar_cocina/features/biometric/domain/repositories/biometric_a
 import 'package:qribar_cocina/features/biometric/domain/use_cases/save_biometric_credentials_use_case.dart';
 
 /// Concrete implementation of [SaveBiometricCredentialsUseCase].
-class SaveBiometricCredentialsUseCaseImpl
+final class SaveBiometricCredentialsUseCaseImpl
     implements SaveBiometricCredentialsUseCase {
   final BiometricAuthRepository _repository;
 

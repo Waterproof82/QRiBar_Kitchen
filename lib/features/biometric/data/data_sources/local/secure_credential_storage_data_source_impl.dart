@@ -5,9 +5,8 @@ import 'package:qribar_cocina/features/biometric/data/data_sources/local/secure_
 
 /// Concrete implementation of [SecureCredentialStorageDataSource]
 /// using `flutter_secure_storage`.
-class SecureCredentialStorageDataSourceImpl
+final class SecureCredentialStorageDataSourceImpl
     implements SecureCredentialStorageDataSource {
-
   final FlutterSecureStorage _secureStorage;
 
   // Define keys for secure storage

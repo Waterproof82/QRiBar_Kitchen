@@ -1,7 +1,5 @@
-// fingerprint_auth_module/lib/presentation/bloc/biometric_auth_state.dart
-
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:qribar_cocina/app/types/repository_error.dart'; // Your existing error type
+import 'package:qribar_cocina/app/types/repository_error.dart';
 
 part 'biometric_auth_state.freezed.dart';
 

@@ -27,52 +27,17 @@ final class LoginForm extends StatelessWidget {
         BlocListener<BiometricAuthBloc, BiometricAuthState>(
           listener: (context, biometricState) {
             biometricState.whenOrNull(
-              promptForSetup: (email, password) {
-                showDialog(
-                  context: context,
-                  builder: (dialogContext) {
-                    return AlertDialog(
-                      title: Text(l10n.enableBiometricLoginTitle),
-                      content: Text(l10n.enableBiometricLoginContent),
-                      actions: [
-                        TextButton(
-                          child: Text(l10n.noThanksButton),
-                          onPressed: () => Navigator.of(dialogContext).pop(),
-                        ),
-                        TextButton(
-                          child: Text(l10n.yesEnableButton),
-                          onPressed: () {
-                            context.read<BiometricAuthBloc>().add(
-                              BiometricAuthEvent.saveCredentialsRequested(
-                                email: email,
-                                password: password,
-                              ),
-                            );
-                            Navigator.of(dialogContext).pop();
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              credentialsSaved: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.biometricsEnabledMessage)),
-                );
-              },
-              biometricLoginSuccess: () {
-                context.read<LoginFormBloc>().add(
-                  const LoginFormEvent.sessionRestored(),
-                );
-              },
+              promptForSetup: (email, password) =>
+                  _showBiometricSetupDialog(context, l10n, email, password),
+              credentialsSaved: () =>
+                  _showBiometricsEnabledSnackBar(context, l10n),
+              biometricLoginSuccess: () => _dispatchSessionRestored(context),
             );
           },
         ),
         BlocListener<LoginFormBloc, LoginFormState>(
           listenWhen: (previous, current) =>
-              previous.loginSuccess != current.loginSuccess ||
-              previous.failure != current.failure,
+              previous.loginSuccess != current.loginSuccess,
           listener: (context, state) {
             if (state.loginSuccess) {
               context.pushTo(AppRoute.cocinaGeneral);
@@ -165,5 +130,54 @@ final class LoginForm extends StatelessWidget {
         },
       ),
     );
+  }
+
+  // Helpers
+  void _showBiometricSetupDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    String email,
+    String password,
+  ) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(l10n.enableBiometricLoginTitle),
+          content: Text(l10n.enableBiometricLoginContent),
+          actions: [
+            TextButton(
+              child: Text(l10n.noThanksButton),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+            TextButton(
+              child: Text(l10n.yesEnableButton),
+              onPressed: () {
+                context.read<BiometricAuthBloc>().add(
+                  BiometricAuthEvent.saveCredentialsRequested(
+                    email: email,
+                    password: password,
+                  ),
+                );
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showBiometricsEnabledSnackBar(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.biometricsEnabledMessage)));
+  }
+
+  void _dispatchSessionRestored(BuildContext context) {
+    context.read<LoginFormBloc>().add(const LoginFormEvent.sessionRestored());
   }
 }

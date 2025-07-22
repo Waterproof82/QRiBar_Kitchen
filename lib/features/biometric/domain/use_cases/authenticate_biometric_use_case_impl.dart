@@ -4,7 +4,7 @@ import 'package:qribar_cocina/features/biometric/domain/repositories/biometric_a
 import 'package:qribar_cocina/features/biometric/domain/use_cases/authenticate_biometric_use_case.dart';
 
 /// Concrete implementation of [AuthenticateBiometricUseCase].
-class AuthenticateWithBiometricsUseCaseImpl
+final class AuthenticateWithBiometricsUseCaseImpl
     implements AuthenticateBiometricUseCase {
   final BiometricAuthRepository _repository;
 

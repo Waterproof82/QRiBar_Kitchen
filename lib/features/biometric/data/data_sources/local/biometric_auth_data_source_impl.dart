@@ -5,7 +5,7 @@ import 'package:local_auth_android/local_auth_android.dart';
 import 'package:qribar_cocina/features/biometric/data/data_sources/local/biometric_auth_data_source.dart';
 
 /// Concrete implementation of [BiometricAuthDataSource] using `local_auth`.
-class BiometricAuthDataSourceImpl implements BiometricAuthDataSource {
+final class BiometricAuthDataSourceImpl implements BiometricAuthDataSource {
   final LocalAuthentication _auth;
 
   BiometricAuthDataSourceImpl({LocalAuthentication? auth})

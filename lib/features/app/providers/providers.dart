@@ -4,9 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:qribar_cocina/app/config/di.dart'; // Assuming getIt is configured here
-// --- Shared Data Sources & Repositories (ensure these paths are correct for your project structure) ---
-// If these are indeed shared and not specific to a single module, their paths might be like this.
+import 'package:qribar_cocina/app/config/di.dart';
 import 'package:qribar_cocina/data/data_sources/local/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/data_sources/local/localization_local_data_source.dart';
 import 'package:qribar_cocina/data/data_sources/local/localization_local_datasource_contract.dart';
@@ -22,8 +20,8 @@ import 'package:qribar_cocina/features/app/bloc/listener_bloc_impl.dart';
 import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
 import 'package:qribar_cocina/features/app/cubit/language_cubit_impl.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
-import 'package:qribar_cocina/features/biometric/data/data_sources/local/biometric_auth_data_source_impl.dart';
 import 'package:qribar_cocina/features/biometric/data/data_sources/local/biometric_auth_data_source.dart';
+import 'package:qribar_cocina/features/biometric/data/data_sources/local/biometric_auth_data_source_impl.dart';
 import 'package:qribar_cocina/features/biometric/data/data_sources/local/secure_credential_storage_data_source.dart';
 import 'package:qribar_cocina/features/biometric/data/data_sources/local/secure_credential_storage_data_source_impl.dart';
 import 'package:qribar_cocina/features/biometric/data/repositories/biometric_auth_repository_impl.dart';
@@ -133,14 +131,13 @@ final class AppProviders extends StatelessWidget {
             ),
           ),
 
-          // Repository for Biometric Module (THIS WAS THE MISSING PIECE!)
+          // Repository for Biometric Module
           RepositoryProvider<BiometricAuthRepository>(
             create: (context) => BiometricAuthRepositoryImpl(
               biometricDataSource: context.read<BiometricAuthDataSource>(),
               secureStorageDataSource: context
                   .read<SecureCredentialStorageDataSource>(),
-              loginUseCase: context
-                  .read<LoginUseCase>(), // Correctly pass LoginUseCase
+              loginUseCase: context.read<LoginUseCase>(),
             ),
           ),
 
@@ -181,7 +178,7 @@ final class AppProviders extends StatelessWidget {
               ),
             ),
 
-            // New: BiometricAuthBloc (Provided BEFORE LoginFormBloc)
+            // BiometricAuthBloc
             BlocProvider<BiometricAuthBloc>(
               create: (context) => BiometricAuthBloc(
                 authenticateUseCase: context
@@ -200,10 +197,7 @@ final class AppProviders extends StatelessWidget {
               create: (context) => LoginFormBlocImpl(
                 loginUseCase: context.read<LoginUseCase>(),
                 listenerBloc: context.read<ListenerBloc>(),
-                biometricAuthBloc: context
-                    .read<
-                      BiometricAuthBloc
-                    >(), // Correctly inject BiometricAuthBloc
+                biometricAuthBloc: context.read<BiometricAuthBloc>(),
               ),
             ),
           ],
