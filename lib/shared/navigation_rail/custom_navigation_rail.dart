@@ -7,7 +7,7 @@ import 'package:qribar_cocina/app/enums/app_route_enum.dart';
 import 'package:qribar_cocina/app/enums/assets_enum.dart';
 import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
 import 'package:qribar_cocina/app/enums/svg_enum.dart';
-import 'package:qribar_cocina/app/extensions/l10n.dart';
+import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/shared/utils/svg_loader.dart';
 import 'package:qribar_cocina/shared/utils/ui_helpers.dart';

@@ -5,7 +5,7 @@ import 'package:qribar_cocina/app/enums/app_route_enum.dart';
 import 'package:qribar_cocina/app/enums/estado_pedido_enum.dart';
 import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
 import 'package:qribar_cocina/app/extensions/app_route_extension.dart';
-import 'package:qribar_cocina/app/extensions/l10n.dart';
+import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
@@ -93,6 +93,7 @@ final class PedidoDismissible extends StatelessWidget {
     // Access NavegacionProvider without listening for changes within build,
     // as changes are handled by _toggleCategoria.
     final nav = Provider.of<NavigationProvider>(context, listen: false);
+    final l10n = AppLocalizations.of(context);
 
     return Dismissible(
       // Use ValueKey for better performance in lists, assuming itemPedido.id is unique and stable.
@@ -129,7 +130,7 @@ final class PedidoDismissible extends StatelessWidget {
             const Icon(Icons.cancel_outlined, color: Colors.white, size: 24),
             const SizedBox(width: 12),
             Text(
-              context.l10n.cancelOrder,
+              l10n.cancelOrder,
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w400,
@@ -148,7 +149,7 @@ final class PedidoDismissible extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(
-              context.l10n.served,
+              l10n.served,
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w400,

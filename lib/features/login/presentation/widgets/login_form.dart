@@ -5,38 +5,51 @@ import 'package:qribar_cocina/app/const/app_constants.dart';
 import 'package:qribar_cocina/app/const/app_sizes.dart';
 import 'package:qribar_cocina/app/enums/app_route_enum.dart';
 import 'package:qribar_cocina/app/extensions/app_route_extension.dart';
-import 'package:qribar_cocina/app/extensions/l10n.dart';
+import 'package:qribar_cocina/app/l10n/app_localizations.dart';
+import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_bloc.dart';
+import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_event.dart';
+import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_state.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/input_decoration.dart';
 
-/// A final [StatelessWidget] that represents the login form.
-/// It handles user input, form validation, and dispatches login events to the [LoginFormBloc].
 final class LoginForm extends StatelessWidget {
-  /// Creates a constant instance of [LoginForm].
   const LoginForm({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // GlobalKey for accessing and validating the FormState.
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    final l10n = AppLocalizations.of(context);
 
-    return BlocListener<LoginFormBloc, LoginFormState>(
-      // Listen only when loginSuccess state changes.
-      listenWhen: (previous, current) =>
-          previous.loginSuccess != current.loginSuccess,
-      listener: (context, state) {
-        if (state.loginSuccess) {
-          context.goTo(AppRoute.cocinaGeneral);
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<BiometricAuthBloc, BiometricAuthState>(
+          listener: (context, biometricState) {
+            biometricState.whenOrNull(
+              promptForSetup: (email, password) =>
+                  _showBiometricSetupDialog(context, l10n, email, password),
+              credentialsSaved: () =>
+                  _showBiometricsEnabledSnackBar(context, l10n),
+              biometricLoginSuccess: () => _dispatchSessionRestored(context),
+            );
+          },
+        ),
+        BlocListener<LoginFormBloc, LoginFormState>(
+          listenWhen: (previous, current) =>
+              previous.loginSuccess != current.loginSuccess,
+          listener: (context, state) {
+            if (state.loginSuccess) {
+              context.pushTo(AppRoute.cocinaGeneral);
+            }
+          },
+        ),
+      ],
       child: BlocBuilder<LoginFormBloc, LoginFormState>(
-        // Rebuild only when isLoading state changes to optimize performance.
         buildWhen: (previous, current) =>
-            previous.isLoading != current.isLoading,
+            previous.isLoading != current.isLoading ||
+            previous.failure != current.failure,
         builder: (context, state) {
-          // Access the LoginFormBloc instance.
           final LoginFormBloc bloc = context.read<LoginFormBloc>();
 
           return Padding(
@@ -46,45 +59,42 @@ final class LoginForm extends StatelessWidget {
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 children: [
-                  // Email input field.
                   TextFormField(
                     autocorrect: false,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecorations.authInputDecoration(
                       hintText: 'xxxx@qribar.es',
-                      labelText: context.l10n.email,
+                      labelText: l10n.email,
                       prefixIcon: Icons.alternate_email_rounded,
                     ),
                     onChanged: (value) => bloc.add(EmailChanged(value)),
                     validator: (value) {
-                      final RegExp regExp = RegExp(AppConstants.emailPattern);
+                      final regExp = RegExp(AppConstants.emailPattern);
                       return regExp.hasMatch(value ?? '')
                           ? null
-                          : context.l10n.emailError;
+                          : l10n.emailError;
                     },
                     style: const TextStyle(fontSize: 22),
                   ),
-                  Gap.h32,
-                  // Password input field.
+                  const SizedBox(height: AppSizes.p32),
                   TextFormField(
                     autocorrect: false,
                     obscureText: true,
                     keyboardType: TextInputType.text,
                     decoration: InputDecorations.authInputDecoration(
                       hintText: '*****',
-                      labelText: context.l10n.password,
+                      labelText: l10n.password,
                       prefixIcon: Icons.lock_clock_outlined,
                     ),
                     onChanged: (value) => bloc.add(PasswordChanged(value)),
                     validator: (value) {
                       return (value != null && value.length >= 6)
                           ? null
-                          : context.l10n.passwordError;
+                          : l10n.passwordError;
                     },
                     style: const TextStyle(fontSize: 22),
                   ),
-                  Gap.h32,
-                  // Login button.
+                  const SizedBox(height: AppSizes.p32),
                   MaterialButton(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppSizes.p10),
@@ -93,9 +103,8 @@ final class LoginForm extends StatelessWidget {
                     elevation: 0,
                     color: AppColors.blackSoft,
                     onPressed: state.isLoading
-                        ? null // Disable button when loading
+                        ? null
                         : () {
-                            // Validate form and dispatch LoginSubmitted event.
                             if (formKey.currentState?.validate() ?? false) {
                               bloc.add(const LoginSubmitted());
                             }
@@ -106,9 +115,7 @@ final class LoginForm extends StatelessWidget {
                         vertical: AppSizes.p16 - 1,
                       ),
                       child: Text(
-                        state.isLoading
-                            ? context.l10n.wait
-                            : context.l10n.enter,
+                        state.isLoading ? l10n.wait : l10n.enter,
                         style: const TextStyle(
                           color: AppColors.onPrimary,
                           fontSize: 18,
@@ -123,5 +130,54 @@ final class LoginForm extends StatelessWidget {
         },
       ),
     );
+  }
+
+  // Helpers
+  void _showBiometricSetupDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    String email,
+    String password,
+  ) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(l10n.enableBiometricLoginTitle),
+          content: Text(l10n.enableBiometricLoginContent),
+          actions: [
+            TextButton(
+              child: Text(l10n.noThanksButton),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+            TextButton(
+              child: Text(l10n.yesEnableButton),
+              onPressed: () {
+                context.read<BiometricAuthBloc>().add(
+                  BiometricAuthEvent.saveCredentialsRequested(
+                    email: email,
+                    password: password,
+                  ),
+                );
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showBiometricsEnabledSnackBar(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.biometricsEnabledMessage)));
+  }
+
+  void _dispatchSessionRestored(BuildContext context) {
+    context.read<LoginFormBloc>().add(const LoginFormEvent.sessionRestored());
   }
 }

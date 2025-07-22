@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qribar_cocina/app/const/app_sizes.dart';
+import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/auth_background.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/login_container.dart';
 import 'package:qribar_cocina/features/login/presentation/widgets/login_form.dart';
@@ -14,14 +15,15 @@ final class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final l10n = AppLocalizations.of(context);
+
+    return Scaffold(
       // The background for the authentication screen.
       body: AuthBackground(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Row containing the language dropdown, aligned to the end.
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [Flexible(child: LanguageDropdown())],
               ),
@@ -34,14 +36,14 @@ final class LoginScreen extends StatelessWidget {
                     Gap.h10,
                     // Login title.
                     Text(
-                      'Login',
-                      style: TextStyle(
+                      l10n.login,
+                      style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Gap.h24,
-                    LoginForm(),
+                    const LoginForm(),
                   ],
                 ),
               ),

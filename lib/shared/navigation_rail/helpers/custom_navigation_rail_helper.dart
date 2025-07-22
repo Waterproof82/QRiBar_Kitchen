@@ -74,11 +74,13 @@ List<NavigationRailDestination> _buildDestinationsWidget(
   BuildContext context,
   int currentAnimatedIndex,
 ) {
+  final l10n = AppLocalizations.of(context);
+
   return <NavigationRailDestination>[
     _buildNavigationDestination(
       context: context,
       iconData: Icons.kitchen_sharp,
-      label: context.l10n.generalView,
+      label: l10n.generalView,
       index: 0,
       currentAnimatedIndex: currentAnimatedIndex,
       defaultColor: AppColors.onPrimary,
@@ -87,7 +89,7 @@ List<NavigationRailDestination> _buildDestinationsWidget(
     _buildNavigationDestination(
       context: context,
       iconData: Icons.soup_kitchen,
-      label: context.l10n.tablesView,
+      label: l10n.tablesView,
       index: 1,
       currentAnimatedIndex: currentAnimatedIndex,
       defaultColor: AppColors.onPrimary,
@@ -96,7 +98,7 @@ List<NavigationRailDestination> _buildDestinationsWidget(
     _buildNavigationDestination(
       context: context,
       iconData: Icons.logout_outlined,
-      label: context.l10n.exitApp,
+      label: l10n.exitApp,
       index: 2,
       currentAnimatedIndex: currentAnimatedIndex,
       defaultColor: AppColors.error,

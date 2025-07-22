@@ -6,9 +6,9 @@ import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/login/domain/use_cases/login_use_case.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
+import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc_impl.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
-import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc_impl.dart';
 
 // Mocks
 class MockLoginUseCase extends Mock implements LoginUseCase {}
@@ -29,6 +29,7 @@ void main() {
     bloc = LoginFormBlocImpl(
       loginUseCase: mockLoginUseCase,
       listenerBloc: mockListenerBloc,
+      biometricAuthBloc: null,
     );
   });
 

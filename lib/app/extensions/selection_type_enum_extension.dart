@@ -1,14 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
-import 'package:qribar_cocina/app/extensions/l10n.dart';
+import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 
 extension SelectionTypeEnumL10n on SelectionTypeEnum {
   String localizedLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     switch (this) {
       case SelectionTypeEnum.pedidosScreen:
-        return context.l10n.cocinaPedidosPorMesa;
+        return l10n.cocinaPedidosPorMesa;
       case SelectionTypeEnum.generalScreen:
-        return context.l10n.cocinaEstadoPedidos;
+        return l10n.cocinaEstadoPedidos;
     }
   }
 }

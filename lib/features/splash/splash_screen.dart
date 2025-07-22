@@ -1,34 +1,33 @@
-import 'dart:async'; // For Timer and Future.delayed
+import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:local_auth_android/local_auth_android.dart';
 import 'package:qribar_cocina/app/enums/app_route_enum.dart';
 import 'package:qribar_cocina/app/enums/svg_enum.dart';
 import 'package:qribar_cocina/app/extensions/app_route_extension.dart';
+import 'package:qribar_cocina/app/l10n/app_localizations.dart';
+import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
+import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_bloc.dart';
+import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_event.dart';
+import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_state.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 import 'package:qribar_cocina/shared/utils/svg_loader.dart';
 
-/// A final [StatefulWidget] that displays the splash screen.
-/// It handles initial animations and checks the user's session status
-/// to navigate to the appropriate screen (login or main app).
 final class Splash extends StatefulWidget {
-  /// Creates a constant instance of [Splash].
   const Splash({super.key});
 
   @override
   SplashState createState() => SplashState();
 }
 
-/// The state class for the [Splash] widget.
-/// Manages animation and navigation logic after session check.
 final class SplashState extends State<Splash>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animationController;
   late final Animation<double> _animation;
-  bool _navigated = false; // Flag to prevent multiple navigations
 
   @override
   void initState() {
@@ -44,11 +43,10 @@ final class SplashState extends State<Splash>
       curve: Curves.easeOut,
     );
 
-    // Start the animation immediately.
     _animationController.forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkSessionAndNavigate();
+      _checkSessionAndNavigate(context);
     });
   }
 
@@ -60,77 +58,146 @@ final class SplashState extends State<Splash>
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LoginFormBloc, LoginFormState>(
-      // Listen only when loginSuccess state changes to trigger navigation.
-      listenWhen: (previous, current) =>
-          previous.loginSuccess != current.loginSuccess,
-      listener: (context, state) {
-        // If login is successful (e.g., after session restoration) and not already navigated,
-        // navigate to the main kitchen screen.
-        if (state.loginSuccess && !_navigated) {
-          _navigated = true; // Mark as navigated to prevent further attempts
-          context.goTo(AppRoute.cocinaGeneral);
-        }
-      },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Logo at the bottom of the screen.
-            const Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 30.0),
-                child: SvgLoader(
-                  SvgEnum.logo,
-                  height: 25.0,
-                  fit: BoxFit.scaleDown,
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<ListenerBloc, ListenerState>(
+          listenWhen: (previous, current) {
+            final wasSuccess = previous.maybeWhen(
+              success: () => true,
+              orElse: () => false,
+            );
+            final isSuccess = current.maybeWhen(
+              success: () => true,
+              orElse: () => false,
+            );
+            return !wasSuccess && isSuccess;
+          },
+          listener: (context, state) {
+            state.maybeWhen(
+              success: () {
+                context.read<LoginFormBloc>().add(
+                  const LoginFormEvent.listenerReady(),
+                );
+              },
+              orElse: () {},
+            );
+          },
+        ),
+
+        BlocListener<LoginFormBloc, LoginFormState>(
+          listenWhen: (previous, current) =>
+              previous.loginSuccess != current.loginSuccess,
+          listener: (context, state) {
+            if (state.loginSuccess) {
+              context.pushTo(AppRoute.cocinaGeneral);
+            }
+          },
+        ),
+        BlocListener<BiometricAuthBloc, BiometricAuthState>(
+          listener: (context, state) {
+            state.mapOrNull(
+              biometricLoginSuccess: (_) {
+                context.read<LoginFormBloc>().add(
+                  const LoginFormEvent.sessionRestored(),
+                );
+              },
+              biometricLoginFailure: (_) {
+                context.goTo(AppRoute.login);
+              },
+              error: (_) {
+                context.goTo(AppRoute.login);
+              },
+            );
+          },
+        ),
+      ],
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              const Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 30.0),
+                  child: SvgLoader(
+                    SvgEnum.logo,
+                    height: 25.0,
+                    fit: BoxFit.scaleDown,
+                  ),
                 ),
               ),
-            ),
-            // Animated logo name in the center.
-            Center(
-              child: AnimatedBuilder(
-                animation: _animationController,
-                builder: (context, child) {
-                  final double value = _animation.value;
-                  return SvgLoader(
-                    SvgEnum.logoName,
-                    width: value * 250,
-                    height: value * 250,
-                  );
-                },
+              Center(
+                child: AnimatedBuilder(
+                  animation: _animationController,
+                  builder: (context, child) {
+                    final double value = _animation.value;
+                    return SvgLoader(
+                      SvgEnum.logoName,
+                      width: value * 250,
+                      height: value * 250,
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  /// Checks the user's Firebase session and navigates accordingly.
-  ///
-  /// Waits for an initial delay, then checks if a user is logged in.
-  /// If a user exists, it dispatches a [SessionRestored] event to [LoginFormBloc].
-  /// Otherwise, it navigates to the login screen.
-  Future<void> _checkSessionAndNavigate() async {
-    // Ensure a minimum display time for the splash screen.
+  Future<void> _checkSessionAndNavigate(BuildContext context) async {
     await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
 
     final User? user = FirebaseAuth.instance.currentUser;
+    final biometricAuthBloc = context.read<BiometricAuthBloc>();
 
-    // Prevent navigation if the widget is no longer mounted or already navigated.
-    if (!mounted || _navigated) return;
+    final bool canAuthenticate = await biometricAuthBloc
+        .canAuthenticateWithBiometrics();
+    final bool hasStoredCredentials = await biometricAuthBloc
+        .hasStoredCredentials();
+        
+    final l10n = AppLocalizations.of(context);
+
+    final String localizedReason = l10n.localizedReasonBiometricLogin;
+
+    final authMessages = AndroidAuthMessages(
+      signInTitle: l10n.signInTitle,
+      cancelButton: l10n.cancelButton,
+      biometricHint: l10n.biometricHint,
+      biometricNotRecognized: l10n.biometricNotRecognized,
+      biometricSuccess: l10n.biometricSuccess,
+      goToSettingsButton: l10n.goToSettingsButton,
+      goToSettingsDescription: l10n.goToSettingsDescription,
+    );
 
     if (user != null) {
-      // If user exists, restore session via LoginFormBloc.
-      // Navigation to cocinaGeneral will be handled by LoginFormBloc's BlocListener.
-      context.read<LoginFormBloc>().add(const LoginFormEvent.sessionRestored());
+      if (canAuthenticate && hasStoredCredentials) {
+        biometricAuthBloc.add(
+          BiometricAuthEvent.authenticateForSession(
+            localizedReason: localizedReason,
+            androidAuthMessages: authMessages,
+          ),
+        );
+      } else {
+        context.read<LoginFormBloc>().add(
+          const LoginFormEvent.sessionRestored(),
+        );
+      }
     } else {
-      // If no user, navigate to the login screen.
-      _navigated = true; // Mark as navigated to prevent further attempts
-      context.goTo(AppRoute.login);
+      if (canAuthenticate && hasStoredCredentials) {
+        biometricAuthBloc.add(
+          BiometricAuthEvent.authenticateAndLogin(
+            localizedReason: localizedReason,
+            androidAuthMessages: authMessages,
+          ),
+        );
+      } else {
+        context.goTo(AppRoute.login);
+      }
     }
   }
 }
