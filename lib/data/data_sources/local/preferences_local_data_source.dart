@@ -1,15 +1,26 @@
-
 import 'package:qribar_cocina/data/data_sources/local/preferences_local_datasource_contract.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Wrapper class for the shared preferences.
-class Preferences implements PreferencesLocalDataSourceContract {
-  Preferences({required SharedPreferences sharedPreferences})
-      : _sharedPreferences = sharedPreferences;
+/// A final class that implements [PreferencesLocalDataSourceContract].
+///
+/// This class acts as a wrapper for `shared_preferences`, providing a
+/// simplified and type-safe interface for local data persistence.
+
+final class Preferences implements PreferencesLocalDataSourceContract {
+  /// The underlying `SharedPreferences` instance used for data storage.
   final SharedPreferences _sharedPreferences;
 
-  /// Writes the value to the shared preferences.
+  /// Creates an instance of [Preferences].
   ///
+  /// Requires an initialized [sharedPreferences] instance to perform
+  /// read and write operations.
+  Preferences({required SharedPreferences sharedPreferences})
+    : _sharedPreferences = sharedPreferences;
+
+  /// Writes a [value] of type `T` to the shared preferences using the given [key].
+  ///
+  /// Supports `String`, `int`, `double`, `bool`, and `List<String>`.
+  /// Throws an [ArgumentError] if the value type is not supported.
   /// Returns `true` if the value was successfully written, `false` otherwise.
   @override
   Future<bool> write<T>({required String key, required T value}) async {
@@ -28,12 +39,16 @@ class Preferences implements PreferencesLocalDataSourceContract {
     if (T == List<String>) {
       return await _sharedPreferences.setStringList(key, value as List<String>);
     }
-    throw ArgumentError('Unsupported value type');
+    throw ArgumentError(
+      'Unsupported value type: $T for key $key',
+    ); // Added type and key to error message
   }
 
-  /// Reads the value from the shared preferences.
+  /// Reads a value of type `T` from the shared preferences using the given [key].
   ///
+  /// Supports `String`, `int`, `double`, `bool`, and `List<String>`.
   /// Returns the value of type `T` if it exists, `null` otherwise.
+  /// Throws an [ArgumentError] if the requested type `T` is not supported.
   @override
   T? read<T>({required String key}) {
     if (T == String) {
@@ -51,18 +66,20 @@ class Preferences implements PreferencesLocalDataSourceContract {
     if (T == List<String>) {
       return _sharedPreferences.getStringList(key) as T?;
     }
-    throw ArgumentError('Unsupported value type');
+    throw ArgumentError(
+      'Unsupported type: $T for key $key',
+    ); // Added type and key to error message
   }
 
-  /// Clears all the shared preferences.
+  /// Clears all data stored in the shared preferences.
   ///
-  /// Returns `true` if the shared preferences were successfully cleared, `false` otherwise.
+  /// Returns `true` if all preferences were successfully cleared, `false` otherwise.
   @override
   Future<bool> clearAll() => _sharedPreferences.clear();
 
-  /// Clears the shared preferences for the given [key].
+  /// Clears the value associated with the given [key] from shared preferences.
   ///
-  /// Returns `true` if the shared preferences for the given [key] were successfully cleared, `false` otherwise.
+  /// Returns `true` if the value for the given [key] was successfully removed, `false` otherwise.
   @override
   Future<bool> clear({required String key}) => _sharedPreferences.remove(key);
 }

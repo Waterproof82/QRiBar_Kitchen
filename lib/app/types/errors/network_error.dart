@@ -10,7 +10,8 @@ part 'network_error.freezed.dart';
 class NetworkError with _$NetworkError {
   const factory NetworkError.badRequest() = _BadRequest;
 
-  const factory NetworkError.badRequestListErrors(List<String> listErrors) = _BadRequestListErrors;
+  const factory NetworkError.badRequestListErrors(List<String> listErrors) =
+      _BadRequestListErrors;
 
   const factory NetworkError.conflict() = _Conflict;
 

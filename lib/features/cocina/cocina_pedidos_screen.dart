@@ -10,24 +10,19 @@ import 'package:qribar_cocina/features/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/features/cocina/widgets/pedido_dismissible.dart';
 import 'package:qribar_cocina/shared/app_exports.dart';
 
-class CocinaPedidosScreen extends StatelessWidget {
-  const CocinaPedidosScreen({super.key});
+final class CocinaPedidosScreen extends StatelessWidget {
+  const CocinaPedidosScreen({Key? key, this.extra}) : super(key: key);
 
+  final dynamic extra;
   @override
   Widget build(BuildContext context) {
-    final navegacionModel = Provider.of<NavegacionProvider>(context, listen: false);
+    final navegacionModel = Provider.of<NavigationProvider>(context);
 
     return BlocBuilder<ListenerBloc, ListenerState>(
       builder: (context, state) {
         return state.maybeWhen(
-          pedidosUpdated: (pedidos) => _buildFromPedidos(
-            pedidos,
-            navegacionModel,
-          ),
-          pedidoRemoved: (pedidos) => _buildFromPedidos(
-            pedidos,
-            navegacionModel,
-          ),
+          data: (productos, pedidos, categorias) =>
+              _buildFromPedidos(pedidos, navegacionModel),
           orElse: () => const SizedBox.shrink(),
         );
       },
@@ -36,7 +31,7 @@ class CocinaPedidosScreen extends StatelessWidget {
 
   Widget _buildFromPedidos(
     List<Pedido> pedidos,
-    NavegacionProvider navegacionModel,
+    NavigationProvider navegacionModel,
   ) {
     if (pedidos.isEmpty) return const SizedBox.shrink();
 
@@ -47,33 +42,41 @@ class CocinaPedidosScreen extends StatelessWidget {
 
     final itemPedidosSelected = pedidos
         .where(
-          (pedido) => pedido.mesa == idMesaActual && pedido.numPedido == idPedidoSelected && pedido.estadoLinea != EstadoPedidoEnum.bloqueado.name,
+          (pedido) =>
+              pedido.mesa == idMesaActual &&
+              pedido.numPedido == idPedidoSelected &&
+              pedido.estadoLinea != EstadoPedidoEnum.bloqueado.name &&
+              pedido.envio == 'cocina',
         )
         .toList();
 
-    final countMenuPedido = pedidos.where((pedido) => pedido.mesa == idMesaActual).map((pedido) => pedido.numPedido).toList();
+    final countMenuPedido = pedidos
+        .where((pedido) => pedido.mesa == idMesaActual)
+        .map((pedido) => pedido.numPedido)
+        .toList();
 
-    final contadorNumPedido = countMenuPedido.isNotEmpty ? countMenuPedido.reduce(max) : 0;
+    final contadorNumPedido = countMenuPedido.isNotEmpty
+        ? countMenuPedido.reduce(max)
+        : 0;
 
-    return _buildStack(resultMesas, contadorNumPedido, navegacionModel, itemPedidosSelected);
+    return _buildStack(
+      resultMesas,
+      contadorNumPedido,
+      navegacionModel,
+      itemPedidosSelected,
+    );
   }
 
   Widget _buildStack(
     List<String> resultMesas,
     int contadorNumPedido,
-    NavegacionProvider navegacionModel,
+    NavigationProvider navegacionModel,
     List<Pedido> itemPedidosSelected,
   ) {
     return Stack(
       children: [
-        PedidosMesasListMenu(
-          navegacionModel,
-          resultMesas,
-        ),
-        PedidosListMenu(
-          navegacionModel,
-          contadorNumPedido,
-        ),
+        PedidosMesasListMenu(navegacionModel, resultMesas),
+        PedidosListMenu(navegacionModel, contadorNumPedido),
         ListaProductosPedidos(
           navegacionModel: navegacionModel,
           itemPedidos: itemPedidosSelected,
@@ -84,45 +87,55 @@ class CocinaPedidosScreen extends StatelessWidget {
 }
 
 class PedidosListMenu extends StatelessWidget {
-  PedidosListMenu(
-    this.navegacionModel,
-    this.count,
-  );
-  final NavegacionProvider navegacionModel;
+  PedidosListMenu(this.navegacionModel, this.count);
+  final NavigationProvider navegacionModel;
   final int count;
   final ScrollController _controller = ScrollController();
 
   void _goToElemento(int index) {
-    _controller.animateTo((100.0 * index), duration: const Duration(milliseconds: 100), curve: Curves.easeIn);
+    _controller.animateTo(
+      (100.0 * index),
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeIn,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 70),
+      margin: const EdgeInsets.only(top: 70),
       height: 50,
       child: ListView.builder(
         itemCount: count,
         controller: _controller,
-        reverse: false,
         scrollDirection: Axis.horizontal,
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         itemBuilder: (BuildContext context, int index) {
           return Container(
             width: 100,
-            margin: EdgeInsets.only(right: 5, left: 10),
+            margin: const EdgeInsets.only(right: 5, left: 10),
             decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.black26),
+              border: Border.all(color: Colors.black26),
               borderRadius: BorderRadius.circular(10),
             ),
             child: FloatingActionButton(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              backgroundColor: (navegacionModel.idPedidoSelected == index + 1) ? Color.fromARGB(255, 30, 62, 97) : Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              backgroundColor: (navegacionModel.idPedidoSelected == index + 1)
+                  ? const Color.fromARGB(255, 30, 62, 97)
+                  : Colors.white,
               elevation: 1,
               heroTag: 'ListPedido$index',
               child: Text(
                 'Pedido ${index + 1}',
-                style: GoogleFonts.notoSans(color: (navegacionModel.idPedidoSelected == index + 1) ? Colors.white : Colors.black, fontSize: 15, fontWeight: FontWeight.w500),
+                style: GoogleFonts.notoSans(
+                  color: (navegacionModel.idPedidoSelected == index + 1)
+                      ? Colors.white
+                      : Colors.black,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               onPressed: () {
                 navegacionModel.idPedidoSelected = index + 1;
@@ -137,12 +150,9 @@ class PedidosListMenu extends StatelessWidget {
 }
 
 class PedidosMesasListMenu extends StatelessWidget {
-  PedidosMesasListMenu(
-    this.navegacionModel,
-    this.resultMesas,
-  );
+  PedidosMesasListMenu(this.navegacionModel, this.resultMesas);
 
-  final NavegacionProvider navegacionModel;
+  final NavigationProvider navegacionModel;
   final List<String> resultMesas;
 
   final ScrollController _controller = ScrollController();
@@ -158,25 +168,29 @@ class PedidosMesasListMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 5),
+      margin: const EdgeInsets.only(top: 5),
       height: 50,
       child: ListView.builder(
         itemCount: resultMesas.length,
         controller: _controller,
-        reverse: false,
         scrollDirection: Axis.horizontal,
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         itemBuilder: (BuildContext context, int index) {
           return Container(
             width: 100,
-            margin: EdgeInsets.only(right: 5, left: 10),
+            margin: const EdgeInsets.only(right: 5, left: 10),
             decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.black26),
+              border: Border.all(color: Colors.black26),
               borderRadius: BorderRadius.circular(10),
             ),
             child: FloatingActionButton(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              backgroundColor: (navegacionModel.mesaActual == resultMesas[index]) ? Colors.greenAccent : Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              backgroundColor:
+                  (navegacionModel.mesaActual == resultMesas[index])
+                  ? Colors.greenAccent
+                  : Colors.white,
               elevation: 1,
               heroTag: 'ListPedidoMesas$index',
               child: Text(
@@ -201,13 +215,13 @@ class PedidosMesasListMenu extends StatelessWidget {
 }
 
 class ListaProductosPedidos extends StatelessWidget {
-  ListaProductosPedidos({
+  const ListaProductosPedidos({
     Key? key,
     required this.navegacionModel,
     required this.itemPedidos,
   }) : super(key: key);
 
-  final NavegacionProvider navegacionModel;
+  final NavigationProvider navegacionModel;
   final List<Pedido> itemPedidos;
 
   @override
@@ -215,60 +229,77 @@ class ListaProductosPedidos extends StatelessWidget {
     final ancho = context.width;
     // ignore: unused_local_variable
     bool notaBar = false;
-    double resultPrecio = 0;
+    const double resultPrecio = 0;
 
     return Container(
       color: Colors.black,
-      margin: EdgeInsets.only(top: 140),
+      margin: const EdgeInsets.only(top: 140),
       child: ListView.builder(
         controller: navegacionModel.pageController,
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         itemCount: itemPedidos.length,
         itemBuilder: (_, int index) {
           itemPedidos.sort((a, b) {
             final nombreCmp = a.titulo!.compareTo(b.titulo!);
-            return nombreCmp != 0 ? nombreCmp : (a.modifiers ?? []).toString().compareTo((b.modifiers ?? []).toString());
+            return nombreCmp != 0
+                ? nombreCmp
+                : (a.modifiers ?? []).toString().compareTo(
+                    (b.modifiers ?? []).toString(),
+                  );
           });
 
           if (itemPedidos[index].nota != null) notaBar = true;
-          return (itemPedidos[index].estadoLinea != EstadoPedidoEnum.cocinado.name)
+          return (itemPedidos[index].estadoLinea !=
+                  EstadoPedidoEnum.cocinado.name)
               ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 2,
+                    vertical: 8,
+                  ),
                   child: Column(
                     children: [
-                      LineaProducto(itemPedidos: itemPedidos, index: index, resultPrecio: resultPrecio),
-                      if (itemPedidos[index].nota != null && itemPedidos[index].nota != '')
+                      LineaProducto(
+                        itemPedidos: itemPedidos,
+                        index: index,
+                        resultPrecio: resultPrecio,
+                      ),
+                      if (itemPedidos[index].nota != null &&
+                          itemPedidos[index].nota != '')
                         Container(
                           width: ancho,
-                          decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 255, 255, 255),
-                              borderRadius: BorderRadius.all(Radius.circular(5)),
-                              boxShadow: <BoxShadow>[BoxShadow(color: Colors.black, blurRadius: 5, spreadRadius: 0)]),
+                          decoration: const BoxDecoration(
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            boxShadow: <BoxShadow>[BoxShadow(blurRadius: 5)],
+                          ),
                           child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.note_alt_outlined,
-                                    size: 20,
-                                    color: Colors.red,
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.note_alt_outlined,
+                                  size: 20,
+                                  color: Colors.red,
+                                ),
+                                Text(
+                                  ' ${itemPedidos[index].nota}',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  textAlign: TextAlign.left,
+                                  style: GoogleFonts.notoSans(
+                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                    fontSize: (ancho > 450) ? 22 : 18,
+                                    fontWeight: FontWeight.w500,
                                   ),
-                                  Text(' ${itemPedidos[index].nota}',
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      textAlign: TextAlign.left,
-                                      style: GoogleFonts.notoSans(
-                                        color: const Color.fromARGB(255, 0, 0, 0),
-                                        fontSize: (ancho > 450) ? 22 : 18,
-                                        fontWeight: FontWeight.w500,
-                                      )),
-                                ],
-                              )),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                     ],
                   ),
                 )
-              : SizedBox.shrink();
+              : const SizedBox.shrink();
         },
       ),
     );
@@ -301,33 +332,41 @@ class LineaProducto extends StatelessWidget {
     final String listSelName;
 
     final bool enMarcha = itemPedidos[index].enMarcha;
-    final Color marchando = enMarcha ? const Color.fromARGB(255, 7, 255, 19) : Colors.white;
+    final Color marchando = enMarcha
+        ? const Color.fromARGB(255, 7, 255, 19)
+        : Colors.white;
 
     listSelCant = itemPedidos[index].cantidad;
     listSelName = itemPedidos[index].titulo ?? '';
     envioProd = itemPedidos[index].envio;
-    hora = (itemPedidos[index].hora.isNotEmpty) ? itemPedidos[index].hora.split(':').sublist(0, 2).join(':') : "--:--";
+    hora = (itemPedidos[index].hora.isNotEmpty)
+        ? itemPedidos[index].hora.split(':').sublist(0, 2).join(':')
+        : '--:--';
     pedidoNum = itemPedidos[index].numPedido;
     mesaVar = itemPedidos[index].mesa;
 
     return GestureDetector(
       onTap: () {
         context.read<ListenerBloc>().add(
-              ListenerEvent.updateEnMarchaPedido(
-                mesa: itemPedidos[index].mesa,
-                idPedido: itemPedidos[index].id,
-                enMarcha: !enMarcha,
-              ),
-            );
+          ListenerEvent.updateEnMarchaPedido(
+            mesa: itemPedidos[index].mesa,
+            idPedido: itemPedidos[index].id,
+            enMarcha: !enMarcha,
+          ),
+        );
       },
       child: Column(
         children: [
           Container(
             width: ancho,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(100)),
               boxShadow: <BoxShadow>[
-                BoxShadow(color: Colors.black54, blurRadius: 5, spreadRadius: -5),
+                BoxShadow(
+                  color: Colors.black54,
+                  blurRadius: 5,
+                  spreadRadius: -5,
+                ),
               ],
             ),
             child: PedidoDismissible(

@@ -4,7 +4,7 @@ import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 void main() {
   group('Pedido', () {
     test('constructor debe crear correctamente un Pedido con datos requeridos', () {
-      final pedido = Pedido(
+      const pedido = Pedido(
         cantidad: 2,
         fecha: '2025-06-25',
         hora: '12:30',
@@ -31,51 +31,51 @@ void main() {
 
     test('fromJson y toJson deben funcionar correctamente', () {
       final json = {
-        "cantidad": 1,
-        "categoriaProducto": "Bebidas",
-        "fecha": "2025-06-25",
-        "hora": "13:00",
-        "titulo": "Agua Mineral",
-        "precioProducto": 1.5,
-        "mesa": "3B",
-        "numPedido": 202,
-        "idProducto": "prod_002",
-        "estadoLinea": "servido",
-        "nota": "sin hielo",
-        "orden": 2,
-        "envio": "cocina",
-        "fechaHora": "2025-06-25T13:00:00.000",
-        "id": "ped_002",
-        "enMarcha": true,
-        "modifiers": [
+        'cantidad': 1,
+        'categoriaProducto': 'Bebidas',
+        'fecha': '2025-06-25',
+        'hora': '13:00',
+        'titulo': 'Agua Mineral',
+        'precioProducto': 1.5,
+        'mesa': '3B',
+        'numPedido': 202,
+        'idProducto': 'prod_002',
+        'estadoLinea': 'servido',
+        'nota': 'sin hielo',
+        'orden': 2,
+        'envio': 'cocina',
+        'fechaHora': '2025-06-25T13:00:00.000',
+        'id': 'ped_002',
+        'enMarcha': true,
+        'modifiers': [
           {
-            "name": "Limón",
-            "increment": 0.5,
-            "mainProduct": "Agua Mineral",
+            'name': 'Limón',
+            'increment': 0.5,
+            'mainProduct': 'Agua Mineral',
           }
         ],
-        "racion": true,
+        'racion': true,
       };
 
       final pedido = Pedido.fromJson(json);
 
-      expect(pedido.categoriaProducto, "Bebidas");
+      expect(pedido.categoriaProducto, 'Bebidas');
       expect(pedido.precioProducto, 1.5);
-      expect(pedido.estadoLinea, "servido");
+      expect(pedido.estadoLinea, 'servido');
       expect(pedido.orden, 2);
-      expect(pedido.envio, "cocina");
+      expect(pedido.envio, 'cocina');
       expect(pedido.enMarcha, true);
-      expect(pedido.fechaHora, DateTime.parse("2025-06-25T13:00:00.000"));
-      expect(pedido.modifiers?.first.name, "Limón");
+      expect(pedido.fechaHora, DateTime.parse('2025-06-25T13:00:00.000'));
+      expect(pedido.modifiers?.first.name, 'Limón');
       expect(pedido.racion, true);
 
       final serialized = pedido.toJson();
-      expect(serialized["titulo"], "Agua Mineral");
-      expect(serialized["modifiers"], isA<List>());
+      expect(serialized['titulo'], 'Agua Mineral');
+      expect(serialized['modifiers'], isA<List>());
     });
 
     test('modifiers debe permitir null o lista vacía', () {
-      final pedido1 = Pedido(
+      const pedido1 = Pedido(
         cantidad: 1,
         fecha: '2025-06-25',
         hora: '14:00',
@@ -84,7 +84,6 @@ void main() {
         idProducto: 'prod_003',
         estadoLinea: 'en espera',
         id: 'ped_003',
-        modifiers: null,
       );
 
       final pedido2 = pedido1.copyWith(modifiers: []);

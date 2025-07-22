@@ -4,12 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:qribar_cocina/data/data_sources/local/localization_local_datasource_contract.dart';
 import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
+import 'package:qribar_cocina/features/app/cubit/language_cubit_impl.dart';
 import 'package:qribar_cocina/shared/utils/language_dropdown.dart';
 
 import '../../../../helpers/pump_app.dart';
 
 // Mock
-class MockLocalizationDataSource extends Mock implements LocalizationLocalDataSourceContract {}
+class MockLocalizationDataSource extends Mock
+    implements LocalizationLocalDataSourceContract {}
 
 void main() {
   late MockLocalizationDataSource mockLocalization;
@@ -19,20 +21,24 @@ void main() {
     mockLocalization = MockLocalizationDataSource();
 
     when(() => mockLocalization.getCachedLocalLanguageCode()).thenReturn('es');
-    when(() => mockLocalization.cacheLocalLanguageCode(any())).thenAnswer((_) async {});
+    when(
+      () => mockLocalization.cacheLocalLanguageCode(any()),
+    ).thenAnswer((_) async {});
 
-    languageCubit = LanguageCubit(mockLocalization);
+    languageCubit = LanguageCubitImpl(mockLocalization);
   });
 
-  testWidgets('LanguageDropdown muestra y cambia el idioma correctamente', (tester) async {
+  testWidgets('LanguageDropdown muestra y cambia el idioma correctamente', (
+    tester,
+  ) async {
     await tester.pumpApp(
       const LanguageDropdown(),
       repositories: [
-        RepositoryProvider<LocalizationLocalDataSourceContract>.value(value: mockLocalization),
+        RepositoryProvider<LocalizationLocalDataSourceContract>.value(
+          value: mockLocalization,
+        ),
       ],
-      blocs: [
-        BlocProvider<LanguageCubit>.value(value: languageCubit),
-      ],
+      blocs: [BlocProvider<LanguageCubit>.value(value: languageCubit)],
     );
 
     // Verifica idioma predeterminado

@@ -11,7 +11,8 @@ class Modifier with _$Modifier {
     @Default('') String mainProduct,
   }) = _Modifier;
 
-  factory Modifier.fromJson(Map<String, dynamic> json) => _$ModifierFromJson(json);
+  factory Modifier.fromJson(Map<String, dynamic> json) =>
+      _$ModifierFromJson(json);
 }
 
 extension ModifierMapper on Modifier {

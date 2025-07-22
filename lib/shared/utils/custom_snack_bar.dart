@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:qribar_cocina/app/const/app_colors.dart';
 import 'package:qribar_cocina/app/const/app_sizes.dart';
 import 'package:qribar_cocina/app/const/globals.dart';
 import 'package:qribar_cocina/app/enums/snack_bar_enum.dart';
 
-
-class CustomSnackBar extends StatefulWidget {
+/// A final [StatefulWidget] that displays a custom, dismissible snack bar
+/// at the top of the screen.
+///
+/// It supports different types (success, error, warning, info) and
+/// provides an animated slide-in/slide-out effect.
+final class CustomSnackBar extends StatefulWidget {
+  /// The message to be displayed in the snack bar.
   final String message;
+
+  /// The type of snack bar, determining its icon and color.
   final SnackBarType type;
+
+  /// The duration for which the snack bar is displayed.
   final Duration duration;
+
+  /// Optional callback invoked when the snack bar is dismissed.
   final VoidCallback? onDismissed;
 
+  /// Creates a constant instance of [CustomSnackBar].
   const CustomSnackBar({
     super.key,
     required this.message,
@@ -18,39 +31,42 @@ class CustomSnackBar extends StatefulWidget {
     this.onDismissed,
   });
 
+  /// Displays a [CustomSnackBar] at the top of the current overlay.
+  ///
+  /// [message]: The text message to show.
+  /// [type]: The type of snack bar (defaults to warning).
+  /// [duration]: How long the snack bar should be visible (defaults to 4 seconds).
   static void show(
     String message, {
     SnackBarType type = SnackBarType.warning,
     Duration duration = const Duration(seconds: 4),
   }) {
-    final overlayState = Globals.navigatorKey.currentState?.overlay;
+    final OverlayState? overlayState =
+        Globals.navigatorKey.currentState?.overlay;
     if (overlayState == null) {
-      return;
+      return; // Cannot show snack bar if overlay is not available.
     }
 
     late OverlayEntry overlayEntry;
     bool dismissedManually = false;
 
     overlayEntry = OverlayEntry(
-      builder: (context) => Stack(
-        children: [
-          CustomSnackBar(
-            message: message,
-            type: type,
-            duration: duration,
-            onDismissed: () {
-              dismissedManually = true;
-              if (overlayEntry.mounted) {
-                overlayEntry.remove();
-              }
-            },
-          ),
-        ],
+      builder: (context) => CustomSnackBar(
+        message: message,
+        type: type,
+        duration: duration,
+        onDismissed: () {
+          dismissedManually = true;
+          if (overlayEntry.mounted) {
+            overlayEntry.remove();
+          }
+        },
       ),
     );
 
     overlayState.insert(overlayEntry);
 
+    // Schedule automatic dismissal after the specified duration.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(duration, () {
         if (!dismissedManually && overlayEntry.mounted) {
@@ -64,11 +80,14 @@ class CustomSnackBar extends StatefulWidget {
   State<CustomSnackBar> createState() => _CustomSnackBarState();
 }
 
-class _CustomSnackBarState extends State<CustomSnackBar> with SingleTickerProviderStateMixin {
+/// The state class for [CustomSnackBar], managing its animation and dismissal.
+final class _CustomSnackBarState extends State<CustomSnackBar>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<Offset> _offsetAnimation;
   late final Key _dismissibleKey;
 
+  // Pre-calculated decorations and styles for performance.
   late final BoxDecoration _boxDecoration;
   late final TextStyle _textStyle;
 
@@ -84,17 +103,18 @@ class _CustomSnackBarState extends State<CustomSnackBar> with SingleTickerProvid
     );
 
     _offsetAnimation = Tween<Offset>(
-      begin: const Offset(0.0, -1.0),
-      end: Offset.zero,
+      begin: const Offset(0.0, -1.0), // Starts above the screen
+      end: Offset.zero, // Slides to its final position
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
+    // Initialize decoration and text style based on widget properties.
     _boxDecoration = BoxDecoration(
       color: widget.type.color.withAlpha((0.1 * 255).round()),
       border: Border.all(color: widget.type.color, width: 2),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppSizes.p12),
       boxShadow: const [
         BoxShadow(
-          color: Colors.black26,
+          color: AppColors.blackSoft2,
           blurRadius: 8,
           offset: Offset(0, 2),
         ),
@@ -102,20 +122,24 @@ class _CustomSnackBarState extends State<CustomSnackBar> with SingleTickerProvid
     );
 
     _textStyle = const TextStyle(
-      color: Color.fromARGB(221, 255, 255, 255),
+      color: AppColors.onPrimary,
       fontSize: 16,
       fontWeight: FontWeight.w500,
     );
 
-    _controller.forward();
+    _controller.forward(); // Start the slide-in animation
   }
 
+  /// Handles the dismissal of the snack bar.
+  ///
+  /// [triggeredByDismissible]: True if dismissal was initiated by the Dismissible widget.
   void _dismissSnackBar({bool triggeredByDismissible = false}) {
     if (triggeredByDismissible) {
-      widget.onDismissed?.call();
+      widget.onDismissed?.call(); // Call the external onDismissed callback
       return;
     }
 
+    // Reverse the animation for slide-out effect, then call onDismissed.
     _controller.reverse().then((_) {
       if (mounted) {
         widget.onDismissed?.call();
@@ -126,19 +150,18 @@ class _CustomSnackBarState extends State<CustomSnackBar> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: MediaQuery.of(context).viewPadding.top + 16,
-      left: 16,
-      right: 16,
+      top: MediaQuery.of(context).viewPadding.top + AppSizes.p16,
+      left: AppSizes.p16,
+      right: AppSizes.p16,
       child: SlideTransition(
         position: _offsetAnimation,
         child: Dismissible(
           key: _dismissibleKey,
-          direction: DismissDirection.horizontal,
           onDismissed: (_) => _dismissSnackBar(triggeredByDismissible: true),
           child: Material(
             color: Colors.transparent,
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSizes.p16),
               decoration: _boxDecoration,
               child: Row(
                 children: [
@@ -152,7 +175,11 @@ class _CustomSnackBarState extends State<CustomSnackBar> with SingleTickerProvid
                   ),
                   GestureDetector(
                     onTap: _dismissSnackBar,
-                    child: const Icon(Icons.close, size: 20, color: Colors.white),
+                    child: const Icon(
+                      Icons.close,
+                      size: 20,
+                      color: AppColors.onPrimary,
+                    ),
                   ),
                 ],
               ),

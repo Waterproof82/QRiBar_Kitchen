@@ -1,38 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:qribar_cocina/app/const/app_sizes.dart';
+import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/auth_background.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/login_container.dart';
-import 'package:qribar_cocina/shared/utils/language_dropdown.dart';
 import 'package:qribar_cocina/features/login/presentation/widgets/login_form.dart';
+import 'package:qribar_cocina/shared/utils/language_dropdown.dart';
 
-// ...existing imports...
+/// A final [StatelessWidget] representing the login screen of the application.
+/// It provides a visual background, a language selection dropdown,
+/// and embeds the [LoginForm] within a styled container.
+final class LoginScreen extends StatelessWidget {
+  /// Creates a constant instance of [LoginScreen].
+  const LoginScreen({super.key});
 
-class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
+      // The background for the authentication screen.
       body: AuthBackground(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Flexible(child: LanguageDropdown()),
-                ],
+                children: [Flexible(child: LanguageDropdown())],
               ),
               Gap.h248,
+              // Container for the login form with a card-like style.
               LoginContainer(
+                // Use const for LoginContainer
                 child: Column(
                   children: [
                     Gap.h10,
-                    Text('Login', style: Theme.of(context).textTheme.headlineMedium),
+                    // Login title.
+                    Text(
+                      l10n.login,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     Gap.h24,
-                    LoginForm(),
+                    const LoginForm(),
                   ],
                 ),
               ),
-              Gap.h48
+              Gap.h48, // Vertical spacing
             ],
           ),
         ),

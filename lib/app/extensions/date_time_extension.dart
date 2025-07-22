@@ -7,19 +7,6 @@ import 'package:intl/intl.dart';
 /// dates in different ways, including ISO 8601 format, UTC format, local format,
 /// custom format, and conversion to epoch and Unix timestamp.
 ///
-/// Example Usage:
-/// ```dart
-/// DateTime now = DateTime.now();
-/// String iso8601 = now.toIso8601; // ISO 8601 format
-/// String utcFormat = now.toUtcFormat; // UTC format
-/// String localFormat = now.toLocalFormat; // Local format
-/// String customFormat = now.toCustomFormat(context, dateFormat: 'dd/MM/yyyy');
-/// int epoch = now.toEpoch; // Epoch time
-/// int unixTimestamp = now.toUnixTimestamp; // Unix timestamp
-/// ```
-///
-/// See also:
-///
 ///  * [DateTime], the class on which this extension is based.
 ///  * [DateFormat], from the intl package, used for custom date formatting.
 extension DateTimeExtension on DateTime {
@@ -51,7 +38,9 @@ extension DateTimeExtension on DateTime {
 
   /// Combines the current date with a specific time string (e.g., 'HH:mm:ss').
   static DateTime combineNowWithTime(String time) {
-    final datePart = DateFormat('yyyy-MM-dd').format(DateTime.now()); // Extract today's date
+    final datePart = DateFormat(
+      'yyyy-MM-dd',
+    ).format(DateTime.now()); // Extract today's date
     return DateTime.parse('$datePart $time'); // Combine date and time
   }
 

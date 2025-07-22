@@ -9,7 +9,8 @@ import 'package:qribar_cocina/data/repositories/remote/listener_repository_impl.
 
 class MockFirebaseDatabase extends Mock implements FirebaseDatabase {}
 
-class MockListenersRemoteDataSourceContract extends Mock implements ListenersRemoteDataSourceContract {}
+class MockListenersRemoteDataSourceContract extends Mock
+    implements ListenersRemoteDataSourceContract {}
 
 class MockDatabaseReference extends Mock implements DatabaseReference {}
 
@@ -35,52 +36,61 @@ void main() {
   });
 
   group('initializeListeners', () {
-    test('debe ejecutar todos los listeners y devolver Result.success', () async {
-      when(() => mockDataSource.addProduct()).thenAnswer((_) async {});
-      when(() => mockDataSource.addCategoriaMenu()).thenAnswer((_) async {});
-      when(() => mockDataSource.changeCategoriaMenu()).thenAnswer((_) async {});
-      when(() => mockDataSource.addSalaMesas()).thenAnswer((_) async {});
-      when(() => mockDataSource.addAndChangedPedidos()).thenAnswer((_) async {});
-      when(() => mockDataSource.removePedidos()).thenAnswer((_) async {});
+    test(
+      'debe ejecutar todos los listeners y devolver Result.success',
+      () async {
+        when(() => mockDataSource.addProduct()).thenAnswer((_) async {});
+        when(() => mockDataSource.addCategoriaMenu()).thenAnswer((_) async {});
+        when(() => mockDataSource.addSalaMesas()).thenAnswer((_) async {});
+        when(
+          () => mockDataSource.addAndChangedPedidos(),
+        ).thenAnswer((_) async {});
+        when(() => mockDataSource.removePedidos()).thenAnswer((_) async {});
 
-      final result = await repository.initializeListeners();
+        final result = await repository.initializeListeners();
 
-      expect(result, isA<Success<void>>());
-      expect((result as Success).data, isNull);
+        expect(result, isA<Success<void>>());
+        expect((result as Success).data, isNull);
 
-      verifyInOrder([
-        () => mockDataSource.addProduct(),
-        () => mockDataSource.addCategoriaMenu(),
-        () => mockDataSource.changeCategoriaMenu(),
-        () => mockDataSource.addSalaMesas(),
-        () => mockDataSource.addAndChangedPedidos(),
-        () => mockDataSource.removePedidos(),
-      ]);
-    });
+        verifyInOrder([
+          () => mockDataSource.addProduct(),
+          () => mockDataSource.addCategoriaMenu(),
+          () => mockDataSource.addSalaMesas(),
+          () => mockDataSource.addAndChangedPedidos(),
+          () => mockDataSource.removePedidos(),
+        ]);
+      },
+    );
 
-    test('debe capturar errores y devolver Result.failure con RepositoryError', () async {
-      when(() => mockDataSource.addProduct()).thenThrow(Exception('Error'));
+    test(
+      'debe capturar errores y devolver Result.failure con RepositoryError',
+      () async {
+        when(() => mockDataSource.addProduct()).thenThrow(Exception('Error'));
 
-      final result = await repository.initializeListeners();
+        final result = await repository.initializeListeners();
 
-      expect(result, isA<Failure<void>>());
-      final failure = result as Failure<void>;
-      expect(failure.error, isA<RepositoryError>());
-    });
+        expect(result, isA<Failure<void>>());
+        final failure = result as Failure<void>;
+        expect(failure.error, isA<RepositoryError>());
+      },
+    );
   });
 
   group('updateEstadoPedido', () {
-    test('actualiza correctamente estado_linea y devuelve Result.success', () async {
-      final result = await repository.updateEstadoPedido(
-        mesa: 'mesa1',
-        idPedido: 'pedido123',
-        nuevoEstado: 'listo',
-      );
+    test(
+      'actualiza correctamente estado_linea y devuelve Result.success',
+      () async {
+        final result = await repository.updateEstadoPedido(
+          mesa: 'mesa1',
+          idPedido: 'pedido123',
+          nuevoEstado: 'listo',
+        );
 
-      expect(result, isA<Success<void>>());
-      expect((result as Success).data, isNull);
-      verify(() => mockRef.update({'estado_linea': 'listo'})).called(1);
-    });
+        expect(result, isA<Success<void>>());
+        expect((result as Success).data, isNull);
+        verify(() => mockRef.update({'estado_linea': 'listo'})).called(1);
+      },
+    );
 
     test('devuelve Result.failure si falla actualización', () async {
       when(() => mockRef.update(any())).thenThrow(Exception('Error Firebase'));
@@ -98,17 +108,20 @@ void main() {
   });
 
   group('updateEnMarchaPedido', () {
-    test('actualiza correctamente en_marcha y devuelve Result.success', () async {
-      final result = await repository.updateEnMarchaPedido(
-        mesa: 'mesa1',
-        idPedido: 'pedido456',
-        enMarcha: true,
-      );
+    test(
+      'actualiza correctamente en_marcha y devuelve Result.success',
+      () async {
+        final result = await repository.updateEnMarchaPedido(
+          mesa: 'mesa1',
+          idPedido: 'pedido456',
+          enMarcha: true,
+        );
 
-      expect(result, isA<Success<void>>());
-      expect((result as Success).data, isNull);
-      verify(() => mockRef.update({'en_marcha': true})).called(1);
-    });
+        expect(result, isA<Success<void>>());
+        expect((result as Success).data, isNull);
+        verify(() => mockRef.update({'en_marcha': true})).called(1);
+      },
+    );
 
     test('devuelve Result.failure si falla actualización', () async {
       final idBarDataSource = IdBarDataSource.instance;
@@ -128,7 +141,12 @@ void main() {
       expect(() => idBarDataSource.idBar, throwsA(isA<StateError>()));
       expect(
         () => idBarDataSource.idBar,
-        throwsA(predicate((e) => e is StateError && e.message == 'idBar no ha sido inicializado')),
+        throwsA(
+          predicate(
+            (e) =>
+                e is StateError && e.message == 'idBar no ha sido inicializado',
+          ),
+        ),
       );
     });
   });
@@ -136,9 +154,5 @@ void main() {
   test('dispose llama correctamente a dispose del dataSource', () {
     repository.dispose();
     verify(() => mockDataSource.dispose()).called(1);
-  });
-
-  test('debe devolver la instancia correcta de dataSource', () {
-    expect(repository.dataSource, equals(mockDataSource));
   });
 }

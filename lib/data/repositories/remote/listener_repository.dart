@@ -1,17 +1,22 @@
-abstract class ListenerRepository {
-  Future<void> initializeListeners();
+import 'package:qribar_cocina/app/types/result.dart';
+import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 
-  Future<void> updateEstadoPedido({
+abstract class ListenerRepository {
+  Stream<ListenerEvent> get eventsStream;
+
+  Future<Result<void>> initializeListeners();
+
+  Future<Result<void>> updateEstadoPedido({
     required String mesa,
     required String idPedido,
     required String nuevoEstado,
   });
 
-  Future<void> updateEnMarchaPedido({
+  Future<Result<void>> updateEnMarchaPedido({
     required String mesa,
     required String idPedido,
     required bool enMarcha,
   });
 
-  void dispose();
+  Future<void> dispose();
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:qribar_cocina/app/types/errors/network_error.dart';
 
@@ -5,7 +7,8 @@ part 'repository_error.freezed.dart';
 
 @freezed
 class RepositoryError with _$RepositoryError {
-  const factory RepositoryError.badRequestListErrors(List<String> listErrors) = BadRequestListErrors;
+  const factory RepositoryError.badRequestListErrors(List<String> listErrors) =
+      BadRequestListErrors;
 
   const factory RepositoryError.securityError() = SecurityError;
 
@@ -23,7 +26,8 @@ class RepositoryError with _$RepositoryError {
 
   const factory RepositoryError.infoNotMatching() = InfoNotMatching;
 
-  const factory RepositoryError.listErrors(List<String> errorList) = ListErrorsM;
+  const factory RepositoryError.listErrors(List<String> errorList) =
+      ListErrorsM;
 
   const factory RepositoryError.userNotFound() = UserNotFound;
 
@@ -31,7 +35,8 @@ class RepositoryError with _$RepositoryError {
 
   static RepositoryError fromDataSourceError(NetworkError error) {
     return error.maybeWhen(
-      badRequestListErrors: (errors) => RepositoryError.badRequestListErrors(errors),
+      badRequestListErrors: (errors) =>
+          RepositoryError.badRequestListErrors(errors),
       infoNotMatching: RepositoryError.infoNotMatching,
       badRequest: () => const RepositoryError.badRequest(),
       forbidden: () => const RepositoryError.noAccess(),
@@ -58,7 +63,7 @@ class RepositoryError with _$RepositoryError {
   static RepositoryError fromFirebaseAuthError(String errorCode) {
     final error = _firebaseAuthErrorMap[errorCode];
     if (error == null) {
-      print('[FirebaseAuth] Código desconocido: $errorCode');
+      log('[FirebaseAuth] Código desconocido: $errorCode');
     }
     return error ?? const RepositoryError.badRequest();
   }

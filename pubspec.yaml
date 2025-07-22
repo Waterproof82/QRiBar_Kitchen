@@ -1,7 +1,7 @@
 name: qribar_cocina
 description: Tu carta digital inteligente.
 publish_to: 'none'  # Prevent publishing to pub.dev
-version: 1.6.0+4
+version: 1.6.1+1
 
 environment:
   sdk: ">=3.8.0 <4.0.0"  # Dart SDK version constraint
@@ -19,6 +19,9 @@ dependencies:
   # --- State Management ---
   flutter_bloc: ^9.1.1            # BLoC pattern for state management
   provider: ^6.1.4                # Provider for dependency injection & state
+  
+  # --- Routes Management ---
+  go_router: ^16.0.0
 
   # --- UI and Fonts ---
   flutter_svg: ^2.1.0             # SVG rendering support
@@ -33,12 +36,15 @@ dependencies:
 
   # --- Permissions ---
   permission_handler: ^12.0.0+1   # Handling permissions (camera, storage, etc.)
+  local_auth: ^2.1.8              # Local authentication (fingerprint, face ID)
+  local_auth_android: ^1.0.50
 
   # --- Local Storage ---
   shared_preferences: ^2.5.3      # Key-value local storage
+  flutter_secure_storage: ^9.2.4
 
   # --- Utilities ---
-  freezed_annotation: ^2.4.1      # Annotations for freezed code generation
+  freezed_annotation: ^3.1.0      # Annotations for freezed code generation
   get_it: ^8.0.3                  # Service locator for dependency injection
   wakelock_plus: ^1.2.10          # Prevent screen from sleeping
 
@@ -52,9 +58,9 @@ dev_dependencies:
     sdk: flutter                 # Flutter's test framework
 
   # --- Code generation ---
-  build_runner: ^2.4.6           # Run code generators
-  freezed: ^2.4.5                # Code generation for immutable classes and unions
-  json_serializable: ^6.9.0      # JSON serialization generator
+  build_runner: ^2.6.0           # Run code generators
+  freezed: ^3.2.0                # Code generation for immutable classes and unions
+  json_serializable: ^6.10.0      # JSON serialization generator
 
   # --- Testing & Mocking ---
   bloc_test: ^10.0.0             # Utilities for testing BLoCs

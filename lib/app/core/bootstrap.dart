@@ -3,10 +3,10 @@ import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
+import 'package:qribar_cocina/app/config/di.dart';
 import 'package:qribar_cocina/app/types/errors/network_error.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/app/types/result.dart';
-import 'package:qribar_cocina/app/config/di.dart';
 
 /// A [BlocObserver] which observes all [Bloc] state changes.
 class AppBlocObserver extends BlocObserver {
@@ -44,9 +44,7 @@ Future<Result<void>> bootstrap(FutureOr<Widget> Function() builder) async {
   } catch (e, stackTrace) {
     log('Error during app bootstrap: $e', stackTrace: stackTrace);
     return Result.failure(
-      error: RepositoryError.fromDataSourceError(
-        NetworkError.fromException(e),
-      ),
+      error: RepositoryError.fromDataSourceError(NetworkError.fromException(e)),
     );
   }
 }
