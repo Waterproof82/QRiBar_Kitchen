@@ -34,7 +34,14 @@ final class ListenerRepositoryImpl implements ListenerRepository {
   /// Retrieves the current `idBar` from [IdBarDataSource].
   ///
   /// This ID is crucial for constructing Firebase Realtime Database paths.
-  String get _idBar => IdBarDataSource.instance.idBar;
+  String get _idBar {
+    if (!IdBarDataSource.instance.hasIdBar) {
+      throw StateError(
+        'idBar no inicializado en ListenerRepositoryImpl',
+      ); // Lanzar error si no está listo
+    }
+    return IdBarDataSource.instance.idBar;
+  }
 
   @override
   Stream<ListenerEvent> get eventsStream => _dataSource.eventsStream;
@@ -55,12 +62,35 @@ final class ListenerRepositoryImpl implements ListenerRepository {
 
     try {
       log('🔄 [ListenerRepositoryImpl] Inicializando listeners...');
-      await _dataSource.addSalaMesas();
-      await _dataSource.addProduct();
-      await _dataSource.addCategoriaMenu();
+
+      final results = await Future.wait([
+        _dataSource.addSalaMesas(),
+        _dataSource.addProduct(),
+        _dataSource.addCategoriaMenu(),
+      ]);
+
+      // Check if any of the initial operations failed
+      for (final initialResult in results) {
+        if (initialResult case Failure<void>(error: final err)) {
+          log(
+            '❌ [ListenerRepositoryImpl] Fallo una de las cargas iniciales de datos: $err',
+            error: err,
+          );
+          return Result.failure(error: err);
+        }
+      }
+
+      log(
+        '✅ [ListenerRepositoryImpl] Datos iniciales (salas, productos, categorías) cargados.',
+      );
+
       await _dataSource.addAndChangedPedidos();
       await _dataSource.removePedidos();
-      log('✅ [ListenerRepositoryImpl] Listeners inicializados correctamente.');
+
+      log('✅ [ListenerRepositoryImpl] Listeners de pedidos configurados.');
+      log(
+        '✅ [ListenerRepositoryImpl] Todos los listeners inicializados correctamente.',
+      );
       return const Result.success(null);
     } catch (e, stackTrace) {
       log(

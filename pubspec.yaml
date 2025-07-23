@@ -45,6 +45,7 @@ dependencies:
 
   # --- Utilities ---
   freezed_annotation: ^3.1.0      # Annotations for freezed code generation
+  json_annotation: ^4.9.0         # 
   get_it: ^8.0.3                  # Service locator for dependency injection
   wakelock_plus: ^1.2.10          # Prevent screen from sleeping
 

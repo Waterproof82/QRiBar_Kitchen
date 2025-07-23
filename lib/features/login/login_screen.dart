@@ -18,7 +18,6 @@ final class LoginScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      // The background for the authentication screen.
       body: AuthBackground(
         child: SingleChildScrollView(
           child: Column(
@@ -30,7 +29,6 @@ final class LoginScreen extends StatelessWidget {
               Gap.h248,
               // Container for the login form with a card-like style.
               LoginContainer(
-                // Use const for LoginContainer
                 child: Column(
                   children: [
                     Gap.h10,

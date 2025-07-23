@@ -1,5 +1,5 @@
-import 'package:flutter/services.dart';
 import 'package:local_auth_android/local_auth_android.dart';
+import 'package:qribar_cocina/app/types/errors/network_error.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/features/biometric/data/data_sources/local/biometric_auth_data_source.dart';
@@ -21,25 +21,16 @@ final class BiometricAuthRepositoryImpl implements BiometricAuthRepository {
        _loginUseCase = loginUseCase;
 
   @override
-  Future<Result<bool>> canAuthenticateWithBiometrics() async {
-    try {
-      final bool canAuthenticate = await _biometricDataSource.canAuthenticate();
-      return Result.success(canAuthenticate);
-    } on PlatformException {
-      return const Result.failure(error: RepositoryError.securityError());
-    } catch (e) {
-      return const Result.failure(error: RepositoryError.serverError());
-    }
+  Future<Result<bool>> canAuthenticateWithBiometrics() {
+    return _biometricDataSource.canAuthenticate();
   }
 
   @override
   Future<Result<bool>> hasStoredCredentials() async {
     try {
-      final bool hasCredentials = await _secureStorageDataSource
-          .hasCredentials();
-      return Result.success(hasCredentials);
+      return Result.success(await _secureStorageDataSource.hasCredentials());
     } catch (e) {
-      return const Result.failure(error: RepositoryError.serverError());
+      return const Result.failure(error: RepositoryError.noStoredCredentials());
     }
   }
 
@@ -49,36 +40,46 @@ final class BiometricAuthRepositoryImpl implements BiometricAuthRepository {
     required AndroidAuthMessages androidAuthMessages,
   }) async {
     try {
-      final bool hasCreds = await _secureStorageDataSource.hasCredentials();
+      final hasCreds = await _secureStorageDataSource.hasCredentials();
       if (!hasCreds) {
         return const Result.failure(error: RepositoryError.badRequest());
       }
 
-      final bool didAuthenticate = await _biometricDataSource.authenticate(
+      final authResult = await _biometricDataSource.authenticate(
         localizedReason: localizedReason,
         androidAuthMessages: androidAuthMessages,
       );
 
-      if (!didAuthenticate) {
-        return const Result.failure(error: RepositoryError.securityError());
-      }
+      return await authResult.when(
+        success: (isAuthenticated) async {
+          if (!isAuthenticated) {
+            return const Result.failure(
+              error: RepositoryError.biometricAuthFailed(),
+            );
+          }
 
-      final String? email = await _secureStorageDataSource.getEmail();
-      final String? password = await _secureStorageDataSource.getPassword();
+          final email = await _secureStorageDataSource.getEmail();
+          final password = await _secureStorageDataSource.getPassword();
 
-      if (email == null ||
-          email.isEmpty ||
-          password == null ||
-          password.isEmpty) {
-        return const Result.failure(error: RepositoryError.infoNotMatching());
-      }
+          if (email == null ||
+              email.isEmpty ||
+              password == null ||
+              password.isEmpty) {
+            return const Result.failure(
+              error: RepositoryError.infoNotMatching(),
+            );
+          }
 
-      final loginResult = await _loginUseCase(email: email, password: password);
-      return loginResult;
-    } on PlatformException {
-      return const Result.failure(error: RepositoryError.securityError());
+          return _loginUseCase(email: email, password: password);
+        },
+        failure: (error) => Result.failure(error: error),
+      );
     } catch (e) {
-      return const Result.failure(error: RepositoryError.serverError());
+      return Result.failure(
+        error: RepositoryError.fromDataSourceError(
+          NetworkError.fromException(e),
+        ),
+      );
     }
   }
 
@@ -94,7 +95,7 @@ final class BiometricAuthRepositoryImpl implements BiometricAuthRepository {
       );
       return const Result.success(null);
     } catch (e) {
-      return const Result.failure(error: RepositoryError.serverError());
+      return const Result.failure(error: RepositoryError.securityError());
     }
   }
 
@@ -104,7 +105,7 @@ final class BiometricAuthRepositoryImpl implements BiometricAuthRepository {
       await _secureStorageDataSource.clearCredentials();
       return const Result.success(null);
     } catch (e) {
-      return const Result.failure(error: RepositoryError.serverError());
+      return const Result.failure(error: RepositoryError.securityError());
     }
   }
 }

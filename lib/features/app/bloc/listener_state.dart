@@ -1,7 +1,7 @@
 part of 'listener_bloc.dart';
 
 @freezed
-class ListenerState with _$ListenerState {
+sealed class ListenerState with _$ListenerState {
   const factory ListenerState.initial() = _Initial;
   const factory ListenerState.loading() = _Loading;
   const factory ListenerState.success() = _Success;
