@@ -4,7 +4,7 @@ import 'package:qribar_cocina/app/types/repository_error.dart';
 part 'login_form_state.freezed.dart';
 
 @freezed
-class LoginFormState with _$LoginFormState {
+sealed class LoginFormState with _$LoginFormState {
   const factory LoginFormState({
     @Default('') String email,
     @Default('') String password,

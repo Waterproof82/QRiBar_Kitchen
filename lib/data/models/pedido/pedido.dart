@@ -5,7 +5,7 @@ part 'pedido.freezed.dart';
 part 'pedido.g.dart';
 
 @freezed
-class Pedido with _$Pedido {
+sealed class Pedido with _$Pedido {
   const factory Pedido({
     required int cantidad,
     String? categoriaProducto,
@@ -18,7 +18,7 @@ class Pedido with _$Pedido {
     required String idProducto,
     required String estadoLinea,
     String? nota,
-    @Default(1) num orden,
+    @Default(1) int orden,
     @Default('barra') String envio,
     DateTime? fechaHora,
     required String id,

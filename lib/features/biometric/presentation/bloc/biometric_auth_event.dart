@@ -4,7 +4,7 @@ import 'package:local_auth_android/local_auth_android.dart';
 part 'biometric_auth_event.freezed.dart';
 
 @freezed
-abstract class BiometricAuthEvent with _$BiometricAuthEvent {
+sealed class BiometricAuthEvent with _$BiometricAuthEvent {
   /// Event to check initial biometric capabilities and stored credentials
   const factory BiometricAuthEvent.checkAvailabilityAndCredentials() =
       CheckAvailabilityAndCredentials;
