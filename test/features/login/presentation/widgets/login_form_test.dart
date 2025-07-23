@@ -16,17 +16,27 @@ import '../../../../helpers/pump_app.dart';
 
 class MockLoginFormBloc extends Mock implements LoginFormBloc {}
 
-class FakeLoginFormEvent extends Fake implements LoginFormEvent {}
+// You no longer need FakeLoginFormState! Remove this line:
+// class FakeLoginFormState extends Fake implements LoginFormState {}
 
-class FakeLoginFormState extends Fake implements LoginFormState {}
+// If LoginFormEvent is also sealed (which it should be if it has multiple factory constructors),
+// you'll need a concrete fake for it too.
+// For example, if you have an `EmailChanged` event:
+class _FakeEmailChanged extends Fake implements EmailChanged {}
 
 void main() {
   late MockLoginFormBloc mockBloc;
   late StreamController<LoginFormState> controller;
 
   setUpAll(() {
-    registerFallbackValue(FakeLoginFormEvent());
-    registerFallbackValue(FakeLoginFormState());
+    // For LoginFormEvent, you should register a concrete instance of one of its variants
+    // or a Fake of one of its concrete variants if it's also sealed.
+    // Assuming `EmailChanged` is a valid variant of LoginFormEvent:
+    registerFallbackValue(_FakeEmailChanged());
+
+    // This is the key change for LoginFormState:
+    // Register a concrete instance of LoginFormState using its factory constructor.
+    registerFallbackValue(const LoginFormState());
   });
 
   setUp(() {
@@ -46,7 +56,9 @@ void main() {
     await controller.close();
   });
 
-  testWidgets('LoginForm renders with 2 TextFormFields and a MaterialButton', (tester) async {
+  testWidgets('LoginForm renders with 2 TextFormFields and a MaterialButton', (
+    tester,
+  ) async {
     await tester.pumpApp(
       const LoginForm(),
       blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
@@ -57,7 +69,9 @@ void main() {
     expect(find.byType(MaterialButton), findsOneWidget);
   });
 
-  testWidgets('calls PasswordChanged when password field is modified', (tester) async {
+  testWidgets('calls PasswordChanged when password field is modified', (
+    tester,
+  ) async {
     await tester.pumpApp(
       const LoginForm(),
       blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
@@ -70,7 +84,9 @@ void main() {
     verify(() => mockBloc.add(const PasswordChanged('123456'))).called(1);
   });
 
-  testWidgets('calls EmailChanged when email field is modified', (tester) async {
+  testWidgets('calls EmailChanged when email field is modified', (
+    tester,
+  ) async {
     await tester.pumpApp(
       const LoginForm(),
       blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
@@ -80,10 +96,14 @@ void main() {
     final emailField = find.byType(TextFormField).at(0);
     await tester.enterText(emailField, 'test@example.com');
 
-    verify(() => mockBloc.add(const EmailChanged('test@example.com'))).called(1);
+    verify(
+      () => mockBloc.add(const EmailChanged('test@example.com')),
+    ).called(1);
   });
 
-  testWidgets('validator returns null if email format is valid', (tester) async {
+  testWidgets('validator returns null if email format is valid', (
+    tester,
+  ) async {
     await tester.pumpApp(
       const LoginForm(),
       blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
@@ -108,10 +128,8 @@ void main() {
       blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
     );
 
-    // Captura el context del LoginForm
     final context = tester.element(find.byType(LoginForm));
 
-    // Emitimos el estado con error
     controller.add(failureState);
 
     await tester.pump();
@@ -123,22 +141,25 @@ void main() {
     expect(find.text(translatedError), findsOneWidget);
   });
 
-  testWidgets('dispatches LoginSubmitted when form is valid and button tapped', (tester) async {
-    await tester.pumpApp(
-      const LoginForm(),
-      blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
-    );
-    await tester.pumpAndSettle();
+  testWidgets(
+    'dispatches LoginSubmitted when form is valid and button tapped',
+    (tester) async {
+      await tester.pumpApp(
+        const LoginForm(),
+        blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
+      );
+      await tester.pumpAndSettle();
 
-    final emailField = find.byType(TextFormField).at(0);
-    final passwordField = find.byType(TextFormField).at(1);
-    final submitButton = find.byType(MaterialButton);
+      final emailField = find.byType(TextFormField).at(0);
+      final passwordField = find.byType(TextFormField).at(1);
+      final submitButton = find.byType(MaterialButton);
 
-    await tester.enterText(emailField, 'test@example.com');
-    await tester.enterText(passwordField, '12345678');
-    await tester.tap(submitButton);
-    await tester.pump();
+      await tester.enterText(emailField, 'test@example.com');
+      await tester.enterText(passwordField, '12345678');
+      await tester.tap(submitButton);
+      await tester.pump();
 
-    verify(() => mockBloc.add(const LoginSubmitted())).called(1);
-  });
+      verify(() => mockBloc.add(const LoginSubmitted())).called(1);
+    },
+  );
 }
