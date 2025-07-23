@@ -5,7 +5,7 @@ part 'result.freezed.dart';
 
 // Annotating the 'Result' class with '@freezed' to generate the necessary boilerplate code.
 @freezed
-class Result<T> with _$Result<T> {
+sealed class Result<T> with _$Result<T> {
   // Factory constructor for representing a failure.
   // Takes an instance of 'RepositoryError' as a required parameter.
   const factory Result.failure({required RepositoryError error}) = Failure<T>;
