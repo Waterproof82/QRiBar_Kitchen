@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qribar_cocina/app/types/errors/network_error.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
+import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/biometric/domain/use_cases/authenticate_biometric_use_case.dart';
 import 'package:qribar_cocina/features/biometric/domain/use_cases/clear_biometric_credentials_use_case.dart';

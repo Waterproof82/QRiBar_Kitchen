@@ -1,7 +1,7 @@
 part of 'listener_bloc.dart';
 
 @freezed
-class ListenerEvent with _$ListenerEvent {
+sealed class ListenerEvent with _$ListenerEvent {
   const factory ListenerEvent.startListening() = _StartListening;
 
   const factory ListenerEvent.productos(List<Product> productos) = _Productos;

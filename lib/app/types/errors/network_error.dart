@@ -7,7 +7,7 @@ import 'package:qribar_cocina/app/types/errors/network_error_utils.dart';
 part 'network_error.freezed.dart';
 
 @freezed
-class NetworkError with _$NetworkError {
+sealed class NetworkError with _$NetworkError {
   const factory NetworkError.badRequest() = _BadRequest;
 
   const factory NetworkError.badRequestListErrors(List<String> listErrors) =
@@ -50,6 +50,12 @@ class NetworkError with _$NetworkError {
   const factory NetworkError.mockNotFoundError() = _MockNotFoundError;
 
   const factory NetworkError.infoNotMatching() = _InfoNotMatching;
+
+  // Biometrics
+  const factory NetworkError.noStoredCredentials() = _NoStoredCredentials;
+  const factory NetworkError.biometricAuthFailed() = _BiometricAuthFailed;
+  const factory NetworkError.biometricHardwareUnavailable() =
+      _BiometricHardwareUnavailable;
 
   static NetworkError fromException(error) {
     try {

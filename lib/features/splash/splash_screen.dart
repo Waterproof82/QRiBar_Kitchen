@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +14,8 @@ import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.d
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 import 'package:qribar_cocina/shared/utils/svg_loader.dart';
+
+part 'helpers/splash_helpers.dart';
 
 final class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -146,58 +146,5 @@ final class SplashState extends State<Splash>
         ),
       ),
     );
-  }
-
-  Future<void> _checkSessionAndNavigate(BuildContext context) async {
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) return;
-
-    final User? user = FirebaseAuth.instance.currentUser;
-    final biometricAuthBloc = context.read<BiometricAuthBloc>();
-
-    final bool canAuthenticate = await biometricAuthBloc
-        .canAuthenticateWithBiometrics();
-    final bool hasStoredCredentials = await biometricAuthBloc
-        .hasStoredCredentials();
-        
-    final l10n = AppLocalizations.of(context);
-
-    final String localizedReason = l10n.localizedReasonBiometricLogin;
-
-    final authMessages = AndroidAuthMessages(
-      signInTitle: l10n.signInTitle,
-      cancelButton: l10n.cancelButton,
-      biometricHint: l10n.biometricHint,
-      biometricNotRecognized: l10n.biometricNotRecognized,
-      biometricSuccess: l10n.biometricSuccess,
-      goToSettingsButton: l10n.goToSettingsButton,
-      goToSettingsDescription: l10n.goToSettingsDescription,
-    );
-
-    if (user != null) {
-      if (canAuthenticate && hasStoredCredentials) {
-        biometricAuthBloc.add(
-          BiometricAuthEvent.authenticateForSession(
-            localizedReason: localizedReason,
-            androidAuthMessages: authMessages,
-          ),
-        );
-      } else {
-        context.read<LoginFormBloc>().add(
-          const LoginFormEvent.sessionRestored(),
-        );
-      }
-    } else {
-      if (canAuthenticate && hasStoredCredentials) {
-        biometricAuthBloc.add(
-          BiometricAuthEvent.authenticateAndLogin(
-            localizedReason: localizedReason,
-            androidAuthMessages: authMessages,
-          ),
-        );
-      } else {
-        context.goTo(AppRoute.login);
-      }
-    }
   }
 }

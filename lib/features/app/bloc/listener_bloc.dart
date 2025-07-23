@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:qribar_cocina/app/types/errors/network_error.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
+import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/data/models/categoria_producto.dart';
 import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/models/product.dart';

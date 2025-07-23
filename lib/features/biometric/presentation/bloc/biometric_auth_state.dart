@@ -4,7 +4,7 @@ import 'package:qribar_cocina/app/types/repository_error.dart';
 part 'biometric_auth_state.freezed.dart';
 
 @freezed
-class BiometricAuthState with _$BiometricAuthState {
+sealed class BiometricAuthState with _$BiometricAuthState {
   /// Initial state: No operation, ready to check availability.
   const factory BiometricAuthState.initial() = _Initial;
 

@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_bloc.dart';
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_event.dart';
@@ -64,7 +65,9 @@ abstract class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
         // which then triggers a UI prompt.
         final bool canAuthenticate = await _biometricAuthBloc
             .canAuthenticateWithBiometrics();
-        if (canAuthenticate) {
+        final bool hasStored = await _biometricAuthBloc.hasStoredCredentials();
+
+        if (canAuthenticate && !hasStored) {
           _biometricAuthBloc.add(
             BiometricAuthEvent.promptForSetup(
               email: state.email,

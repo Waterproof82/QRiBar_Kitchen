@@ -4,7 +4,7 @@ part 'modifier.freezed.dart';
 part 'modifier.g.dart';
 
 @freezed
-class Modifier with _$Modifier {
+sealed class Modifier with _$Modifier {
   const factory Modifier({
     @Default('') String name,
     @Default(0.0) double increment,
