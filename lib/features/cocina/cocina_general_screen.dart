@@ -251,9 +251,11 @@ class _LineaProductoState extends State<LineaProducto> {
     final String mesaVar = itemPedido.mesa;
     final bool enMarcha = itemPedido.enMarcha;
 
-    final DateTime rstHora = DateTimeExtension.combineNowWithTime(
-      itemPedido.hora,
+    final DateTime rstHora = DateTimeExtension.combineDateAndTime(
+      fecha: itemPedido.fecha,
+      hora: itemPedido.hora,
     );
+
     final Duration diff = _now.difference(rstHora);
     final Color colorLineaCocina = _getColorLineaCocina(diff);
     final Color marchando = enMarcha
