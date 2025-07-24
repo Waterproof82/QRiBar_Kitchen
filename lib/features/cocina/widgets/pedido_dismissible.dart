@@ -201,15 +201,18 @@ final class PedidoDismissible extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(
-                  ' $listSelName',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.left,
-                  style: GoogleFonts.notoSans(
-                    color: Colors.white,
-                    fontSize: ancho > 450 ? 26 : 18,
-                    fontWeight: FontWeight.w400,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Text(
+                    ' $listSelName',
+                    maxLines: 1,
+                    overflow: TextOverflow.visible,
+                    textAlign: TextAlign.left,
+                    style: GoogleFonts.notoSans(
+                      color: Colors.white,
+                      fontSize: ancho > 450 ? 26 : 18,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ),

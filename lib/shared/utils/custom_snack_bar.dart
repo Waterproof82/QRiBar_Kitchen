@@ -114,7 +114,7 @@ final class _CustomSnackBarState extends State<CustomSnackBar>
       borderRadius: BorderRadius.circular(AppSizes.p12),
       boxShadow: const [
         BoxShadow(
-          color: AppColors.blackSoft2,
+          color: AppColors.blackSoft,
           blurRadius: 8,
           offset: Offset(0, 2),
         ),

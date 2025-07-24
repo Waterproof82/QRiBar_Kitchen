@@ -4,6 +4,7 @@ import 'package:qribar_cocina/app/const/app_colors.dart';
 import 'package:qribar_cocina/app/const/app_constants.dart';
 import 'package:qribar_cocina/app/const/app_sizes.dart';
 import 'package:qribar_cocina/app/enums/app_route_enum.dart';
+import 'package:qribar_cocina/app/enums/snack_bar_enum.dart';
 import 'package:qribar_cocina/app/extensions/app_route_extension.dart';
 import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_bloc.dart';
@@ -13,6 +14,7 @@ import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.d
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/input_decoration.dart';
+import 'package:qribar_cocina/shared/utils/custom_snack_bar.dart';
 
 part '../helpers/login_form_helpers.dart';
 
