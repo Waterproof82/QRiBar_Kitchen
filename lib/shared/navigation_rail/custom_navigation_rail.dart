@@ -107,47 +107,66 @@ class _CustomNavigationRailState extends State<CustomNavigationRail> {
           ? Row(
               children: [
                 Flexible(
-                  child: NavigationRail(
-                    backgroundColor: AppColors.black,
-                    elevation: AppSizes.p10,
-                    selectedIndex: visualSelectedIndex,
-                    indicatorColor: AppColors.transparent,
-                    onDestinationSelected: (int index) {
-                      _handleNavigationDestination(
-                        context,
-                        index,
-                        _lastActiveSelectedIndex,
-                        _lastActiveCategoriaSelected,
-                        (newCurrentIndex, newLastIndex, newLastCategory) {
-                          if (!mounted) return;
-                          setState(() {
-                            _currentAnimatedIndex = newCurrentIndex;
-                            if (newLastIndex != null) {
-                              _lastActiveSelectedIndex = newLastIndex;
-                            }
-                            if (newLastCategory != null) {
-                              _lastActiveCategoriaSelected = newLastCategory;
-                            }
-                          });
-                        },
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
+                          child: IntrinsicHeight(
+                            child: NavigationRail(
+                              backgroundColor: AppColors.black,
+                              elevation: AppSizes.p10,
+                              selectedIndex: visualSelectedIndex,
+                              indicatorColor: AppColors.transparent,
+                              onDestinationSelected: (int index) {
+                                _handleNavigationDestination(
+                                  context,
+                                  index,
+                                  _lastActiveSelectedIndex,
+                                  _lastActiveCategoriaSelected,
+                                  (
+                                    newCurrentIndex,
+                                    newLastIndex,
+                                    newLastCategory,
+                                  ) {
+                                    if (!mounted) return;
+                                    setState(() {
+                                      _currentAnimatedIndex = newCurrentIndex;
+                                      if (newLastIndex != null) {
+                                        _lastActiveSelectedIndex = newLastIndex;
+                                      }
+                                      if (newLastCategory != null) {
+                                        _lastActiveCategoriaSelected =
+                                            newLastCategory;
+                                      }
+                                    });
+                                  },
+                                );
+                              },
+                              labelType: _isExpanded
+                                  ? NavigationRailLabelType.all
+                                  : NavigationRailLabelType.none,
+                              minWidth: AppSizes.p80,
+                              minExtendedWidth: AppSizes.p200,
+                              leading: _buildLeadingWidget(_isExpanded, () {
+                                if (mounted) {
+                                  setState(() => _isExpanded = !_isExpanded);
+                                }
+                              }),
+                              destinations: _buildDestinationsWidget(
+                                context,
+                                _currentAnimatedIndex,
+                              ),
+                            ),
+                          ),
+                        ),
                       );
                     },
-                    labelType: _isExpanded
-                        ? NavigationRailLabelType.all
-                        : NavigationRailLabelType.none,
-                    minWidth: AppSizes.p80,
-                    minExtendedWidth: AppSizes.p200,
-                    leading: _buildLeadingWidget(_isExpanded, () {
-                      if (mounted) {
-                        setState(() => _isExpanded = !_isExpanded);
-                      }
-                    }),
-                    destinations: _buildDestinationsWidget(
-                      context,
-                      _currentAnimatedIndex,
-                    ),
                   ),
                 ),
+
                 const VerticalDivider(color: Colors.grey, width: dividerWidth),
               ],
             )

@@ -153,7 +153,7 @@ void _handleNavigationDestination(
       currentLastActiveCategoriaSelected,
     );
 
-    nav.categoriaSelected = '';
+    nav.categoriaSelected = SelectionTypeEnum.none.name;
 
     onBackPressed(context).then((didExit) {
       if (didExit != true) {
