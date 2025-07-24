@@ -87,8 +87,8 @@ class BiometricAuthBloc extends Bloc<BiometricAuthEvent, BiometricAuthState> {
           androidAuthMessages: event.androidAuthMessages,
         );
 
-    await authAndLoginResult.when(
-      success: (_) async {
+    authAndLoginResult.when(
+      success: (_) {
         // Biometric authentication and internal login in use case were successful
         emit(const BiometricAuthState.biometricLoginSuccess());
       },
@@ -98,7 +98,6 @@ class BiometricAuthBloc extends Bloc<BiometricAuthEvent, BiometricAuthState> {
             errorMessage: err.toString(),
           ),
         );
-        // _clearCredentialsUseCase.call();
       },
     );
   }
@@ -147,7 +146,7 @@ class BiometricAuthBloc extends Bloc<BiometricAuthEvent, BiometricAuthState> {
       password: event.password,
     );
 
-    await result.when(
+    result.when(
       success: (_) {
         emit(const BiometricAuthState.credentialsSaved());
       },
@@ -165,19 +164,14 @@ class BiometricAuthBloc extends Bloc<BiometricAuthEvent, BiometricAuthState> {
 
     final result = await _clearCredentialsUseCase();
 
-    await result.when(
-      success: (_) {
-        // After clearing, return to a ready state, but with no stored credentials.
-        // Re-check `canAuthenticate` to keep the state accurate.
-        _onCheckAvailabilityAndCredentials(
-          const CheckAvailabilityAndCredentials(),
-          emit,
-        );
-      },
-      failure: (err) {
-        emit(BiometricAuthState.error(error: err));
-      },
-    );
+    if (result is Success) {
+      await _onCheckAvailabilityAndCredentials(
+        const CheckAvailabilityAndCredentials(),
+        emit,
+      );
+    } else if (result is Failure) {
+      emit(BiometricAuthState.error(error: result.error));
+    }
   }
 
   Future<void> _onAuthenticateForSession(
@@ -193,7 +187,7 @@ class BiometricAuthBloc extends Bloc<BiometricAuthEvent, BiometricAuthState> {
       androidAuthMessages: event.androidAuthMessages,
     );
 
-    await result.when(
+    result.when(
       success: (_) {
         emit(const BiometricAuthState.biometricLoginSuccess());
         _listenerBloc.add(const ListenerEvent.startListening());

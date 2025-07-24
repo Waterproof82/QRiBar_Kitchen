@@ -1,6 +1,7 @@
 part of '../widgets/login_form.dart';
 
-void _showBiometricSetupDialog(
+void 
+_showBiometricSetupDialog(
   BuildContext context,
   AppLocalizations l10n,
   String email,
@@ -16,9 +17,6 @@ void _showBiometricSetupDialog(
           TextButton(
             child: Text(l10n.noThanksButton),
             onPressed: () {
-              context.read<BiometricAuthBloc>().add(
-                const BiometricAuthEvent.clearCredentials(),
-              );
               Navigator.of(dialogContext).pop();
             },
           ),
@@ -44,9 +42,10 @@ void _showBiometricsEnabledSnackBar(
   BuildContext context,
   AppLocalizations l10n,
 ) {
-  ScaffoldMessenger.of(
-    context,
-  ).showSnackBar(SnackBar(content: Text(l10n.biometricsEnabledMessage)));
+  CustomSnackBar.show(
+    l10n.biometricsEnabledMessage,
+    type: SnackBarType.success,
+  );
 }
 
 void _dispatchSessionRestored(BuildContext context) {

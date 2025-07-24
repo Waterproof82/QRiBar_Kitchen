@@ -186,10 +186,7 @@ abstract class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
   ///
   /// Updates the category list in the current state and re-processes orders
   /// to reflect potential changes in shipping information based on categories.
-  Future<void> _onCategorias(
-    _Categorias event,
-    Emitter<ListenerState> emit,
-  ) async {
+  void _onCategorias(_Categorias event, Emitter<ListenerState> emit) {
     state.maybeMap(
       data: (dataState) {
         final nuevosPedidos = asignarEnviosPorPedidos(

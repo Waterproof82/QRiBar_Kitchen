@@ -6,9 +6,13 @@ import 'package:qribar_cocina/app/const/app_sizes.dart';
 import 'package:qribar_cocina/app/enums/app_route_enum.dart';
 import 'package:qribar_cocina/app/enums/assets_enum.dart';
 import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
+import 'package:qribar_cocina/app/enums/snack_bar_enum.dart';
 import 'package:qribar_cocina/app/enums/svg_enum.dart';
 import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
+import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_bloc.dart';
+import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_event.dart';
+import 'package:qribar_cocina/shared/utils/custom_snack_bar.dart';
 import 'package:qribar_cocina/shared/utils/svg_loader.dart';
 import 'package:qribar_cocina/shared/utils/ui_helpers.dart';
 
