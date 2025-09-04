@@ -1,7 +1,6 @@
 part of '../widgets/login_form.dart';
 
-void 
-_showBiometricSetupDialog(
+void _showBiometricSetupDialog(
   BuildContext context,
   AppLocalizations l10n,
   String email,

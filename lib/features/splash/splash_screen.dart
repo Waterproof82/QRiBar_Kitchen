@@ -1,21 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:local_auth_android/local_auth_android.dart';
 import 'package:qribar_cocina/app/enums/app_route_enum.dart';
 import 'package:qribar_cocina/app/enums/svg_enum.dart';
 import 'package:qribar_cocina/app/extensions/app_route_extension.dart';
-import 'package:qribar_cocina/app/l10n/app_localizations.dart';
-import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_bloc.dart';
-import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_event.dart';
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_state.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 import 'package:qribar_cocina/shared/utils/svg_loader.dart';
-
-part 'helpers/splash_helpers.dart';
 
 final class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -45,9 +38,33 @@ final class SplashState extends State<Splash>
 
     _animationController.forward();
 
+    // 🚀 Verificación inicial para no quedarnos colgados en el splash
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkSessionAndNavigate(context);
+      _handleInitialNavigation(context);
     });
+  }
+
+  void _handleInitialNavigation(BuildContext context) {
+    final loginState = context.read<LoginFormBloc>().state;
+    final biometricState = context.read<BiometricAuthBloc>().state;
+
+    // Si ya hay sesión activa en LoginFormBloc → navegar directo
+    loginState.mapOrNull(
+      authenticated: (_) => context.goTo(AppRoute.cocinaGeneral),
+    );
+
+    // Si biometría está lista pero sin credenciales → ir al login
+    biometricState.mapOrNull(
+      ready: (s) {
+        if (!s.hasStoredCredentials) {
+          context.goTo(AppRoute.login);
+        }
+      },
+      error: (_) => context.goTo(AppRoute.login),
+    );
+
+    // Si nada de lo anterior aplica → ir a login por defecto
+    context.goTo(AppRoute.login);
   }
 
   @override
@@ -60,53 +77,30 @@ final class SplashState extends State<Splash>
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
-        BlocListener<ListenerBloc, ListenerState>(
-          listenWhen: (previous, current) {
-            final wasSuccess = previous.maybeWhen(
-              success: () => true,
-              orElse: () => false,
-            );
-            final isSuccess = current.maybeWhen(
-              success: () => true,
-              orElse: () => false,
-            );
-            return !wasSuccess && isSuccess;
-          },
+        // Listener de login
+        BlocListener<LoginFormBloc, LoginFormState>(
           listener: (context, state) {
-            state.maybeWhen(
-              success: () {
-                context.read<LoginFormBloc>().add(
-                  const LoginFormEvent.listenerReady(),
-                );
-              },
-              orElse: () {},
+            state.map(
+              initial: (_) => context.goTo(AppRoute.login),
+              loading: (_) {},
+              authenticated: (_) => context.goTo(AppRoute.cocinaGeneral),
+              failure: (_) => context.goTo(AppRoute.login),
             );
           },
         ),
 
-        BlocListener<LoginFormBloc, LoginFormState>(
-          listenWhen: (previous, current) =>
-              previous.loginSuccess != current.loginSuccess,
-          listener: (context, state) {
-            if (state.loginSuccess) {
-              context.pushTo(AppRoute.cocinaGeneral);
-            }
-          },
-        ),
+        // Listener de biométrica
         BlocListener<BiometricAuthBloc, BiometricAuthState>(
           listener: (context, state) {
             state.mapOrNull(
-              biometricLoginSuccess: (_) {
-                context.read<LoginFormBloc>().add(
-                  const LoginFormEvent.sessionRestored(),
-                );
+              biometricLoginSuccess: (_) =>
+                  context.read<LoginFormBloc>().add(const SessionRestored()),
+              ready: (s) {
+                if (!s.hasStoredCredentials) {
+                  context.goTo(AppRoute.login);
+                }
               },
-              biometricLoginFailure: (_) {
-                context.goTo(AppRoute.login);
-              },
-              error: (_) {
-                context.goTo(AppRoute.login);
-              },
+              error: (_) => context.goTo(AppRoute.login),
             );
           },
         ),
@@ -132,7 +126,7 @@ final class SplashState extends State<Splash>
                 child: AnimatedBuilder(
                   animation: _animationController,
                   builder: (context, child) {
-                    final double value = _animation.value;
+                    final value = _animation.value;
                     return SvgLoader(
                       SvgEnum.logoName,
                       width: value * 250,

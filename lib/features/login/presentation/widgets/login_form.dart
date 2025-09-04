@@ -28,6 +28,7 @@ final class LoginForm extends StatelessWidget {
 
     return MultiBlocListener(
       listeners: [
+        // Listener para BiometricAuthBloc
         BlocListener<BiometricAuthBloc, BiometricAuthState>(
           listener: (context, biometricState) {
             biometricState.whenOrNull(
@@ -39,22 +40,31 @@ final class LoginForm extends StatelessWidget {
             );
           },
         ),
+
+        // Listener para LoginFormBloc
         BlocListener<LoginFormBloc, LoginFormState>(
-          listenWhen: (previous, current) =>
-              previous.loginSuccess != current.loginSuccess,
           listener: (context, state) {
-            if (state.loginSuccess) {
-              context.pushTo(AppRoute.cocinaGeneral);
-            }
+            state.maybeMap(
+              authenticated: (authState) {
+                context.pushTo(AppRoute.cocinaGeneral);
+              },
+              orElse: () {},
+            );
           },
         ),
       ],
       child: BlocBuilder<LoginFormBloc, LoginFormState>(
         buildWhen: (previous, current) =>
-            previous.isLoading != current.isLoading ||
-            previous.failure != current.failure,
+            previous.maybeMap(loading: (_) => true, orElse: () => false) !=
+                current.maybeMap(loading: (_) => true, orElse: () => false) ||
+            previous != current,
         builder: (context, state) {
-          final LoginFormBloc bloc = context.read<LoginFormBloc>();
+          final bloc = context.read<LoginFormBloc>();
+
+          final isLoading = state.maybeMap(
+            loading: (_) => true,
+            orElse: () => false,
+          );
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
@@ -106,7 +116,7 @@ final class LoginForm extends StatelessWidget {
                     disabledColor: AppColors.greySoft,
                     elevation: 0,
                     color: AppColors.blackSoft,
-                    onPressed: state.isLoading
+                    onPressed: isLoading
                         ? null
                         : () {
                             if (formKey.currentState?.validate() ?? false) {
@@ -119,7 +129,7 @@ final class LoginForm extends StatelessWidget {
                         vertical: AppSizes.p16 - 1,
                       ),
                       child: Text(
-                        state.isLoading ? l10n.wait : l10n.enter,
+                        isLoading ? l10n.wait : l10n.enter,
                         style: const TextStyle(
                           color: AppColors.onPrimary,
                           fontSize: 18,

@@ -11,4 +11,3 @@ sealed class LoginFormEvent with _$LoginFormEvent {
   const factory LoginFormEvent.sessionRestored() = SessionRestored;
   const factory LoginFormEvent.listenerReady() = ListenerReady;
 }
-

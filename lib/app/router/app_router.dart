@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qribar_cocina/app/const/globals.dart';
@@ -23,7 +22,7 @@ final class AppRouter {
   late final GoRouter _router = GoRouter(
     navigatorKey: Globals.navigatorKey,
     initialLocation: AppRoute.splash.path,
-    redirect: _handleRedirect,
+    // redirect: _handleRedirect,
     routes: _routes,
   );
 
@@ -38,19 +37,19 @@ final class AppRouter {
   ///
   /// Redirects unauthenticated users to the login screen, unless they are
   /// already on the login or splash screen.
-  String? _handleRedirect(BuildContext context, GoRouterState state) {
-    final User? user = FirebaseAuth.instance.currentUser;
-    final bool isLoggingIn = state.matchedLocation == AppRoute.login.path;
-    final bool isAtSplash = state.matchedLocation == AppRoute.splash.path;
+  // String? _handleRedirect(BuildContext context, GoRouterState state) {
+  //   final User? user = FirebaseAuth.instance.currentUser;
+  //   final bool isLoggingIn = state.matchedLocation == AppRoute.login.path;
+  //   final bool isAtSplash = state.matchedLocation == AppRoute.splash.path;
 
-    // If no user is logged in and not already on login/splash, redirect to login.
-    if (user == null && !isLoggingIn && !isAtSplash) {
-      return AppRoute.login.path;
-    }
+  //   // If no user is logged in and not already on login/splash, redirect to login.
+  //   if (user == null && !isLoggingIn && !isAtSplash) {
+  //     return AppRoute.login.path;
+  //   }
 
-    // No redirection needed if authenticated or already on login/splash.
-    return null;
-  }
+  //   // No redirection needed if authenticated or already on login/splash.
+  //   return null;
+  // }
 
   /// Defines all the application's routes.
   ///
