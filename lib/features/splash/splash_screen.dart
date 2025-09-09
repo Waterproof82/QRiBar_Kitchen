@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:local_auth_android/local_auth_android.dart';
 import 'package:qribar_cocina/app/enums/app_route_enum.dart';
 import 'package:qribar_cocina/app/enums/svg_enum.dart';
 import 'package:qribar_cocina/app/extensions/app_route_extension.dart';
+import 'package:qribar_cocina/app/l10n/app_localizations.dart';
+import 'package:qribar_cocina/features/authentication/bloc/auth_bloc.dart';
+import 'package:qribar_cocina/features/authentication/bloc/auth_event.dart';
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_bloc.dart';
+import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_event.dart';
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_state.dart';
-import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
-import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
-import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 import 'package:qribar_cocina/shared/utils/svg_loader.dart';
 
 final class Splash extends StatefulWidget {
@@ -38,33 +40,17 @@ final class SplashState extends State<Splash>
 
     _animationController.forward();
 
-    // 🚀 Verificación inicial para no quedarnos colgados en el splash
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _handleInitialNavigation(context);
+      Future.delayed(const Duration(seconds: 3), () {
+        _handleInitialNavigation(context);
+      });
     });
   }
 
   void _handleInitialNavigation(BuildContext context) {
-    final loginState = context.read<LoginFormBloc>().state;
-    final biometricState = context.read<BiometricAuthBloc>().state;
-
-    // Si ya hay sesión activa en LoginFormBloc → navegar directo
-    loginState.mapOrNull(
-      authenticated: (_) => context.goTo(AppRoute.cocinaGeneral),
+    context.read<BiometricAuthBloc>().add(
+      const CheckAvailabilityAndCredentials(),
     );
-
-    // Si biometría está lista pero sin credenciales → ir al login
-    biometricState.mapOrNull(
-      ready: (s) {
-        if (!s.hasStoredCredentials) {
-          context.goTo(AppRoute.login);
-        }
-      },
-      error: (_) => context.goTo(AppRoute.login),
-    );
-
-    // Si nada de lo anterior aplica → ir a login por defecto
-    context.goTo(AppRoute.login);
   }
 
   @override
@@ -75,29 +61,32 @@ final class SplashState extends State<Splash>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return MultiBlocListener(
       listeners: [
-        // Listener de login
-        BlocListener<LoginFormBloc, LoginFormState>(
-          listener: (context, state) {
-            state.map(
-              initial: (_) => context.goTo(AppRoute.login),
-              loading: (_) {},
-              authenticated: (_) => context.goTo(AppRoute.cocinaGeneral),
-              failure: (_) => context.goTo(AppRoute.login),
-            );
-          },
-        ),
-
-        // Listener de biométrica
         BlocListener<BiometricAuthBloc, BiometricAuthState>(
           listener: (context, state) {
             state.mapOrNull(
-              biometricLoginSuccess: (_) =>
-                  context.read<LoginFormBloc>().add(const SessionRestored()),
+              biometricLoginSuccess: (s) {
+                context.read<AuthBloc>().add(const AuthEvent.sessionRestored());
+                context.goTo(AppRoute.cocinaGeneral);
+              },
               ready: (s) {
                 if (!s.hasStoredCredentials) {
                   context.goTo(AppRoute.login);
+                } else {
+                  context.read<BiometricAuthBloc>().add(
+                    AuthenticateAndLogin(
+                      localizedReason: l10n.localizedReasonBiometricLogin,
+
+                      androidAuthMessages: AndroidAuthMessages(
+                        signInTitle: l10n.signInTitle,
+                        cancelButton: l10n.cancelButton,
+                        biometricHint: l10n.biometricHint,
+                      ),
+                    ),
+                  );
                 }
               },
               error: (_) => context.goTo(AppRoute.login),

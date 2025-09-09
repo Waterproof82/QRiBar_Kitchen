@@ -8,7 +8,8 @@ import 'package:qribar_cocina/features/biometric/domain/use_cases/save_biometric
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_event.dart';
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_state.dart';
 
-class BiometricAuthBloc extends Bloc<BiometricAuthEvent, BiometricAuthState> {
+final class BiometricAuthBloc
+    extends Bloc<BiometricAuthEvent, BiometricAuthState> {
   final AuthenticateBiometricUseCase _authenticateUseCase;
   final SaveBiometricCredentialsUseCase _saveCredentialsUseCase;
   final ClearBiometricCredentialsUseCase _clearCredentialsUseCase;
@@ -26,7 +27,6 @@ class BiometricAuthBloc extends Bloc<BiometricAuthEvent, BiometricAuthState> {
     on<SaveCredentialsRequested>(_onSaveCredentialsRequested);
     on<ClearCredentials>(_onClearCredentials);
     on<AuthenticateAndLogin>(_onAuthenticateAndLogin);
-    on<AuthenticateForSession>(_onAuthenticateForSession);
   }
 
   Future<void> _onCheckAvailabilityAndCredentials(
@@ -133,26 +133,14 @@ class BiometricAuthBloc extends Bloc<BiometricAuthEvent, BiometricAuthState> {
       androidAuthMessages: event.androidAuthMessages,
     );
 
-    result.when(
-      success: (_) => emit(const BiometricAuthState.biometricLoginSuccess()),
-      failure: (err) => emit(BiometricAuthState.error(error: err)),
-    );
-  }
-
-  Future<void> _onAuthenticateForSession(
-    AuthenticateForSession event,
-    Emitter<BiometricAuthState> emit,
-  ) async {
-    emit(const BiometricAuthState.loading());
-
-    final result = await _authenticateUseCase.callAuthenticateAndLogin(
-      localizedReason: event.localizedReason,
-      androidAuthMessages: event.androidAuthMessages,
-    );
-
-    result.when(
-      success: (_) => emit(const BiometricAuthState.biometricLoginSuccess()),
-      failure: (err) => emit(BiometricAuthState.error(error: err)),
+    await result.maybeWhen(
+      success: (_) async {
+        emit(const BiometricAuthState.biometricLoginSuccess());
+      },
+      failure: (err) async {
+        emit(BiometricAuthState.error(error: err));
+      },
+      orElse: () async {},
     );
   }
 }

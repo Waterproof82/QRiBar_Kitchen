@@ -18,4 +18,8 @@ abstract class AuthenticateBiometricUseCase {
   /// Checks if biometric credentials (e.g., email/password) are stored locally.
   /// Returns `Result<bool>` indicating if credentials exist.
   Future<Result<bool>> hasStoredCredentials();
+
+  /// Retrieves the email of the user stored locally with biometric credentials.
+  /// Returns `Result<String>` with the email, or failure if not available.
+  Future<Result<String>> getStoredEmail();
 }

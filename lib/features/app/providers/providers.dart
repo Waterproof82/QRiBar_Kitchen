@@ -20,6 +20,7 @@ import 'package:qribar_cocina/features/app/bloc/listener_bloc_impl.dart';
 import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
 import 'package:qribar_cocina/features/app/cubit/language_cubit_impl.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
+import 'package:qribar_cocina/features/authentication/bloc/auth_bloc.dart';
 import 'package:qribar_cocina/features/biometric/data/data_sources/local/biometric_auth_data_source.dart';
 import 'package:qribar_cocina/features/biometric/data/data_sources/local/biometric_auth_data_source_impl.dart';
 import 'package:qribar_cocina/features/biometric/data/data_sources/local/secure_credential_storage_data_source.dart';
@@ -190,6 +191,13 @@ final class AppProviders extends StatelessWidget {
             BlocProvider<LoginFormBloc>(
               create: (context) =>
                   LoginFormBloc(loginUseCase: context.read<LoginUseCase>()),
+            ),
+
+            BlocProvider<AuthBloc>(
+              create: (context) => AuthBloc(
+                listenerBloc: context.read<ListenerBloc>(),
+                authenticateBiometricUseCase: context.read<AuthenticateBiometricUseCase>(),
+              ),
             ),
           ],
           child: const App(),

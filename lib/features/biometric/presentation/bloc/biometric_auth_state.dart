@@ -24,7 +24,6 @@ sealed class BiometricAuthState with _$BiometricAuthState {
   const factory BiometricAuthState.biometricLoginSuccess() =
       _BiometricLoginSuccess;
 
-  /// Estado unificado de error para todos los casos.
   const factory BiometricAuthState.error({required RepositoryError error}) =
       _Error;
 }
