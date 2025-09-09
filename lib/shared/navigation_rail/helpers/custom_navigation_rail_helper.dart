@@ -150,9 +150,9 @@ void _handleNavigationDestination(
     updateState(newCurrentIndex, index, newCategoriaSelected);
 
     if (index == 0) {
-      context.goNamed(AppRoute.cocinaGeneral.name);
+      context.goTo(AppRoute.cocinaGeneral);
     } else {
-      context.goNamed(AppRoute.cocinaPedidos.name, extra: 1);
+      context.goTo(AppRoute.cocinaPedidos, extra: 1);
     }
 
     nav.categoriaSelected = newCategoriaSelected;
@@ -166,15 +166,15 @@ void _handleNavigationDestination(
     nav.categoriaSelected = SelectionTypeEnum.none.name;
 
     onBackPressed(context).then((didExit) {
-      if (didExit != true) {
+      if (didExit == true) {
+        updateState(-1, null, null);
+      } else {
         updateState(
           currentLastActiveSelectedIndex,
           currentLastActiveSelectedIndex,
           currentLastActiveCategoriaSelected,
         );
         nav.categoriaSelected = currentLastActiveCategoriaSelected;
-      } else {
-        updateState(-1, null, null);
       }
     });
   } else if (index == 3) {

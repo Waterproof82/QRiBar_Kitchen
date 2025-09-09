@@ -42,7 +42,9 @@ final class BiometricAuthRepositoryImpl implements BiometricAuthRepository {
     try {
       final hasCreds = await _secureStorageDataSource.hasCredentials();
       if (!hasCreds) {
-        return const Result.failure(error: RepositoryError.badRequest());
+        return const Result.failure(
+          error: RepositoryError.noStoredCredentials(),
+        );
       }
 
       final authResult = await _biometricDataSource.authenticate(

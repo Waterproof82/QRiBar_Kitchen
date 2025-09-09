@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:qribar_cocina/app/const/app_colors.dart';
 import 'package:qribar_cocina/app/const/app_sizes.dart';
@@ -8,6 +7,7 @@ import 'package:qribar_cocina/app/enums/assets_enum.dart';
 import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
 import 'package:qribar_cocina/app/enums/snack_bar_enum.dart';
 import 'package:qribar_cocina/app/enums/svg_enum.dart';
+import 'package:qribar_cocina/app/extensions/app_route_extension.dart';
 import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_bloc.dart';
@@ -80,7 +80,7 @@ class _CustomNavigationRailState extends State<CustomNavigationRail> {
           }
         });
       },
-      _currentAnimatedIndex, // Pass current state values
+      _currentAnimatedIndex,
       _lastActiveSelectedIndex,
       _lastActiveCategoriaSelected,
     );
