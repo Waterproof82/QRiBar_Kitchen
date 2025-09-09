@@ -9,6 +9,9 @@ enum AppRoute {
   /// The login screen route.
   login('/login'),
 
+  /// The onboarding screen route.
+  onboarding('/onboarding'),
+
   /// The main home screen route.
   home('/home'),
 

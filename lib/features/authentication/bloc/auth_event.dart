@@ -10,4 +10,8 @@ sealed class AuthEvent with _$AuthEvent {
   }) = _LoginSucceeded;
 
   const factory AuthEvent.sessionRestored() = _SessionRestored;
+  const factory AuthEvent.onboardingCompleted({
+    required String email,
+    required String password,
+  }) = _OnboardingCompleted; 
 }

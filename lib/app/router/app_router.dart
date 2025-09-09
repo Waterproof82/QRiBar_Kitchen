@@ -6,6 +6,7 @@ import 'package:qribar_cocina/features/cocina/cocina_general_screen.dart';
 import 'package:qribar_cocina/features/cocina/cocina_pedidos_screen.dart';
 import 'package:qribar_cocina/features/home/home_screen.dart';
 import 'package:qribar_cocina/features/login/login_screen.dart';
+import 'package:qribar_cocina/features/onboarding/onboarding_sceen.dart';
 import 'package:qribar_cocina/features/splash/splash_screen.dart';
 
 /// A final class that configures and provides the application's [GoRouter] instance.
@@ -66,6 +67,21 @@ final class AppRouter {
       path: AppRoute.login.path,
       builder: (BuildContext context, GoRouterState state) =>
           const LoginScreen(),
+    ),
+    GoRoute(
+      name: AppRoute.onboarding.name,
+      path: AppRoute.onboarding.path,
+      builder: (BuildContext context, GoRouterState state) {
+        final Map<String, dynamic> extraData =
+            state.extra is Map<String, dynamic>
+            ? state.extra as Map<String, dynamic>
+            : {};
+
+        final String email = extraData['email'];
+        final String password = extraData['password'];
+
+        return OnBoardingScreen(email: email, password: password);
+      },
     ),
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) =>
