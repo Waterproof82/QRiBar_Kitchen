@@ -20,6 +20,7 @@ import 'package:qribar_cocina/features/app/bloc/listener_bloc_impl.dart';
 import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
 import 'package:qribar_cocina/features/app/cubit/language_cubit_impl.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
+import 'package:qribar_cocina/features/authentication/bloc/auth_bloc.dart';
 import 'package:qribar_cocina/features/biometric/data/data_sources/local/biometric_auth_data_source.dart';
 import 'package:qribar_cocina/features/biometric/data/data_sources/local/biometric_auth_data_source_impl.dart';
 import 'package:qribar_cocina/features/biometric/data/data_sources/local/secure_credential_storage_data_source.dart';
@@ -41,7 +42,6 @@ import 'package:qribar_cocina/features/login/domain/repositories/login_repositor
 import 'package:qribar_cocina/features/login/domain/use_cases/login_use_case.dart';
 import 'package:qribar_cocina/features/login/domain/use_cases/login_use_case_impl.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
-import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc_impl.dart';
 
 /// A final [StatelessWidget] which wraps the [App] with the necessary providers.
 ///
@@ -166,8 +166,6 @@ final class AppProviders extends StatelessWidget {
             BlocProvider<ListenerBloc>(
               create: (context) => ListenerBlocImpl(
                 repository: context.read<ListenerRepository>(),
-                authRemoteDataSourceContract: context
-                    .read<AuthRemoteDataSourceContract>(),
               ),
             ),
 
@@ -187,17 +185,18 @@ final class AppProviders extends StatelessWidget {
                     .read<SaveBiometricCredentialsUseCase>(),
                 clearCredentialsUseCase: context
                     .read<ClearBiometricCredentialsUseCase>(),
-                listenerBloc: context.read<ListenerBloc>(),
               ),
             ),
 
-            /// Bloc for managing login form state and logic.
-            // Provided AFTER BiometricAuthBloc as it has a dependency on it.
             BlocProvider<LoginFormBloc>(
-              create: (context) => LoginFormBlocImpl(
-                loginUseCase: context.read<LoginUseCase>(),
+              create: (context) =>
+                  LoginFormBloc(loginUseCase: context.read<LoginUseCase>()),
+            ),
+
+            BlocProvider<AuthBloc>(
+              create: (context) => AuthBloc(
                 listenerBloc: context.read<ListenerBloc>(),
-                biometricAuthBloc: context.read<BiometricAuthBloc>(),
+                authenticateBiometricUseCase: context.read<AuthenticateBiometricUseCase>(),
               ),
             ),
           ],

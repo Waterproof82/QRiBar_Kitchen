@@ -32,4 +32,9 @@ final class AuthenticateWithBiometricsUseCaseImpl
   Future<Result<bool>> hasStoredCredentials() {
     return _repository.hasStoredCredentials();
   }
+
+  @override
+  Future<Result<String>> getStoredEmail() {
+    return _repository.getStoredEmail();
+  }
 }

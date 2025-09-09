@@ -28,7 +28,6 @@ final class CocinaGeneralScreen extends StatelessWidget {
         // Top bar displaying time information.
         BarraSuperiorTiempo(ancho: ancho),
 
-        /// Listens to changes in the 'pedidos' list from the [ListenerBloc]'s data state.
         BlocSelector<ListenerBloc, ListenerState, List<Pedido>>(
           selector: (state) => state.maybeWhen(
             data: (productos, pedidos, categorias) => pedidos,
@@ -66,13 +65,8 @@ final class CocinaGeneralScreen extends StatelessWidget {
 /// A final [StatelessWidget] that displays a scrollable list of order items.
 /// It sorts the orders and renders each one using [LineaProducto].
 final class ListaProductosPedidos extends StatelessWidget {
-  /// The list of order items to display.
   final List<Pedido> itemPedidos;
-
-  /// The available width for responsive calculations.
   final double ancho;
-
-  /// The available height for responsive calculations.
   final double alto;
 
   /// Creates a constant instance of [ListaProductosPedidos].
@@ -135,13 +129,9 @@ final class ListaProductosPedidos extends StatelessWidget {
 
 /// A final [StatelessWidget] that displays a note bar for an order.
 final class _NotaBar extends StatelessWidget {
-  /// The note text to display.
   final String nota;
-
-  /// The available width for the widget.
   final double ancho;
 
-  /// Creates a constant instance of [_NotaBar].
   const _NotaBar(this.nota, this.ancho);
 
   @override
