@@ -42,6 +42,8 @@ import 'package:qribar_cocina/features/login/domain/repositories/login_repositor
 import 'package:qribar_cocina/features/login/domain/use_cases/login_use_case.dart';
 import 'package:qribar_cocina/features/login/domain/use_cases/login_use_case_impl.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
+import 'package:qribar_cocina/features/onboarding/cubit/onboarding_cubit.dart';
+import 'package:qribar_cocina/features/onboarding/domain/usecases/first_time_usecase.dart';
 
 /// A final [StatelessWidget] which wraps the [App] with the necessary providers.
 ///
@@ -157,11 +159,21 @@ final class AppProviders extends StatelessWidget {
               repository: context.read<BiometricAuthRepository>(),
             ),
           ),
+          RepositoryProvider(
+            create: (context) => FirstTimeUseCase(
+              preferences: context.read<PreferencesLocalDataSourceContract>(),
+            ),
+          ),
         ],
         child: MultiBlocProvider(
           /// 🧩 Blocs managing app state
           providers: [
-            /// Bloc for managing real-time listeners and data events.
+            BlocProvider<OnboardingCubit>(
+              create: (context) => OnboardingCubit(
+                firstTimeUseCase: context.read<FirstTimeUseCase>(),
+              ),
+            ),
+
             /// Injects the ListenerRepository contract and AuthRemoteDataSourceContract.
             BlocProvider<ListenerBloc>(
               create: (context) => ListenerBlocImpl(
@@ -196,7 +208,9 @@ final class AppProviders extends StatelessWidget {
             BlocProvider<AuthBloc>(
               create: (context) => AuthBloc(
                 listenerBloc: context.read<ListenerBloc>(),
-                authenticateBiometricUseCase: context.read<AuthenticateBiometricUseCase>(),
+                authenticateBiometricUseCase: context
+                    .read<AuthenticateBiometricUseCase>(),
+                onboardingCubit: context.read<OnboardingCubit>(),
               ),
             ),
           ],

@@ -3,12 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+// Importaciones adicionales necesarias para el BlocListener de autenticación y biometría
+import 'package:qribar_cocina/app/const/globals.dart';
 import 'package:qribar_cocina/app/extensions/date_time_extension.dart';
+import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
+import 'package:qribar_cocina/features/authentication/bloc/auth_bloc.dart';
+import 'package:qribar_cocina/features/authentication/bloc/auth_state.dart';
+import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_bloc.dart';
+import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_event.dart';
 import 'package:qribar_cocina/features/cocina/widgets/barra_superior_tiempo.dart';
 import 'package:qribar_cocina/features/cocina/widgets/modifiers_options.dart';
 import 'package:qribar_cocina/features/cocina/widgets/pedido_dismissible.dart';
+import 'package:qribar_cocina/features/login/presentation/widgets/login_form.dart';
 import 'package:qribar_cocina/shared/app_exports.dart';
 
 /// A final [StatelessWidget] representing the main kitchen general view.
@@ -23,24 +31,47 @@ final class CocinaGeneralScreen extends StatelessWidget {
     final double ancho = context.width;
     final double alto = context.height;
 
-    return Stack(
-      children: [
-        // Top bar displaying time information.
-        BarraSuperiorTiempo(ancho: ancho),
-
-        BlocSelector<ListenerBloc, ListenerState, List<Pedido>>(
-          selector: (state) => state.maybeWhen(
-            data: (productos, pedidos, categorias) => pedidos,
-            orElse: () => const [],
-          ),
-          builder: (context, pedidos) {
-            if (pedidos.isEmpty) {
-              return const SizedBox.shrink();
-            }
-            return _buildPedidos(pedidos, ancho, alto);
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<AuthBloc, AuthState>(
+          listener: (_, state) {
+            state.maybeWhen(
+              biometricSetupRequired: (email, password) {
+                context.read<BiometricAuthBloc>().add(
+                  PromptForSetup(email: email, password: password),
+                );
+                showBiometricSetupDialog(
+                  navigatorKey: Globals.navigatorKey,
+                  bloc: context.read<BiometricAuthBloc>(),
+                  l10n: AppLocalizations.of(context),
+                  email: email,
+                  password: password,
+                );
+              },
+              orElse: () {},
+            );
           },
         ),
       ],
+      child: Stack(
+        children: [
+          // Top bar displaying time information.
+          BarraSuperiorTiempo(ancho: ancho),
+
+          BlocSelector<ListenerBloc, ListenerState, List<Pedido>>(
+            selector: (state) => state.maybeWhen(
+              data: (productos, pedidos, categorias) => pedidos,
+              orElse: () => const [],
+            ),
+            builder: (context, pedidos) {
+              if (pedidos.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return _buildPedidos(pedidos, ancho, alto);
+            },
+          ),
+        ],
+      ),
     );
   }
 

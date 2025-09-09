@@ -45,32 +45,6 @@ class _LoginFormState extends State<LoginForm> {
 
     return MultiBlocListener(
       listeners: [
-        BlocListener<AuthBloc, AuthState>(
-          listener: (_, state) {
-            state.maybeWhen(
-              authenticated: () {
-                context.goTo(AppRoute.cocinaGeneral);
-              },
-              biometricSetupRequired: (email, password) {
-                if (!mounted) return;
-
-                context.read<BiometricAuthBloc>().add(
-                  PromptForSetup(email: email, password: password),
-                );
-
-                showBiometricSetupDialog(
-                  navigatorKey: Globals.navigatorKey,
-                  bloc: context.read<BiometricAuthBloc>(),
-                  l10n: l10n,
-                  email: email,
-                  password: password,
-                );
-              },
-              orElse: () {},
-            );
-          },
-        ),
-
         BlocListener<LoginFormBloc, LoginFormState>(
           listener: (context, state) {
             state.maybeMap(
@@ -87,6 +61,36 @@ class _LoginFormState extends State<LoginForm> {
                     ),
                   );
                 }
+              },
+              orElse: () {},
+            );
+          },
+        ),
+
+        BlocListener<AuthBloc, AuthState>(
+          listener: (_, state) {
+            state.maybeWhen(
+              authenticated: () {
+                context.goTo(AppRoute.cocinaGeneral);
+              },
+              onboardingRequired: (email, password) {
+                context.goTo(
+                  AppRoute.onboarding,
+                  extra: {'email': email, 'password': password},
+                );
+              },
+              biometricSetupRequired: (email, password) {
+                context.read<BiometricAuthBloc>().add(
+                  PromptForSetup(email: email, password: password),
+                );
+                showBiometricSetupDialog(
+                  navigatorKey:
+                      Globals.navigatorKey, // El contexto local es suficiente
+                  bloc: context.read<BiometricAuthBloc>(),
+                  l10n: AppLocalizations.of(context),
+                  email: email,
+                  password: password,
+                );
               },
               orElse: () {},
             );

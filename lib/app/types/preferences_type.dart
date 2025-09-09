@@ -1,7 +1,8 @@
 /// Enum representing the types of preferences in the application.
 enum PreferencesType {
   /// Represents the locale code preference.
-  localeCode('localeCode');
+  localeCode('localeCode'),
+  firstTime('firstTime');
 
   /// The type of the preference.
   final String type;

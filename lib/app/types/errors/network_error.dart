@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:qribar_cocina/app/types/errors/network_error_utils.dart';
 
@@ -56,6 +57,7 @@ sealed class NetworkError with _$NetworkError {
   const factory NetworkError.biometricAuthFailed() = _BiometricAuthFailed;
   const factory NetworkError.biometricHardwareUnavailable() =
       _BiometricHardwareUnavailable;
+  const factory NetworkError.biometricAuthCancelled() = _BiometricAuthCancelled;
 
   static NetworkError fromException(error) {
     try {
@@ -70,6 +72,17 @@ sealed class NetworkError with _$NetworkError {
       }
       if (error is FormatException) {
         return const NetworkError.formatException();
+      }
+      if (error is PlatformException) {
+        if (error.code == 'auth_canceled') {
+          return const NetworkError.biometricAuthCancelled();
+        }
+        if (error.code == 'not_available' ||
+            error.code == 'not_authenticated') {
+          return const NetworkError.biometricHardwareUnavailable();
+        }
+        // Para otros códigos de error, asume que es un fallo de autenticación
+        return const NetworkError.biometricAuthFailed();
       }
       if (error.toString().contains('is not a subtype of')) {
         return const NetworkError.unableToProcess();

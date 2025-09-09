@@ -10,4 +10,8 @@ sealed class AuthState with _$AuthState {
     required String email,
     required String password,
   }) = _BiometricSetupRequired;
+  const factory AuthState.onboardingRequired({
+    required String email,
+    required String password,
+  }) = _OnboardingRequired;
 }
