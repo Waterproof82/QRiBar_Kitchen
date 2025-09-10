@@ -83,6 +83,7 @@ flutter:
     - assets/img/
     - assets/svg/
     - assets/sounds/
+    - assets/onboarding/
 
 # flutter_gen configuration for asset generation
 flutter_gen:

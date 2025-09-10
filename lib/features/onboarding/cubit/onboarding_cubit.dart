@@ -15,7 +15,7 @@ class OnboardingCubit extends Cubit<int> {
   _cachedFirstTime; // cache en memoria para evitar lecturas inconsistentes
 
   /// Cambia de página en el Onboarding
-  void goTo(int number) => emit(number);
+  //void goTo(int number) => emit(number);
 
   /// Marca que el Onboarding ya fue mostrado (se guarda en memoria y disco).
   Future<void> setFirstTime() async {
