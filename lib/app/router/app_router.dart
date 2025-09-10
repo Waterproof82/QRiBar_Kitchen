@@ -6,7 +6,7 @@ import 'package:qribar_cocina/features/cocina/cocina_general_screen.dart';
 import 'package:qribar_cocina/features/cocina/cocina_pedidos_screen.dart';
 import 'package:qribar_cocina/features/home/home_screen.dart';
 import 'package:qribar_cocina/features/login/login_screen.dart';
-import 'package:qribar_cocina/features/onboarding/onboarding_sceen.dart';
+import 'package:qribar_cocina/features/onboarding/onboarding_screen.dart';
 import 'package:qribar_cocina/features/splash/splash_screen.dart';
 
 /// A final class that configures and provides the application's [GoRouter] instance.
@@ -33,24 +33,6 @@ final class AppRouter {
   /// Provides the singleton [GoRouter] instance for navigation.
   /// This is the primary access point for routing throughout the app.
   static GoRouter get router => _instance._router;
-
-  /// Handles global redirection logic based on authentication status.
-  ///
-  /// Redirects unauthenticated users to the login screen, unless they are
-  /// already on the login or splash screen.
-  // String? _handleRedirect(BuildContext context, GoRouterState state) {
-  //   final User? user = FirebaseAuth.instance.currentUser;
-  //   final bool isLoggingIn = state.matchedLocation == AppRoute.login.path;
-  //   final bool isAtSplash = state.matchedLocation == AppRoute.splash.path;
-
-  //   // If no user is logged in and not already on login/splash, redirect to login.
-  //   if (user == null && !isLoggingIn && !isAtSplash) {
-  //     return AppRoute.login.path;
-  //   }
-
-  //   // No redirection needed if authenticated or already on login/splash.
-  //   return null;
-  // }
 
   /// Defines all the application's routes.
   ///
@@ -125,8 +107,8 @@ final class AppRouter {
                     Widget child,
                   ) {
                     final Animatable<Offset> tween = Tween<Offset>(
-                      begin: const Offset(1.0, 0.0), // Starts from right
-                      end: Offset.zero, // Slides to center
+                      begin: const Offset(1.0, 0.0),
+                      end: Offset.zero,
                     ).chain(CurveTween(curve: Curves.easeInOut));
                     return SlideTransition(
                       position: animation.drive(tween),
