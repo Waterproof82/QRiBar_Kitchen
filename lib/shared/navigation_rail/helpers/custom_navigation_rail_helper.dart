@@ -204,7 +204,7 @@ void _handleNavigationDestination(
         CustomSnackBar.show(l10n.biometricsCleared, type: SnackBarType.success);
       } else {
         CustomSnackBar.show(
-          l10n.biometricsClearedError,
+          l10n.biometricsClearedCancelled,
           type: SnackBarType.info,
         );
       }

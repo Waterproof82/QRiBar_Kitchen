@@ -23,15 +23,12 @@ class MockAuthRemoteDataSourceContract extends Mock
 void main() {
   late MockListenerRepositoryImpl mockRepository;
   late MockDataSource mockDataSource;
-  late MockAuthRemoteDataSourceContract mockAuthDataSource;
   late ListenerBloc bloc;
   late StreamController<ListenerEvent> streamController;
 
   setUp(() {
     mockRepository = MockListenerRepositoryImpl();
     mockDataSource = MockDataSource();
-    mockAuthDataSource = MockAuthRemoteDataSourceContract();
-
     streamController = StreamController<ListenerEvent>.broadcast();
 
     // Stub del stream de eventos dentro del dataSource
@@ -60,10 +57,7 @@ void main() {
       ),
     ).thenAnswer((_) async => const Result.success(null));
 
-    bloc = ListenerBlocImpl(
-      repository: mockRepository,
-      authRemoteDataSourceContract: mockAuthDataSource,
-    );
+    bloc = ListenerBlocImpl(repository: mockRepository);
   });
 
   tearDown(() async {
