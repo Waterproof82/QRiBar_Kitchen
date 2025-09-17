@@ -133,14 +133,13 @@ final class BiometricAuthBloc
       androidAuthMessages: event.androidAuthMessages,
     );
 
-    await result.maybeWhen(
+    await result.when(
       success: (_) async {
         emit(const BiometricAuthState.biometricLoginSuccess());
       },
       failure: (err) async {
         emit(BiometricAuthState.error(error: err));
       },
-      orElse: () async {},
     );
   }
 }
