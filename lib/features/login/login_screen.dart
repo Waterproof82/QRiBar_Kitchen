@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:qribar_cocina/app/const/app_sizes.dart';
 import 'package:qribar_cocina/app/l10n/app_localizations.dart';
+import 'package:qribar_cocina/app/localization/app_language.dart';
+import 'package:qribar_cocina/app/localization/widgets/language_dropdown.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/auth_background.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/login_container.dart';
 import 'package:qribar_cocina/features/login/presentation/widgets/login_form.dart';
-import 'package:qribar_cocina/shared/utils/language_dropdown.dart';
 
 /// A final [StatelessWidget] representing the login screen of the application.
 /// It provides a visual background, a language selection dropdown,
@@ -24,7 +25,13 @@ final class LoginScreen extends StatelessWidget {
             children: [
               const Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [Flexible(child: LanguageDropdown())],
+                children: [
+                  Flexible(
+                    child: const LanguageDropdown(
+                      languages: [AppLanguage.es, AppLanguage.en],
+                    ),
+                  ),
+                ],
               ),
               Gap.h248,
               // Container for the login form with a card-like style.
