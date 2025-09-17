@@ -22,14 +22,15 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "com.qribar.bar"
-    compileSdkVersion 35
-    ndkVersion "27.0.12077973"
+    namespace = "com.qribar.bar"
+    compileSdkVersion = 36
+    ndkVersion = "27.0.12077973"
+    buildToolsVersion = "36.0.0"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-        coreLibraryDesugaringEnabled true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -37,66 +38,80 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.qribar.bar"
-        minSdk 23
-        targetSdk 35
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
-        multiDexEnabled true
+        applicationId = "com.qribar.bar"
+        minSdkVersion = flutter.minSdkVersion
+        targetSdk = 36
+        versionCode = flutterVersionCode.toInteger()
+        versionName = flutterVersionName
+        multiDexEnabled = true
     }
 
     signingConfigs {
         release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+            keyAlias = keystoreProperties['keyAlias']
+            keyPassword = keystoreProperties['keyPassword']
+            storeFile = file(keystoreProperties['storeFile'])
+            storePassword = keystoreProperties['storePassword']
         }
         debug {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+            keyAlias = keystoreProperties['keyAlias']
+            keyPassword = keystoreProperties['keyPassword']
+            storeFile = file(keystoreProperties['storeFile'])
+            storePassword = keystoreProperties['storePassword']
         }
     }
 
     buildTypes {
         release {
-            shrinkResources false
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            shrinkResources = false
+            minifyEnabled = false
+            proguardFiles(getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro')
+            signingConfig = signingConfigs.release
         }
         debug {
-            signingConfig signingConfigs.debug
+            signingConfig = signingConfigs.debug
         }
     }
 
     lint {
-        baseline file("lint-baseline.xml")
+        baseline = file("lint-baseline.xml")
+    }
+
+    // Compatibilidad con 16 KB page size y empaquetado moderno de librerías nativas
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false
+        }
     }
 }
 
 flutter {
-    source "../.."
+    source = "../.."
 }
 
 dependencies {
-    implementation platform("com.google.firebase:firebase-bom:33.13.0")
-    implementation "com.google.firebase:firebase-auth"
-    implementation "com.google.firebase:firebase-analytics-ktx"
-    implementation "com.google.firebase:firebase-inappmessaging-display:21.0.2"
+    // 1. Updated Firebase BOM to the latest stable version.
+    implementation(platform("com.google.firebase:firebase-bom:34.2.0")) 
 
-    implementation "com.google.android.gms:play-services-base:18.7.0"
-    implementation "com.google.android.gms:play-services-identity-credentials:16.0.0-alpha07"
+    // 2. Updated Firebase Analytics and In-App Messaging dependencies.
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-analytics-ktx:22.5.0")
+    implementation("com.google.firebase:firebase-inappmessaging-display:22.0.0")
 
-    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.5"
+    // 3. Updated Google Play Services dependencies.
+    implementation("com.google.android.gms:play-services-base:18.8.0")
+    implementation("com.google.android.gms:play-services-identity-credentials:16.0.0-alpha08")
 
-    implementation "androidx.multidex:multidex:2.0.1"
-    implementation "com.github.bumptech.glide:glide:4.15.1"
-    implementation "androidx.preference:preference-ktx:1.2.1"
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
-    annotationProcessor "com.github.bumptech.glide:compiler:4.15.1"
+    implementation("androidx.multidex:multidex:2.0.1")
+    
+    // 4. Updated Glide dependencies.
+    implementation("com.github.bumptech.glide:glide:5.0.4")
+    implementation("androidx.preference:preference-ktx:1.2.1")
+
+    // 5. Updated Glide annotation processor.
+    annotationProcessor("com.github.bumptech.glide:compiler:5.0.4")
 }
 
 apply plugin: "com.google.gms.google-services"

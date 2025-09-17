@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-
-enum Side { left, top, right, bottom }
+import 'package:qribar_cocina/features/onboarding/enum/side_enum.dart';
+import 'package:vector_math/vector_math_64.dart';
 
 class FluidEdge extends ChangeNotifier {
   List<_FluidPoint> points = [];
@@ -121,22 +121,22 @@ class FluidEdge extends ChangeNotifier {
     final double h = (vertical ? size.width : size.height) + margin * 2;
 
     final Matrix4 mtx = Matrix4.identity()
-      ..translate(-margin)
-      ..scale(w, h);
+      ..translateByVector3(Vector3(-margin, 0.0, 0.0))
+      ..scaleByVector3(Vector3(w, h, 1.0));
+
     if (side == Side.top) {
       mtx
         ..rotateZ(pi / 2)
-        ..translate(0.0, -1.0);
+        ..translateByVector3(Vector3(0.0, -1.0, 0.0));
     } else if (side == Side.right) {
       mtx
         ..rotateZ(pi)
-        ..translate(-1.0, -1.0);
+        ..translateByVector3(Vector3(-1.0, -1.0, 0.0));
     } else if (side == Side.bottom) {
       mtx
         ..rotateZ(pi * 3 / 2)
-        ..translate(-1.0);
+        ..translateByVector3(Vector3(-1.0, 0.0, 0.0));
     }
-
     return mtx;
   }
 
