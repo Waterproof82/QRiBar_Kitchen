@@ -12,9 +12,9 @@ dependencies:
     sdk: flutter
 
   # --- Firebase packages ---
-  firebase_core: ^3.13.0          # Core Firebase SDK
-  firebase_auth: ^5.5.2           # Firebase Authentication
-  firebase_database: ^11.3.5      # Firebase Realtime Database
+  firebase_core: ^4.1.0          # Core Firebase SDK
+  firebase_auth: ^6.0.2           # Firebase Authentication
+  firebase_database: ^12.0.1      # Firebase Realtime Database
 
   # --- State Management ---
   flutter_bloc: ^9.1.1            # BLoC pattern for state management
@@ -48,6 +48,7 @@ dependencies:
   json_annotation: ^4.9.0         # 
   get_it: ^8.0.3                  # Service locator for dependency injection
   wakelock_plus: ^1.2.10          # Prevent screen from sleeping
+  vector_math: ^2.2.0
 
   # --- Localization support ---
   flutter_localizations:
