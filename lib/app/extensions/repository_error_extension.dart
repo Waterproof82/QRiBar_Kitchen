@@ -34,13 +34,13 @@ extension RepositoryErrorExtension on RepositoryError {
   SnackBarType get snackBarType {
     return maybeWhen(
       // Nuevos casos de biometría
-      biometricHardwareUnavailable: () => SnackBarType.warning,
+      biometricHardwareUnavailable: () => SnackBarType.error,
       noStoredCredentials: () => SnackBarType.warning,
       biometricAuthCancelled: () => SnackBarType.info,
-      biometricAuthFailed: () => SnackBarType.warning,
+      biometricAuthFailed: () => SnackBarType.error,
       // Casos existentes
       userNotFound: () => SnackBarType.warning,
-      wrongPassword: () => SnackBarType.warning,
+      wrongPassword: () => SnackBarType.error,
       orElse: () => SnackBarType.error,
     );
   }

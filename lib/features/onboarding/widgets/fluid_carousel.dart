@@ -7,6 +7,7 @@ import 'package:qribar_cocina/app/extensions/build_context_extension.dart';
 import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/features/authentication/bloc/auth_bloc.dart';
 import 'package:qribar_cocina/features/authentication/bloc/auth_event.dart';
+import 'package:qribar_cocina/features/onboarding/enum/side_enum.dart';
 import 'package:qribar_cocina/features/onboarding/widgets/components.dart';
 import 'package:qribar_cocina/features/onboarding/widgets/fluid_clipper.dart';
 import 'package:qribar_cocina/features/onboarding/widgets/fluid_edge.dart';
