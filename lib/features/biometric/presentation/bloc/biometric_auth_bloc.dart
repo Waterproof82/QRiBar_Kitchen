@@ -41,11 +41,18 @@ final class BiometricAuthBloc
 
       final canAuthenticate = canAuthResult.when(
         success: (data) => data,
-        failure: (_) => false,
+        failure: (err) {
+          emit(BiometricAuthState.error(error: err));
+          return false;
+        },
       );
+
       final hasStoredCredentials = hasCredsResult.when(
         success: (data) => data,
-        failure: (_) => false,
+        failure: (err) {
+          emit(BiometricAuthState.error(error: err));
+          return false;
+        },
       );
 
       emit(
@@ -69,24 +76,37 @@ final class BiometricAuthBloc
     PromptForSetup event,
     Emitter<BiometricAuthState> emit,
   ) async {
-    final canAuthResult = await _authenticateUseCase.callCanAuthenticate();
-    final canAuthenticate = canAuthResult.when(
-      success: (data) => data,
-      failure: (_) => false,
-    );
-
-    if (canAuthenticate) {
-      emit(
-        BiometricAuthState.promptForSetup(
-          email: event.email,
-          password: event.password,
-        ),
+    try {
+      final canAuthResult = await _authenticateUseCase.callCanAuthenticate();
+      final canAuthenticate = canAuthResult.when(
+        success: (data) => data,
+        failure: (err) {
+          emit(BiometricAuthState.error(error: err));
+          return false;
+        },
       );
-    } else {
+
+      if (canAuthenticate) {
+        emit(
+          BiometricAuthState.promptForSetup(
+            email: event.email,
+            password: event.password,
+          ),
+        );
+      } else {
+        emit(
+          BiometricAuthState.error(
+            error: RepositoryError.fromDataSourceError(
+              NetworkError.fromException('Biometric not available'),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
       emit(
         BiometricAuthState.error(
           error: RepositoryError.fromDataSourceError(
-            NetworkError.fromException('Biometric not available'),
+            NetworkError.fromException(e),
           ),
         ),
       );
@@ -99,14 +119,25 @@ final class BiometricAuthBloc
   ) async {
     emit(const BiometricAuthState.loading());
 
-    final result = await _saveCredentialsUseCase(
-      email: event.email,
-      password: event.password,
-    );
-    result.when(
-      success: (_) => emit(const BiometricAuthState.credentialsSaved()),
-      failure: (err) => emit(BiometricAuthState.error(error: err)),
-    );
+    try {
+      final result = await _saveCredentialsUseCase(
+        email: event.email,
+        password: event.password,
+      );
+
+      result.when(
+        success: (_) => emit(const BiometricAuthState.credentialsSaved()),
+        failure: (err) => emit(BiometricAuthState.error(error: err)),
+      );
+    } catch (e) {
+      emit(
+        BiometricAuthState.error(
+          error: RepositoryError.fromDataSourceError(
+            NetworkError.fromException(e),
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> _onClearCredentials(
@@ -115,11 +146,21 @@ final class BiometricAuthBloc
   ) async {
     emit(const BiometricAuthState.loading());
 
-    final result = await _clearCredentialsUseCase();
-    result.when(
-      success: (_) => add(const CheckAvailabilityAndCredentials()),
-      failure: (err) => emit(BiometricAuthState.error(error: err)),
-    );
+    try {
+      final result = await _clearCredentialsUseCase();
+      result.when(
+        success: (_) => add(const CheckAvailabilityAndCredentials()),
+        failure: (err) => emit(BiometricAuthState.error(error: err)),
+      );
+    } catch (e) {
+      emit(
+        BiometricAuthState.error(
+          error: RepositoryError.fromDataSourceError(
+            NetworkError.fromException(e),
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> _onAuthenticateAndLogin(
@@ -128,18 +169,24 @@ final class BiometricAuthBloc
   ) async {
     emit(const BiometricAuthState.loading());
 
-    final result = await _authenticateUseCase.callAuthenticateAndLogin(
-      localizedReason: event.localizedReason,
-      androidAuthMessages: event.androidAuthMessages,
-    );
+    try {
+      final result = await _authenticateUseCase.callAuthenticateAndLogin(
+        localizedReason: event.localizedReason,
+        androidAuthMessages: event.androidAuthMessages,
+      );
 
-    await result.when(
-      success: (_) async {
-        emit(const BiometricAuthState.biometricLoginSuccess());
-      },
-      failure: (err) async {
-        emit(BiometricAuthState.error(error: err));
-      },
-    );
+      result.when(
+        success: (_) => emit(const BiometricAuthState.biometricLoginSuccess()),
+        failure: (err) => emit(BiometricAuthState.error(error: err)),
+      );
+    } catch (e) {
+      emit(
+        BiometricAuthState.error(
+          error: RepositoryError.fromDataSourceError(
+            NetworkError.fromException(e),
+          ),
+        ),
+      );
+    }
   }
 }

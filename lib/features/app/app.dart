@@ -5,6 +5,7 @@ import 'package:qribar_cocina/app/extensions/l10n.dart';
 import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/app/router/app_router.dart';
 import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
+import 'package:qribar_cocina/features/app/cubit/language_state.dart';
 import 'package:qribar_cocina/shared/utils/global_error_listener.dart';
 
 final class App extends StatelessWidget {
@@ -12,7 +13,7 @@ final class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LanguageCubit, LanguageChangedState>(
+    return BlocBuilder<LanguageCubit, LanguageState>(
       builder: (context, state) {
         return MaterialApp.router(
           theme: AppTheme.theme(),

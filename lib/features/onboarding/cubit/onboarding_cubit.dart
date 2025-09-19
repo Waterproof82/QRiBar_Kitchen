@@ -1,41 +1,61 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:qribar_cocina/app/types/errors/network_error.dart';
+import 'package:qribar_cocina/app/types/repository_error.dart';
+import 'package:qribar_cocina/features/onboarding/cubit/onboarding_state.dart';
 import 'package:qribar_cocina/features/onboarding/domain/usecases/first_time_usecase.dart';
 
-/// Maneja el estado del Onboarding y garantiza consistencia entre memoria y almacenamiento local.
-/// - Usa caché en memoria para evitar lecturas repetidas y problemas de sincronización.
-/// - Solo permite marcar `setFirstTime()` una vez y actualiza la caché inmediatamente.
-class OnboardingCubit extends Cubit<int> {
+/// Handles onboarding state and ensures consistency between memory and local storage.
+/// - Uses in-memory cache to avoid repeated reads.
+/// - Only allows setting `setFirstTime()` once and updates cache immediately.
+class OnboardingCubit extends Cubit<OnboardingState> {
   OnboardingCubit({required FirstTimeUseCase firstTimeUseCase})
     : _firstTimeUseCase = firstTimeUseCase,
-      super(0);
+      super(const OnboardingState.initial());
 
   final FirstTimeUseCase _firstTimeUseCase;
+  bool? _cachedFirstTime; // memory cache to avoid inconsistent reads
 
-  bool?
-  _cachedFirstTime; // cache en memoria para evitar lecturas inconsistentes
+  /// Navigate to a specific onboarding page
+  //void goTo(int number) => emit(OnboardingState.pageChanged(number));
 
-  /// Cambia de página en el Onboarding
-  //void goTo(int number) => emit(number);
-
-  /// Marca que el Onboarding ya fue mostrado (se guarda en memoria y disco).
+  /// Marks onboarding as shown (updates memory + disk).
   Future<void> setFirstTime() async {
-    // Solo actualizamos si aún no está seteado en memoria
-    if (_cachedFirstTime == null || _cachedFirstTime == true) {
-      await _firstTimeUseCase.setFirstTime();
-      _cachedFirstTime = false;
+    try {
+      if (_cachedFirstTime == null || _cachedFirstTime == true) {
+        await _firstTimeUseCase.setFirstTime();
+        _cachedFirstTime = false;
+      }
+    } catch (e) {
+      emit(
+        OnboardingState.error(
+          error: RepositoryError.fromDataSourceError(
+            NetworkError.fromException(e),
+          ),
+        ),
+      );
     }
   }
 
-  /// Devuelve si es la primera vez que el usuario entra a la app.
-  /// Usa caché en memoria si ya se consultó antes.
+  /// Returns whether it is the first app entry.
   Future<bool> isFirstTime() async {
     if (_cachedFirstTime != null) return _cachedFirstTime!;
-    final value = await _firstTimeUseCase.isFirstTime();
-    _cachedFirstTime = value;
-    return value;
+    try {
+      final value = await _firstTimeUseCase.isFirstTime();
+      _cachedFirstTime = value;
+      return value;
+    } catch (e) {
+      emit(
+        OnboardingState.error(
+          error: RepositoryError.fromDataSourceError(
+            NetworkError.fromException(e),
+          ),
+        ),
+      );
+      return true; // fallback
+    }
   }
 
-  /// Método auxiliar (opcional) para resetear manualmente el flag → útil en testing.
+  /// Resets onboarding flag manually (for testing).
   Future<void> resetFirstTime() async {
     _cachedFirstTime = true;
   }
