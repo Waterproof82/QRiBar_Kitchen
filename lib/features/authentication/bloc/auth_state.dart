@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:qribar_cocina/app/types/repository_error.dart';
 
 part 'auth_state.freezed.dart';
 
@@ -14,4 +15,5 @@ sealed class AuthState with _$AuthState {
     required String email,
     required String password,
   }) = _OnboardingRequired;
+  const factory AuthState.error({required RepositoryError error}) = _Error;
 }

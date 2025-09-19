@@ -2,20 +2,19 @@ part of 'listener_bloc.dart';
 
 @freezed
 sealed class ListenerState with _$ListenerState {
-  /// Estado inicial del Bloc
+  /// Initial state of the Bloc
   const factory ListenerState.initial() = _Initial;
 
-  /// Estado de carga, cuando se están inicializando listeners
+  /// Loading state, when listeners are being initialized
   const factory ListenerState.loading() = _Loading;
 
-  /// Estado de éxito genérico, sin datos asociados
+  /// Generic success state, without associated data
   const factory ListenerState.success() = _Success;
 
-  /// Estado de fallo con un error asociado
-  const factory ListenerState.failure({required RepositoryError error}) =
-      _Failure;
+  /// Error state with an associated RepositoryError
+  const factory ListenerState.error({required RepositoryError error}) = _Error;
 
-  /// Estado que contiene los datos principales del sistema
+  /// State containing the main system data
   const factory ListenerState.data({
     @Default([]) List<Product> productos,
     @Default([]) List<Pedido> pedidos,

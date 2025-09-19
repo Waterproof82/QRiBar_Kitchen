@@ -8,12 +8,14 @@ sealed class LoginFormState with _$LoginFormState {
   const factory LoginFormState.initial({@Default('') String email}) = _Initial;
 
   const factory LoginFormState.loading() = _Loading;
+
   const factory LoginFormState.authenticated({
     required String email,
     required bool sessionRestored,
   }) = _Authenticated;
-  const factory LoginFormState.failure({
+
+  const factory LoginFormState.error({
     required RepositoryError error,
     required String email,
-  }) = Failure;
+  }) = _Error;
 }

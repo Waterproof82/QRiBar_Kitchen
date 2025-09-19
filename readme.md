@@ -97,3 +97,45 @@ final listenerBloc = ListenerBlocImpl( // Using the concrete implementation
   authRemoteDataSourceContract: /* your AuthRemoteDataSourceContract implementation */,
 )
   ..add(const ListenerEvent.startListening());
+
+  ## Firebase → Bloc Flow
+
+┌───────────────────────────┐
+│   Firebase Realtime DB    │
+│   (Streams of data)       │
+└─────────────┬─────────────┘
+              │
+              ▼
+┌───────────────────────────┐
+│   ListenerRepository      │
+│ - Exposes eventsStream    │
+│ - initializeListeners()   │
+└─────────────┬─────────────┘
+              │
+              ▼
+┌───────────────────────────┐
+│   EventStreamManager      │
+│ - Subscribes to repository│
+│ - Maps raw events → Bloc  │
+│ - Handles errors          │
+│ - Maintains a single sub  │
+└─────────────┬─────────────┘
+              │ onEvent(e)
+              ▼
+┌───────────────────────────┐
+│      ListenerBloc         │
+│ - Receives ListenerEvent  │
+│ - Updates state           │
+│   (_Productos, _Pedidos,  │
+│    _Categorias, etc.)     │
+│ - Emits ListenerState     │
+└─────────────┬─────────────┘
+              │
+              ▼
+┌───────────────────────────┐
+│          UI Layer         │
+│ - Listens to Bloc state   │
+│ - Renders widgets         │
+│ - Shows CustomSnackBar    │
+│   for errors              │
+└───────────────────────────┘

@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:qribar_cocina/app/types/errors/network_error.dart';
+import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/authentication/bloc/auth_event.dart';
@@ -21,72 +23,93 @@ final class AuthBloc extends Bloc<AuthEvent, AuthState> {
        super(const AuthState.initial()) {
     on<AuthEvent>(_onEvent);
   }
+
   Future<void> _onEvent(AuthEvent event, Emitter<AuthState> emit) async {
     await event.map(
       loginSucceeded: (e) async {
-        final isFirstTime = await _onboardingCubit.isFirstTime();
+        try {
+          final isFirstTime = await _onboardingCubit.isFirstTime();
 
-        if (isFirstTime) {
-          emit(
-            AuthState.onboardingRequired(email: e.email, password: e.password),
+          if (isFirstTime) {
+            emit(
+              AuthState.onboardingRequired(
+                email: e.email,
+                password: e.password,
+              ),
+            );
+            await _onboardingCubit.setFirstTime();
+            return;
+          }
+
+          emit(const AuthState.authenticated());
+          _listenerBloc.add(const ListenerEvent.startListening());
+
+          await _checkBiometricSetup(e.email, e.password, emit);
+        } catch (err) {
+          final repoErr = RepositoryError.fromDataSourceError(
+            NetworkError.fromException(err),
           );
-          await _onboardingCubit.setFirstTime();
-          return;
-        }
-
-        // Si no es la primera vez, el usuario está autenticado y se puede
-        // empezar a escuchar.
-        emit(const AuthState.authenticated());
-        _listenerBloc.add(const ListenerEvent.startListening());
-
-        final hasCredsResult = await _authenticateBiometricUseCase
-            .hasStoredCredentials();
-        final hasStoredCredentials = hasCredsResult.when(
-          success: (data) => data,
-          failure: (_) => false,
-        );
-
-        if (!hasStoredCredentials) {
-          emit(
-            AuthState.biometricSetupRequired(
-              email: e.email,
-              password: e.password,
-            ),
-          );
-          return;
+          emit(AuthState.error(error: repoErr));
         }
       },
 
       sessionRestored: (e) async {
-        emit(const AuthState.authenticated());
-        _listenerBloc.add(const ListenerEvent.startListening());
+        try {
+          emit(const AuthState.authenticated());
+          _listenerBloc.add(const ListenerEvent.startListening());
+        } catch (err) {
+          final repoErr = RepositoryError.fromDataSourceError(
+            NetworkError.fromException(err),
+          );
+          emit(AuthState.error(error: repoErr));
+        }
       },
 
       onboardingCompleted: (e) async {
-        // Después de completar el onboarding, el usuario está autenticado.
-        // Se puede emitir el estado y empezar a escuchar los datos.
-        // emit(const AuthState.authenticated());
-        _listenerBloc.add(const ListenerEvent.startListening());
+        try {
+          // Usuario ya completó onboarding, lo autenticamos
+          emit(const AuthState.authenticated());
+          _listenerBloc.add(const ListenerEvent.startListening());
 
-        // La lógica de biometría se ejecuta después de que el usuario
-        // haya llegado a la pantalla principal.
-        final hasCredsResult = await _authenticateBiometricUseCase
-            .hasStoredCredentials();
-        final hasStoredCredentials = hasCredsResult.when(
-          success: (data) => data,
-          failure: (_) => false,
-        );
-
-        if (!hasStoredCredentials) {
-          emit(
-            AuthState.biometricSetupRequired(
-              email: e.email,
-              password: e.password,
-            ),
+          await _checkBiometricSetup(e.email, e.password, emit);
+        } catch (err) {
+          final repoErr = RepositoryError.fromDataSourceError(
+            NetworkError.fromException(err),
           );
-          return;
+          emit(AuthState.error(error: repoErr));
         }
       },
     );
+  }
+
+  /// Verifica si el usuario necesita configurar biometría
+  Future<void> _checkBiometricSetup(
+    String email,
+    String password,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      final hasCredsResult = await _authenticateBiometricUseCase
+          .hasStoredCredentials();
+
+      final hasStoredCredentials = hasCredsResult.when(
+        success: (data) => data,
+        failure: (err) {
+          emit(AuthState.error(error: err));
+          return false;
+        },
+      );
+
+      if (!hasStoredCredentials) {
+        emit(
+          AuthState.biometricSetupRequired(email: email, password: password),
+        );
+      }
+    } catch (err) {
+      final repoErr = RepositoryError.fromDataSourceError(
+        NetworkError.fromException(err),
+      );
+      emit(AuthState.error(error: repoErr));
+    }
   }
 }

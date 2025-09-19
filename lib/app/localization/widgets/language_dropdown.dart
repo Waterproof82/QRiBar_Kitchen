@@ -4,6 +4,7 @@ import 'package:qribar_cocina/app/const/app_colors.dart';
 import 'package:qribar_cocina/app/localization/app_language.dart';
 import 'package:qribar_cocina/data/data_sources/local/localization_local_datasource_contract.dart';
 import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
+import 'package:qribar_cocina/features/app/cubit/language_state.dart';
 
 /// A final [StatelessWidget] that provides a language selection dropdown.
 /// It allows users to change the application's locale and persists the selection.
@@ -18,7 +19,7 @@ final class LanguageDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // BlocBuilder listens to LanguageCubit to rebuild when the locale changes.
-    return BlocBuilder<LanguageCubit, LanguageChangedState>(
+    return BlocBuilder<LanguageCubit, LanguageState>(
       builder: (context, state) {
         // Access the localization data source without listening,
         // as it's used only in the onChanged callback.

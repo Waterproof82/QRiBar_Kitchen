@@ -22,7 +22,6 @@ part 'listener_state.dart';
 ///
 /// This class orchestrates interactions with the [ListenerRepository] and
 /// handles authentication status. Concrete implementations will extend this.
-
 abstract class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
   final ListenerRepository _repository;
   final EventStreamManager _eventStream;
@@ -46,86 +45,129 @@ abstract class ListenerBloc extends Bloc<ListenerEvent, ListenerState> {
   ) async {
     emit(const ListenerState.loading());
 
-    final result = await _eventStream.initializeListeners(
-      onEvent: (e) => add(e),
-      onError: (error, stackTrace) {
-        add(
-          ListenerEvent.streamError(
-            RepositoryError.fromDataSourceError(
-              NetworkError.fromException(error),
+    try {
+      final result = await _eventStream.initializeListeners(
+        onEvent: (e) => add(e),
+        onError: (error, stackTrace) {
+          add(
+            ListenerEvent.streamError(
+              RepositoryError.fromDataSourceError(
+                NetworkError.fromException(error),
+              ),
             ),
-          ),
-        );
-        log('Stream error: $error', stackTrace: stackTrace);
-      },
-    );
+          );
+          log('Stream error: $error', stackTrace: stackTrace);
+        },
+      );
 
-    result.when(
-      success: (_) => emit(const ListenerState.success()),
-      failure: (error) => emit(ListenerState.failure(error: error)),
-    );
+      result.when(
+        success: (_) => emit(const ListenerState.success()),
+        failure: (error) => emit(ListenerState.error(error: error)),
+      );
+    } catch (e) {
+      final repoError = RepositoryError.fromDataSourceError(
+        NetworkError.fromException(e),
+      );
+      emit(ListenerState.error(error: repoError));
+      log('StartListening failed: $e');
+    }
   }
 
   void _onProductos(_Productos event, Emitter<ListenerState> emit) {
-    state.maybeMap(
-      data: (dataState) => emit(
-        dataState.copyWith(productos: List.unmodifiable(event.productos)),
-      ),
-      orElse: () => emit(
-        ListenerState.data(
-          productos: List.unmodifiable(event.productos),
-          pedidos: [],
-          categorias: [],
+    try {
+      state.maybeMap(
+        data: (dataState) => emit(
+          dataState.copyWith(productos: List.unmodifiable(event.productos)),
         ),
-      ),
-    );
+        orElse: () => emit(
+          ListenerState.data(
+            productos: List.unmodifiable(event.productos),
+            pedidos: [],
+            categorias: [],
+          ),
+        ),
+      );
+    } catch (e) {
+      final repoError = RepositoryError.fromDataSourceError(
+        NetworkError.fromException(e),
+      );
+      emit(ListenerState.error(error: repoError));
+    }
   }
 
   void _onPedidos(_Pedidos event, Emitter<ListenerState> emit) {
-    state.maybeMap(
-      data: (dataState) => emit(dataState.copyWith(pedidos: event.pedidos)),
-      orElse: () => log('Pedidos recibido en estado no Data, ignorando.'),
-    );
+    try {
+      state.maybeMap(
+        data: (dataState) => emit(dataState.copyWith(pedidos: event.pedidos)),
+        orElse: () => log('Pedidos recibido en estado no Data, ignorando.'),
+      );
+    } catch (e) {
+      final repoError = RepositoryError.fromDataSourceError(
+        NetworkError.fromException(e),
+      );
+      emit(ListenerState.error(error: repoError));
+    }
   }
 
   void _onCategorias(_Categorias event, Emitter<ListenerState> emit) {
-    state.maybeMap(
-      data: (dataState) =>
-          emit(dataState.copyWith(categorias: event.categorias)),
-      orElse: () => log('Categorias recibido en estado no Data, ignorando.'),
-    );
+    try {
+      state.maybeMap(
+        data: (dataState) =>
+            emit(dataState.copyWith(categorias: event.categorias)),
+        orElse: () => log('Categorias recibido en estado no Data, ignorando.'),
+      );
+    } catch (e) {
+      final repoError = RepositoryError.fromDataSourceError(
+        NetworkError.fromException(e),
+      );
+      emit(ListenerState.error(error: repoError));
+    }
   }
 
   Future<void> _onUpdateEstadoPedido(
     _UpdateEstadoPedido event,
     Emitter<ListenerState> emit,
   ) async {
-    final result = await _repository.updateEstadoPedido(
-      mesa: event.mesa,
-      idPedido: event.idPedido,
-      nuevoEstado: event.nuevoEstado,
-    );
-    result.whenOrNull(
-      failure: (error) => emit(ListenerState.failure(error: error)),
-    );
+    try {
+      final Result<void> result = await _repository.updateEstadoPedido(
+        mesa: event.mesa,
+        idPedido: event.idPedido,
+        nuevoEstado: event.nuevoEstado,
+      );
+      result.whenOrNull(
+        failure: (error) => emit(ListenerState.error(error: error)),
+      );
+    } catch (e) {
+      final repoError = RepositoryError.fromDataSourceError(
+        NetworkError.fromException(e),
+      );
+      emit(ListenerState.error(error: repoError));
+    }
   }
 
   Future<void> _onUpdateEnMarchaPedido(
     _UpdateEnMarchaPedido event,
     Emitter<ListenerState> emit,
   ) async {
-    final result = await _repository.updateEnMarchaPedido(
-      mesa: event.mesa,
-      idPedido: event.idPedido,
-      enMarcha: event.enMarcha,
-    );
-    result.whenOrNull(
-      failure: (error) => emit(ListenerState.failure(error: error)),
-    );
+    try {
+      final Result<void> result = await _repository.updateEnMarchaPedido(
+        mesa: event.mesa,
+        idPedido: event.idPedido,
+        enMarcha: event.enMarcha,
+      );
+      result.whenOrNull(
+        failure: (error) => emit(ListenerState.error(error: error)),
+      );
+    } catch (e) {
+      final repoError = RepositoryError.fromDataSourceError(
+        NetworkError.fromException(e),
+      );
+      emit(ListenerState.error(error: repoError));
+    }
   }
 
   void _onStreamError(_StreamError event, Emitter<ListenerState> emit) {
-    emit(ListenerState.failure(error: event.error));
+    emit(ListenerState.error(error: event.error));
   }
 
   @override
