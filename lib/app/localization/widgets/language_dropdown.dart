@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qribar_cocina/app/const/app_colors.dart';
-import 'package:qribar_cocina/app/localization/app_language.dart';
+import 'package:qribar_cocina/app/localization/app_language_enum.dart';
 import 'package:qribar_cocina/data/data_sources/local/localization_local_datasource_contract.dart';
-import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
-import 'package:qribar_cocina/features/app/cubit/language_state.dart';
+import 'package:qribar_cocina/app/localization/cubit/language_cubit.dart';
+import 'package:qribar_cocina/app/localization/cubit/language_state.dart';
 
 /// A final [StatelessWidget] that provides a language selection dropdown.
 /// It allows users to change the application's locale and persists the selection.

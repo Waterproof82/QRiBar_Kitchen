@@ -6,7 +6,7 @@ import 'package:qribar_cocina/app/enums/selection_type_enum.dart';
 import 'package:qribar_cocina/app/extensions/build_context_extension.dart';
 import 'package:qribar_cocina/app/extensions/selection_type_enum_extension.dart';
 import 'package:qribar_cocina/app/l10n/app_localizations.dart';
-import 'package:qribar_cocina/app/localization/app_language.dart';
+import 'package:qribar_cocina/app/localization/app_language_enum.dart';
 import 'package:qribar_cocina/app/localization/widgets/language_dropdown.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qribar_cocina/app/const/app_sizes.dart';
 import 'package:qribar_cocina/app/l10n/app_localizations.dart';
-import 'package:qribar_cocina/app/localization/app_language.dart';
+import 'package:qribar_cocina/app/localization/app_language_enum.dart';
 import 'package:qribar_cocina/app/localization/widgets/language_dropdown.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/auth_background.dart';
 import 'package:qribar_cocina/features/login/presentation/ui/login_container.dart';

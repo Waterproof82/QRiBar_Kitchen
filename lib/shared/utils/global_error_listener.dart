@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
-import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
+import 'package:qribar_cocina/app/localization/cubit/language_cubit.dart';
 import 'package:qribar_cocina/features/authentication/bloc/auth_bloc.dart';
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_bloc.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';

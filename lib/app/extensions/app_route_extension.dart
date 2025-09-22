@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qribar_cocina/app/enums/app_route_enum.dart';
 
-extension AppRouteNavigation on BuildContext {
+extension AppRouteExtension on BuildContext {
   void goTo(
-    AppRoute route, {
+    AppRouteEnum route, {
     Map<String, String> pathParams = const {},
     Map<String, String> queryParams = const {},
     Object? extra,
@@ -18,7 +18,7 @@ extension AppRouteNavigation on BuildContext {
   }
 
   void pushTo(
-    AppRoute route, {
+    AppRouteEnum route, {
     Map<String, String> pathParams = const {},
     Map<String, String> queryParams = const {},
     Object? extra,

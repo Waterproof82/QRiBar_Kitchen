@@ -17,8 +17,8 @@ import 'package:qribar_cocina/data/repositories/remote/listener_repository_impl.
 import 'package:qribar_cocina/features/app/app.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc_impl.dart';
-import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
-import 'package:qribar_cocina/features/app/cubit/language_cubit_impl.dart';
+import 'package:qribar_cocina/app/localization/cubit/language_cubit.dart';
+import 'package:qribar_cocina/app/localization/cubit/language_cubit_impl.dart';
 import 'package:qribar_cocina/features/app/providers/navegacion_provider.dart';
 import 'package:qribar_cocina/features/authentication/bloc/auth_bloc.dart';
 import 'package:qribar_cocina/features/biometric/data/data_sources/local/biometric_auth_data_source.dart';

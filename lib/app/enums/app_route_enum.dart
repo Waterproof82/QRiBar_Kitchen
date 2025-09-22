@@ -2,7 +2,7 @@
 ///
 /// Each enum value represents a distinct route in the application
 /// and is associated with a specific URL path.
-enum AppRoute {
+enum AppRouteEnum {
   /// The splash screen route.
   splash('/splash'),
 
@@ -24,7 +24,7 @@ enum AppRoute {
   /// The associated URL path for the route.
   final String path;
 
-  /// Private constructor for [AppRoute] enum values.
+  /// Private constructor for [AppRouteEnum] enum values.
   /// Each route is initialized with its corresponding path.
-  const AppRoute(this.path);
+  const AppRouteEnum(this.path);
 }

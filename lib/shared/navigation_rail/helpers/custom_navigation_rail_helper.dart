@@ -150,9 +150,9 @@ void _handleNavigationDestination(
     updateState(newCurrentIndex, index, newCategoriaSelected);
 
     if (index == 0) {
-      context.goTo(AppRoute.cocinaGeneral);
+      context.goTo(AppRouteEnum.cocinaGeneral);
     } else {
-      context.goTo(AppRoute.cocinaPedidos, extra: 1);
+      context.goTo(AppRouteEnum.cocinaPedidos, extra: 1);
     }
 
     nav.categoriaSelected = newCategoriaSelected;
@@ -201,11 +201,14 @@ void _handleNavigationDestination(
         context.read<BiometricAuthBloc>().add(
           const BiometricAuthEvent.clearCredentials(),
         );
-        CustomSnackBar.show(l10n.biometricsCleared, type: SnackBarType.success);
+        CustomSnackBar.show(
+          l10n.biometricsCleared,
+          type: SnackBarTypeEnum.success,
+        );
       } else {
         CustomSnackBar.show(
           l10n.biometricsClearedCancelled,
-          type: SnackBarType.info,
+          type: SnackBarTypeEnum.info,
         );
       }
 

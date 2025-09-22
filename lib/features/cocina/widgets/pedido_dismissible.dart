@@ -63,7 +63,7 @@ final class PedidoDismissible extends StatelessWidget {
   });
 
   /// Toggles the category selection in [NavigationProvider] and navigates
-  /// to the appropriate screen ([AppRoute.cocinaPedidos] or [AppRoute.cocinaGeneral]).
+  /// to the appropriate screen ([AppRouteEnum.cocinaPedidos] or [AppRouteEnum.cocinaGeneral]).
   ///
   /// [context]: The current build context.
   /// [nav]: The [NavigationProvider] instance.
@@ -81,7 +81,7 @@ final class PedidoDismissible extends StatelessWidget {
 
     // Navigate to the corresponding route
     context.goTo(
-      isGeneral ? AppRoute.cocinaPedidos : AppRoute.cocinaGeneral,
+      isGeneral ? AppRouteEnum.cocinaPedidos : AppRouteEnum.cocinaGeneral,
       extra: isGeneral
           ? itemPedido.numPedido
           : null, // Pass order number as extra if going to pedidos screen

@@ -9,7 +9,7 @@ import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/data/data_sources/local/id_bar_data_source.dart';
 import 'package:qribar_cocina/data/data_sources/remote/listeners_remote_data_source_contract.dart';
 import 'package:qribar_cocina/data/models/categoria_producto.dart';
-import 'package:qribar_cocina/data/models/complementos/complementos.dart';
+import 'package:qribar_cocina/data/models/complemento/complemento.dart';
 import 'package:qribar_cocina/data/models/modifier/modifier.dart';
 import 'package:qribar_cocina/data/models/pedido/pedido.dart';
 import 'package:qribar_cocina/data/models/product.dart';
