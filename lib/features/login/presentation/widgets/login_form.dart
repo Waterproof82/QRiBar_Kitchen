@@ -71,11 +71,11 @@ class _LoginFormState extends State<LoginForm> {
           listener: (_, state) {
             state.maybeWhen(
               authenticated: () {
-                context.goTo(AppRoute.cocinaGeneral);
+                context.goTo(AppRouteEnum.cocinaGeneral);
               },
               onboardingRequired: (email, password) {
                 context.goTo(
-                  AppRoute.onboarding,
+                  AppRouteEnum.onboarding,
                   extra: {'email': email, 'password': password},
                 );
               },

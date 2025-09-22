@@ -7,7 +7,7 @@ import 'package:qribar_cocina/features/onboarding/domain/usecases/first_time_use
 /// Handles onboarding state and ensures consistency between memory and local storage.
 /// - Uses in-memory cache to avoid repeated reads.
 /// - Only allows setting `setFirstTime()` once and updates cache immediately.
-class OnboardingCubit extends Cubit<OnboardingState> {
+final class OnboardingCubit extends Cubit<OnboardingState> {
   OnboardingCubit({required FirstTimeUseCase firstTimeUseCase})
     : _firstTimeUseCase = firstTimeUseCase,
       super(const OnboardingState.initial());

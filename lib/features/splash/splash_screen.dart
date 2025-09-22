@@ -70,11 +70,11 @@ final class SplashState extends State<Splash>
             state.mapOrNull(
               biometricLoginSuccess: (s) {
                 context.read<AuthBloc>().add(const AuthEvent.sessionRestored());
-                context.goTo(AppRoute.cocinaGeneral);
+                context.goTo(AppRouteEnum.cocinaGeneral);
               },
               ready: (s) {
                 if (!s.hasStoredCredentials) {
-                  context.goTo(AppRoute.login);
+                  context.goTo(AppRouteEnum.login);
                 } else {
                   context.read<BiometricAuthBloc>().add(
                     AuthenticateAndLogin(
@@ -89,7 +89,7 @@ final class SplashState extends State<Splash>
                   );
                 }
               },
-              error: (_) => context.goTo(AppRoute.login),
+              error: (_) => context.goTo(AppRouteEnum.login),
             );
           },
         ),

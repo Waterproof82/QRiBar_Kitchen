@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qribar_cocina/app/types/errors/network_error.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/data/data_sources/local/localization_local_datasource_contract.dart';
-import 'package:qribar_cocina/features/app/cubit/language_state.dart';
+import 'package:qribar_cocina/app/localization/cubit/language_state.dart';
 
 /// An [abstract class] that serves as the contract for a Cubit responsible
 /// for managing the application's language state.

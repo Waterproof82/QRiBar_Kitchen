@@ -109,7 +109,7 @@ class FluidCarouselState extends State<FluidCarousel>
                         password: password,
                       ),
                     );
-                    context.goTo(AppRoute.cocinaGeneral);
+                    context.goTo(AppRouteEnum.cocinaGeneral);
                   },
                   child: FittedBox(
                     fit: BoxFit.scaleDown,

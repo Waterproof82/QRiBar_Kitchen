@@ -22,7 +22,7 @@ final class AppRouter {
   /// It's initialized lazily to ensure all dependencies are ready.
   late final GoRouter _router = GoRouter(
     navigatorKey: Globals.navigatorKey,
-    initialLocation: AppRoute.splash.path,
+    initialLocation: AppRouteEnum.splash.path,
     // redirect: _handleRedirect,
     routes: _routes,
   );
@@ -40,19 +40,19 @@ final class AppRouter {
   /// that share a common layout (like [HomeScreen]).
   List<RouteBase> get _routes => [
     GoRoute(
-      name: AppRoute.splash.name,
-      path: AppRoute.splash.path,
+      name: AppRouteEnum.splash.name,
+      path: AppRouteEnum.splash.path,
       builder: (BuildContext context, GoRouterState state) => const Splash(),
     ),
     GoRoute(
-      name: AppRoute.login.name,
-      path: AppRoute.login.path,
+      name: AppRouteEnum.login.name,
+      path: AppRouteEnum.login.path,
       builder: (BuildContext context, GoRouterState state) =>
           const LoginScreen(),
     ),
     GoRoute(
-      name: AppRoute.onboarding.name,
-      path: AppRoute.onboarding.path,
+      name: AppRouteEnum.onboarding.name,
+      path: AppRouteEnum.onboarding.path,
       builder: (BuildContext context, GoRouterState state) {
         final Map<String, dynamic> extraData =
             state.extra is Map<String, dynamic>
@@ -70,14 +70,14 @@ final class AppRouter {
           HomeScreen(child: child),
       routes: [
         GoRoute(
-          name: AppRoute.home.name,
-          path: AppRoute.home.path,
+          name: AppRouteEnum.home.name,
+          path: AppRouteEnum.home.path,
           builder: (BuildContext context, GoRouterState state) =>
               const SizedBox.shrink(),
         ),
         GoRoute(
-          name: AppRoute.cocinaGeneral.name,
-          path: AppRoute.cocinaGeneral.path,
+          name: AppRouteEnum.cocinaGeneral.name,
+          path: AppRouteEnum.cocinaGeneral.path,
           pageBuilder: (BuildContext context, GoRouterState state) =>
               CustomTransitionPage<void>(
                 key: state.pageKey,
@@ -92,8 +92,8 @@ final class AppRouter {
               ),
         ),
         GoRoute(
-          name: AppRoute.cocinaPedidos.name,
-          path: AppRoute.cocinaPedidos.path,
+          name: AppRouteEnum.cocinaPedidos.name,
+          path: AppRouteEnum.cocinaPedidos.path,
           pageBuilder: (BuildContext context, GoRouterState state) {
             final int? extra = state.extra as int?;
             return CustomTransitionPage<void>(

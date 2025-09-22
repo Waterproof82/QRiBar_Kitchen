@@ -31,17 +31,17 @@ extension RepositoryErrorExtension on RepositoryError {
     );
   }
 
-  SnackBarType get snackBarType {
+  SnackBarTypeEnum get snackBarType {
     return maybeWhen(
       // Nuevos casos de biometría
-      biometricHardwareUnavailable: () => SnackBarType.error,
-      noStoredCredentials: () => SnackBarType.warning,
-      biometricAuthCancelled: () => SnackBarType.info,
-      biometricAuthFailed: () => SnackBarType.error,
+      biometricHardwareUnavailable: () => SnackBarTypeEnum.error,
+      noStoredCredentials: () => SnackBarTypeEnum.warning,
+      biometricAuthCancelled: () => SnackBarTypeEnum.info,
+      biometricAuthFailed: () => SnackBarTypeEnum.error,
       // Casos existentes
-      userNotFound: () => SnackBarType.warning,
-      wrongPassword: () => SnackBarType.error,
-      orElse: () => SnackBarType.error,
+      userNotFound: () => SnackBarTypeEnum.warning,
+      wrongPassword: () => SnackBarTypeEnum.error,
+      orElse: () => SnackBarTypeEnum.error,
     );
   }
 }

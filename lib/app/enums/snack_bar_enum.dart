@@ -12,7 +12,7 @@ final class _SnackBarInfo {
 /// Defines the types of snack bars used in the application,
 /// each with an associated icon and color.
 
-enum SnackBarType {
+enum SnackBarTypeEnum {
   /// Represents a success message.
   success,
 
@@ -25,27 +25,27 @@ enum SnackBarType {
   /// Represents an informational message.
   info;
 
-  /// A static map that associates each [SnackBarType] with its corresponding [_SnackBarInfo].
+  /// A static map that associates each [SnackBarTypeEnum] with its corresponding [_SnackBarInfo].
   /// This provides a lookup for the icon and color properties.
-  static const Map<SnackBarType, _SnackBarInfo> _infoMap = {
-    SnackBarType.success: _SnackBarInfo(
+  static const Map<SnackBarTypeEnum, _SnackBarInfo> _infoMap = {
+    SnackBarTypeEnum.success: _SnackBarInfo(
       Icons.check_circle_outline,
       Colors.green,
     ),
-    SnackBarType.error: _SnackBarInfo(Icons.error_outline, Colors.red),
-    SnackBarType.warning: _SnackBarInfo(
+    SnackBarTypeEnum.error: _SnackBarInfo(Icons.error_outline, Colors.red),
+    SnackBarTypeEnum.warning: _SnackBarInfo(
       Icons.warning_amber_rounded,
       Colors.orange,
     ),
-    SnackBarType.info: _SnackBarInfo(Icons.info_outline, Colors.blue),
+    SnackBarTypeEnum.info: _SnackBarInfo(Icons.info_outline, Colors.blue),
   };
 
-  /// Returns the [IconData] associated with this [SnackBarType].
+  /// Returns the [IconData] associated with this [SnackBarTypeEnum].
   ///
   /// Uses the [_infoMap] to retrieve the icon.
   IconData get icon => _infoMap[this]!.icon;
 
-  /// Returns the [Color] associated with this [SnackBarType].
+  /// Returns the [Color] associated with this [SnackBarTypeEnum].
   ///
   /// Uses the [_infoMap] to retrieve the color.
   Color get color => _infoMap[this]!.color;

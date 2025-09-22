@@ -9,6 +9,6 @@ void showBiometricsEnabledSnackBar(
 ) {
   CustomSnackBar.show(
     l10n.biometricsEnabledMessage,
-    type: SnackBarType.success,
+    type: SnackBarTypeEnum.success,
   );
 }
