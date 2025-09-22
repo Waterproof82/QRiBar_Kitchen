@@ -11,6 +11,8 @@ extension SelectionTypeEnumL10n on SelectionTypeEnum {
         return l10n.cocinaPedidosPorMesa;
       case SelectionTypeEnum.generalScreen:
         return l10n.cocinaEstadoPedidos;
+      case SelectionTypeEnum.none:
+        return '';
     }
   }
 }

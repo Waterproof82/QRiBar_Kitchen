@@ -5,17 +5,17 @@ import 'package:qribar_cocina/app/enums/snack_bar_enum.dart';
 void main() {
   group('SnackBarType', () {
     test('retorna iconos correctos por tipo', () {
-      expect(SnackBarType.success.icon, Icons.check_circle_outline);
-      expect(SnackBarType.error.icon, Icons.error_outline);
-      expect(SnackBarType.warning.icon, Icons.warning_amber_rounded);
-      expect(SnackBarType.info.icon, Icons.info_outline);
+      expect(SnackBarTypeEnum.success.icon, Icons.check_circle_outline);
+      expect(SnackBarTypeEnum.error.icon, Icons.error_outline);
+      expect(SnackBarTypeEnum.warning.icon, Icons.warning_amber_rounded);
+      expect(SnackBarTypeEnum.info.icon, Icons.info_outline);
     });
 
     test('retorna colores correctos por tipo', () {
-      expect(SnackBarType.success.color, Colors.green);
-      expect(SnackBarType.error.color, Colors.red);
-      expect(SnackBarType.warning.color, Colors.orange);
-      expect(SnackBarType.info.color, Colors.blue);
+      expect(SnackBarTypeEnum.success.color, Colors.green);
+      expect(SnackBarTypeEnum.error.color, Colors.red);
+      expect(SnackBarTypeEnum.warning.color, Colors.orange);
+      expect(SnackBarTypeEnum.info.color, Colors.blue);
     });
   });
 }

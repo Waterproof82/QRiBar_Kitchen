@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:local_auth_android/local_auth_android.dart';
@@ -6,16 +5,12 @@ import 'package:qribar_cocina/app/enums/app_route_enum.dart';
 import 'package:qribar_cocina/app/enums/svg_enum.dart';
 import 'package:qribar_cocina/app/extensions/app_route_extension.dart';
 import 'package:qribar_cocina/app/l10n/app_localizations.dart';
-import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
+import 'package:qribar_cocina/features/authentication/bloc/auth_bloc.dart';
+import 'package:qribar_cocina/features/authentication/bloc/auth_event.dart';
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_bloc.dart';
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_event.dart';
 import 'package:qribar_cocina/features/biometric/presentation/bloc/biometric_auth_state.dart';
-import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
-import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
-import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 import 'package:qribar_cocina/shared/utils/svg_loader.dart';
-
-part 'helpers/splash_helpers.dart';
 
 final class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -46,8 +41,16 @@ final class SplashState extends State<Splash>
     _animationController.forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkSessionAndNavigate(context);
+      Future.delayed(const Duration(seconds: 3), () {
+        _handleInitialNavigation(context);
+      });
     });
+  }
+
+  void _handleInitialNavigation(BuildContext context) {
+    context.read<BiometricAuthBloc>().add(
+      const CheckAvailabilityAndCredentials(),
+    );
   }
 
   @override
@@ -58,55 +61,35 @@ final class SplashState extends State<Splash>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return MultiBlocListener(
       listeners: [
-        BlocListener<ListenerBloc, ListenerState>(
-          listenWhen: (previous, current) {
-            final wasSuccess = previous.maybeWhen(
-              success: () => true,
-              orElse: () => false,
-            );
-            final isSuccess = current.maybeWhen(
-              success: () => true,
-              orElse: () => false,
-            );
-            return !wasSuccess && isSuccess;
-          },
-          listener: (context, state) {
-            state.maybeWhen(
-              success: () {
-                context.read<LoginFormBloc>().add(
-                  const LoginFormEvent.listenerReady(),
-                );
-              },
-              orElse: () {},
-            );
-          },
-        ),
-
-        BlocListener<LoginFormBloc, LoginFormState>(
-          listenWhen: (previous, current) =>
-              previous.loginSuccess != current.loginSuccess,
-          listener: (context, state) {
-            if (state.loginSuccess) {
-              context.pushTo(AppRoute.cocinaGeneral);
-            }
-          },
-        ),
         BlocListener<BiometricAuthBloc, BiometricAuthState>(
           listener: (context, state) {
             state.mapOrNull(
-              biometricLoginSuccess: (_) {
-                context.read<LoginFormBloc>().add(
-                  const LoginFormEvent.sessionRestored(),
-                );
+              biometricLoginSuccess: (s) {
+                context.read<AuthBloc>().add(const AuthEvent.sessionRestored());
+                context.goTo(AppRouteEnum.cocinaGeneral);
               },
-              biometricLoginFailure: (_) {
-                context.goTo(AppRoute.login);
+              ready: (s) {
+                if (!s.hasStoredCredentials) {
+                  context.goTo(AppRouteEnum.login);
+                } else {
+                  context.read<BiometricAuthBloc>().add(
+                    AuthenticateAndLogin(
+                      localizedReason: l10n.localizedReasonBiometricLogin,
+
+                      androidAuthMessages: AndroidAuthMessages(
+                        signInTitle: l10n.signInTitle,
+                        cancelButton: l10n.cancelButton,
+                        biometricHint: l10n.biometricHint,
+                      ),
+                    ),
+                  );
+                }
               },
-              error: (_) {
-                context.goTo(AppRoute.login);
-              },
+              error: (_) => context.goTo(AppRouteEnum.login),
             );
           },
         ),
@@ -132,7 +115,7 @@ final class SplashState extends State<Splash>
                 child: AnimatedBuilder(
                   animation: _animationController,
                   builder: (context, child) {
-                    final double value = _animation.value;
+                    final value = _animation.value;
                     return SvgLoader(
                       SvgEnum.logoName,
                       width: value * 250,

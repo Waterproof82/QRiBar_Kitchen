@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:qribar_cocina/data/data_sources/local/localization_local_datasource_contract.dart';
-import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
-import 'package:qribar_cocina/features/app/cubit/language_cubit_impl.dart';
+import 'package:qribar_cocina/app/localization/cubit/language_cubit.dart';
+import 'package:qribar_cocina/app/localization/cubit/language_cubit_impl.dart';
 import 'package:qribar_cocina/shared/utils/language_dropdown.dart';
 
 import '../../../../helpers/pump_app.dart';

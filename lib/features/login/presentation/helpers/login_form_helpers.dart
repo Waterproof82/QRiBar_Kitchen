@@ -1,54 +1,45 @@
 part of '../widgets/login_form.dart';
 
-void _showBiometricSetupDialog(
-  BuildContext context,
-  AppLocalizations l10n,
-  String email,
-  String password,
-) {
-  showDialog(
-    context: context,
-    builder: (dialogContext) {
-      return AlertDialog(
-        title: Text(l10n.enableBiometricLoginTitle),
-        content: Text(l10n.enableBiometricLoginContent),
-        actions: [
-          TextButton(
-            child: Text(l10n.noThanksButton),
-            onPressed: () {
-              context.read<BiometricAuthBloc>().add(
-                const BiometricAuthEvent.clearCredentials(),
-              );
-              Navigator.of(dialogContext).pop();
-            },
-          ),
-          TextButton(
-            child: Text(l10n.yesEnableButton),
-            onPressed: () {
-              context.read<BiometricAuthBloc>().add(
-                BiometricAuthEvent.saveCredentialsRequested(
-                  email: email,
-                  password: password,
-                ),
-              );
-              Navigator.of(dialogContext).pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
+void showBiometricSetupDialog({
+  required GlobalKey<NavigatorState> navigatorKey,
+  required BiometricAuthBloc bloc,
+  required AppLocalizations l10n,
+  required String email,
+  required String password,
+}) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    final context = navigatorKey.currentContext;
+    if (context == null) return;
 
-void _showBiometricsEnabledSnackBar(
-  BuildContext context,
-  AppLocalizations l10n,
-) {
-  ScaffoldMessenger.of(
-    context,
-  ).showSnackBar(SnackBar(content: Text(l10n.biometricsEnabledMessage)));
-}
-
-void _dispatchSessionRestored(BuildContext context) {
-  context.read<LoginFormBloc>().add(const LoginFormEvent.sessionRestored());
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(l10n.enableBiometricLoginTitle),
+          content: Text(l10n.enableBiometricLoginContent),
+          actions: [
+            TextButton(
+              child: Text(l10n.noThanksButton),
+              onPressed: () =>
+                  Navigator.of(dialogContext, rootNavigator: true).pop(),
+            ),
+            TextButton(
+              child: Text(l10n.yesEnableButton),
+              onPressed: () {
+                bloc.add(
+                  BiometricAuthEvent.saveCredentialsRequested(
+                    email: email,
+                    password: password,
+                  ),
+                );
+                showBiometricsEnabledSnackBar(context, l10n);
+                Navigator.of(dialogContext, rootNavigator: true).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  });
 }

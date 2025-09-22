@@ -9,28 +9,17 @@ part 'repository_error.freezed.dart';
 sealed class RepositoryError with _$RepositoryError {
   const factory RepositoryError.badRequestListErrors(List<String> listErrors) =
       BadRequestListErrors;
-
   const factory RepositoryError.securityError() = SecurityError;
-
   const factory RepositoryError.badRequest() = BadRequest;
-
   const factory RepositoryError.noAccess() = NoAccess;
-
   const factory RepositoryError.notFoundResource() = NotFoundResource;
-
   const factory RepositoryError.serverError() = ServerError;
-
   const factory RepositoryError.noInternetConnection() = NoInternetConnection;
-
   const factory RepositoryError.authExpired() = AuthExpired;
-
   const factory RepositoryError.infoNotMatching() = InfoNotMatching;
-
   const factory RepositoryError.listErrors(List<String> errorList) =
       ListErrorsM;
-
   const factory RepositoryError.userNotFound() = UserNotFound;
-
   const factory RepositoryError.wrongPassword() = WrongPassword;
 
   // Biometrics
@@ -38,6 +27,8 @@ sealed class RepositoryError with _$RepositoryError {
   const factory RepositoryError.biometricAuthFailed() = _BiometricAuthFailed;
   const factory RepositoryError.biometricHardwareUnavailable() =
       _BiometricHardwareUnavailable;
+  const factory RepositoryError.biometricAuthCancelled() =
+      _BiometricAuthCancelled;
 
   static RepositoryError fromDataSourceError(NetworkError error) {
     return error.maybeWhen(
@@ -54,6 +45,8 @@ sealed class RepositoryError with _$RepositoryError {
       biometricAuthFailed: () => const RepositoryError.biometricAuthFailed(),
       biometricHardwareUnavailable: () =>
           const RepositoryError.biometricHardwareUnavailable(),
+      biometricAuthCancelled: () =>
+          const RepositoryError.biometricAuthCancelled(),
       orElse: () => const RepositoryError.serverError(),
     );
   }

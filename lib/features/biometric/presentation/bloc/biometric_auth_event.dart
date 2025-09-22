@@ -15,12 +15,6 @@ sealed class BiometricAuthEvent with _$BiometricAuthEvent {
     required AndroidAuthMessages androidAuthMessages,
   }) = AuthenticateAndLogin;
 
-  /// Event to perform biometric authentication for an already active session
-  const factory BiometricAuthEvent.authenticateForSession({
-    required String localizedReason,
-    required AndroidAuthMessages androidAuthMessages,
-  }) = AuthenticateForSession;
-
   /// Event to tell the UI to prompt the user to enable biometric login
   const factory BiometricAuthEvent.promptForSetup({
     required String email,

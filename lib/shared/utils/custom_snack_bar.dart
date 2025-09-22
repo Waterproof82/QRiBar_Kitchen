@@ -14,7 +14,7 @@ final class CustomSnackBar extends StatefulWidget {
   final String message;
 
   /// The type of snack bar, determining its icon and color.
-  final SnackBarType type;
+  final SnackBarTypeEnum type;
 
   /// The duration for which the snack bar is displayed.
   final Duration duration;
@@ -26,7 +26,7 @@ final class CustomSnackBar extends StatefulWidget {
   const CustomSnackBar({
     super.key,
     required this.message,
-    this.type = SnackBarType.warning,
+    this.type = SnackBarTypeEnum.warning,
     this.duration = const Duration(seconds: 4),
     this.onDismissed,
   });
@@ -38,7 +38,7 @@ final class CustomSnackBar extends StatefulWidget {
   /// [duration]: How long the snack bar should be visible (defaults to 4 seconds).
   static void show(
     String message, {
-    SnackBarType type = SnackBarType.warning,
+    SnackBarTypeEnum type = SnackBarTypeEnum.warning,
     Duration duration = const Duration(seconds: 4),
   }) {
     final OverlayState? overlayState =
@@ -114,7 +114,7 @@ final class _CustomSnackBarState extends State<CustomSnackBar>
       borderRadius: BorderRadius.circular(AppSizes.p12),
       boxShadow: const [
         BoxShadow(
-          color: AppColors.blackSoft2,
+          color: AppColors.blackSoft,
           blurRadius: 8,
           offset: Offset(0, 2),
         ),

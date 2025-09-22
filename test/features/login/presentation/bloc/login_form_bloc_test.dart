@@ -6,7 +6,6 @@ import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
 import 'package:qribar_cocina/features/login/domain/use_cases/login_use_case.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
-import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc_impl.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 
@@ -26,11 +25,7 @@ void main() {
 
     registerFallbackValue(const ListenerEvent.startListening());
 
-    bloc = LoginFormBlocImpl(
-      loginUseCase: mockLoginUseCase,
-      listenerBloc: mockListenerBloc,
-      biometricAuthBloc: null,
-    );
+    bloc = LoginFormBloc(loginUseCase: mockLoginUseCase);
   });
 
   tearDown(() {
@@ -46,13 +41,6 @@ void main() {
     build: () => bloc,
     act: (bloc) => bloc.add(const EmailChanged('test@example.com')),
     expect: () => [const LoginFormState(email: 'test@example.com')],
-  );
-
-  blocTest<LoginFormBloc, LoginFormState>(
-    'actualiza password cuando se recibe PasswordChanged',
-    build: () => bloc,
-    act: (bloc) => bloc.add(const PasswordChanged('123456')),
-    expect: () => [const LoginFormState(password: '123456')],
   );
 
   blocTest<LoginFormBloc, LoginFormState>(

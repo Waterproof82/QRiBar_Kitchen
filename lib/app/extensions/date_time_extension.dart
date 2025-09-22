@@ -36,12 +36,23 @@ extension DateTimeExtension on DateTime {
     return format.format(this);
   }
 
-  /// Combines the current date with a specific time string (e.g., 'HH:mm:ss').
-  static DateTime combineNowWithTime(String time) {
-    final datePart = DateFormat(
-      'yyyy-MM-dd',
-    ).format(DateTime.now()); // Extract today's date
-    return DateTime.parse('$datePart $time'); // Combine date and time
+  static DateTime combineDateAndTime({
+    required String fecha,
+    required String hora,
+  }) {
+    if (fecha.isEmpty || hora.isEmpty) {
+      debugPrint('WARNING: fecha u hora vacía. Fecha: $fecha, Hora: $hora');
+      return DateTime.now(); // o DateTime(2000)
+    }
+
+    final dateTimeStr = '$fecha $hora';
+
+    try {
+      return DateFormat('dd-MM-yyyy HH:mm:ss').parseStrict(dateTimeStr);
+    } catch (e) {
+      debugPrint('ERROR al parsear fecha/hora: $e');
+      return DateTime(2000);
+    }
   }
 
   /// Converts the [DateTime] to an epoch time (milliseconds since the Unix epoch).

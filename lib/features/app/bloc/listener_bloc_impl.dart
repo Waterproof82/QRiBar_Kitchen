@@ -1,6 +1,5 @@
 import 'package:qribar_cocina/data/repositories/remote/listener_repository.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
-import 'package:qribar_cocina/features/login/data/data_sources/remote/auth_remote_data_source_contract.dart';
 
 /// A final class that provides the concrete implementation for [ListenerBloc].
 ///
@@ -13,11 +12,6 @@ final class ListenerBlocImpl extends ListenerBloc {
   ///
   /// Delegates the injection of [repository] and [authRemoteDataSourceContract]
   /// to the superclass constructor.
-  ListenerBlocImpl({
-    required ListenerRepository repository,
-    required AuthRemoteDataSourceContract authRemoteDataSourceContract,
-  }) : super(
-         repository: repository,
-         authRemoteDataSourceContract: authRemoteDataSourceContract,
-       );
+  ListenerBlocImpl({required ListenerRepository repository})
+    : super(repository: repository);
 }

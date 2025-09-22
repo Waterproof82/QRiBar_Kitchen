@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
+import 'package:qribar_cocina/features/onboarding/domain/usecases/first_time_usecase.dart';
 
 Future<bool> onBackPressed(BuildContext context) async {
   final listenerBloc = context.read<ListenerBloc>();
@@ -29,6 +30,7 @@ Future<bool> onBackPressed(BuildContext context) async {
               color: Colors.black26,
               onPressed: () async {
                 await listenerBloc.close();
+                context.read<FirstTimeUseCase>().resetFirstTime();
                 SystemNavigator.pop();
               },
               child: Padding(

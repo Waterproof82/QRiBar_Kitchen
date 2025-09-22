@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:qribar_cocina/app/types/errors/network_error_utils.dart';
 
@@ -56,9 +57,33 @@ sealed class NetworkError with _$NetworkError {
   const factory NetworkError.biometricAuthFailed() = _BiometricAuthFailed;
   const factory NetworkError.biometricHardwareUnavailable() =
       _BiometricHardwareUnavailable;
+  const factory NetworkError.biometricAuthCancelled() = _BiometricAuthCancelled;
 
   static NetworkError fromException(error) {
     try {
+      if (error is PlatformException) {
+        if (error.code == 'auth_canceled') {
+          return const NetworkError.biometricAuthCancelled();
+        }
+        if (error.code == 'NotAvailable' || error.code == 'not_authenticated') {
+          return const NetworkError.biometricHardwareUnavailable();
+        }
+        if (error.code == 'NotEnrolled') {
+          return const NetworkError.noStoredCredentials();
+        }
+        if (error.code == 'NotSupported') {
+          return const NetworkError.biometricHardwareUnavailable();
+        }
+        if (error.code == 'AuthCancelled') {
+          return const NetworkError.biometricAuthCancelled();
+        }
+        if (error.code == 'LockedOut' || error.code == 'PermanentlyLockedOut') {
+          // Maneja el caso en que el usuario intentó demasiadas veces
+          return const NetworkError.biometricAuthFailed();
+        }
+        // Para otros códigos de error, asume que es un fallo de autenticación
+        return const NetworkError.biometricAuthFailed();
+      }
       if (error is Exception) {
         if (error is DioException) {
           return getErrorFromDioError(error);
@@ -71,6 +96,7 @@ sealed class NetworkError with _$NetworkError {
       if (error is FormatException) {
         return const NetworkError.formatException();
       }
+
       if (error.toString().contains('is not a subtype of')) {
         return const NetworkError.unableToProcess();
       }

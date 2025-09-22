@@ -34,4 +34,8 @@ abstract class BiometricAuthRepository {
   /// Checks if biometric credentials (email and password) are currently stored.
   /// Returns a `Result<bool>`.
   Future<Result<bool>> hasStoredCredentials();
+
+  /// Retrieves the email of the user stored securely for biometric login.
+  /// Returns a `Result<String>` with the email, or a failure if not available.
+  Future<Result<String>> getStoredEmail();
 }

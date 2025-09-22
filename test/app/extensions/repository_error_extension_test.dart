@@ -26,31 +26,45 @@ void main() {
 
     testWidgets('authExpired returns localized string', (tester) async {
       await _pumpWithContext(tester, const Locale('en'));
-      final result = const RepositoryError.authExpired().translateError(context);
+      final result = const RepositoryError.authExpired().translateError(
+        context,
+      );
       expect(result, AppLocalizations.of(context).authenticationExpired);
     });
 
-    testWidgets('badRequestListErrors returns joined error list', (tester) async {
+    testWidgets('badRequestListErrors returns joined error list', (
+      tester,
+    ) async {
       await _pumpWithContext(tester, const Locale('en'));
-      final result = const RepositoryError.badRequestListErrors(['Error 1', 'Error 2']).translateError(context);
+      final result = const RepositoryError.badRequestListErrors([
+        'Error 1',
+        'Error 2',
+      ]).translateError(context);
       expect(result, 'Error 1\nError 2');
     });
 
     testWidgets('userNotFound returns localized string', (tester) async {
       await _pumpWithContext(tester, const Locale('en'));
-      final result = const RepositoryError.userNotFound().translateError(context);
+      final result = const RepositoryError.userNotFound().translateError(
+        context,
+      );
       expect(result, AppLocalizations.of(context).userNotFound);
     });
 
     testWidgets('notFoundResource returns localized string', (tester) async {
       await _pumpWithContext(tester, const Locale('en'));
-      final result = const RepositoryError.notFoundResource().translateError(context);
+      final result = const RepositoryError.notFoundResource().translateError(
+        context,
+      );
       expect(result, AppLocalizations.of(context).notFound);
     });
 
     testWidgets('listErrors returns joined string', (tester) async {
       await _pumpWithContext(tester, const Locale('en'));
-      final result = const RepositoryError.listErrors(['A', 'B']).translateError(context);
+      final result = const RepositoryError.listErrors([
+        'A',
+        'B',
+      ]).translateError(context);
       expect(result, 'A\nB');
     });
 
@@ -62,7 +76,9 @@ void main() {
 
     testWidgets('infoNotMatching returns localized string', (tester) async {
       await _pumpWithContext(tester, const Locale('en'));
-      final result = const RepositoryError.infoNotMatching().translateError(context);
+      final result = const RepositoryError.infoNotMatching().translateError(
+        context,
+      );
       expect(result, AppLocalizations.of(context).infoNotMatch);
     });
 
@@ -72,27 +88,36 @@ void main() {
       expect(result, AppLocalizations.of(context).noAccess);
     });
 
-    testWidgets('noInternetConnection returns localized string', (tester) async {
+    testWidgets('noInternetConnection returns localized string', (
+      tester,
+    ) async {
       await _pumpWithContext(tester, const Locale('en'));
-      final result = const RepositoryError.noInternetConnection().translateError(context);
+      final result = const RepositoryError.noInternetConnection()
+          .translateError(context);
       expect(result, AppLocalizations.of(context).noInternetConnection);
     });
 
     testWidgets('serverError returns localized string', (tester) async {
       await _pumpWithContext(tester, const Locale('en'));
-      final result = const RepositoryError.serverError().translateError(context);
+      final result = const RepositoryError.serverError().translateError(
+        context,
+      );
       expect(result, AppLocalizations.of(context).internalServerError);
     });
 
     testWidgets('securityError returns localized string', (tester) async {
       await _pumpWithContext(tester, const Locale('en'));
-      final result = const RepositoryError.securityError().translateError(context);
+      final result = const RepositoryError.securityError().translateError(
+        context,
+      );
       expect(result, AppLocalizations.of(context).securityError);
     });
 
     testWidgets('wrongPassword returns localized string', (tester) async {
       await _pumpWithContext(tester, const Locale('en'));
-      final result = const RepositoryError.wrongPassword().translateError(context);
+      final result = const RepositoryError.wrongPassword().translateError(
+        context,
+      );
       expect(result, AppLocalizations.of(context).wrongPassword);
     });
 
@@ -113,9 +138,9 @@ void main() {
       const wrongPasswordError = RepositoryError.wrongPassword();
       const defaultError = RepositoryError.serverError();
 
-      expect(userNotFoundError.snackBarType, SnackBarType.warning);
-      expect(wrongPasswordError.snackBarType, SnackBarType.warning);
-      expect(defaultError.snackBarType, SnackBarType.error);
+      expect(userNotFoundError.snackBarType, SnackBarTypeEnum.warning);
+      expect(wrongPasswordError.snackBarType, SnackBarTypeEnum.warning);
+      expect(defaultError.snackBarType, SnackBarTypeEnum.error);
     });
   });
 }

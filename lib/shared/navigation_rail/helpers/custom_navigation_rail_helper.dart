@@ -104,6 +104,15 @@ List<NavigationRailDestination> _buildDestinationsWidget(
       defaultColor: AppColors.error,
       selectedColor: AppColors.error,
     ),
+    _buildNavigationDestination(
+      context: context,
+      iconData: Icons.delete_forever_rounded,
+      label: l10n.biometricsCleared,
+      index: 3,
+      currentAnimatedIndex: currentAnimatedIndex,
+      defaultColor: AppColors.onPrimary,
+      selectedColor: AppColors.greySoft,
+    ),
   ];
 }
 
@@ -141,10 +150,11 @@ void _handleNavigationDestination(
     updateState(newCurrentIndex, index, newCategoriaSelected);
 
     if (index == 0) {
-      context.goNamed(AppRoute.cocinaGeneral.name);
+      context.goTo(AppRouteEnum.cocinaGeneral);
     } else {
-      context.goNamed(AppRoute.cocinaPedidos.name, extra: 1);
+      context.goTo(AppRouteEnum.cocinaPedidos, extra: 1);
     }
+
     nav.categoriaSelected = newCategoriaSelected;
   } else if (index == 2) {
     updateState(
@@ -153,20 +163,62 @@ void _handleNavigationDestination(
       currentLastActiveCategoriaSelected,
     );
 
-    nav.categoriaSelected = '';
+    nav.categoriaSelected = SelectionTypeEnum.none.name;
 
     onBackPressed(context).then((didExit) {
-      if (didExit != true) {
+      if (didExit == true) {
+        updateState(-1, null, null);
+      } else {
         updateState(
           currentLastActiveSelectedIndex,
           currentLastActiveSelectedIndex,
           currentLastActiveCategoriaSelected,
         );
-
         nav.categoriaSelected = currentLastActiveCategoriaSelected;
-      } else {
-        updateState(-1, null, null);
       }
+    });
+  } else if (index == 3) {
+    final l10n = AppLocalizations.of(context);
+
+    showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.confirmDialogTitle),
+        content: Text(l10n.confirmDialogContent),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancelButton),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.deleteButton),
+          ),
+        ],
+      ),
+    ).then((confirmed) {
+      if (confirmed == true) {
+        context.read<BiometricAuthBloc>().add(
+          const BiometricAuthEvent.clearCredentials(),
+        );
+        CustomSnackBar.show(
+          l10n.biometricsCleared,
+          type: SnackBarTypeEnum.success,
+        );
+      } else {
+        CustomSnackBar.show(
+          l10n.biometricsClearedCancelled,
+          type: SnackBarTypeEnum.info,
+        );
+      }
+
+      // Restaurar estado visual
+      updateState(
+        3,
+        currentLastActiveSelectedIndex,
+        currentLastActiveCategoriaSelected,
+      );
+      nav.categoriaSelected = currentLastActiveCategoriaSelected;
     });
   }
 }

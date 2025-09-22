@@ -1,5 +1,5 @@
 import 'package:qribar_cocina/data/data_sources/local/localization_local_datasource_contract.dart';
-import 'package:qribar_cocina/features/app/cubit/language_cubit.dart';
+import 'package:qribar_cocina/app/localization/cubit/language_cubit.dart';
 
 /// A final class that provides the concrete implementation for [LanguageCubit].
 ///

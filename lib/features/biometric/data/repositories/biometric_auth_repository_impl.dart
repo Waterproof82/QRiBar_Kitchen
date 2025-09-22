@@ -42,7 +42,9 @@ final class BiometricAuthRepositoryImpl implements BiometricAuthRepository {
     try {
       final hasCreds = await _secureStorageDataSource.hasCredentials();
       if (!hasCreds) {
-        return const Result.failure(error: RepositoryError.badRequest());
+        return const Result.failure(
+          error: RepositoryError.noStoredCredentials(),
+        );
       }
 
       final authResult = await _biometricDataSource.authenticate(
@@ -106,6 +108,31 @@ final class BiometricAuthRepositoryImpl implements BiometricAuthRepository {
       return const Result.success(null);
     } catch (e) {
       return const Result.failure(error: RepositoryError.securityError());
+    }
+  }
+
+  @override
+  Future<Result<String>> getStoredEmail() async {
+    try {
+      final hasCreds = await _secureStorageDataSource.hasCredentials();
+      if (!hasCreds) {
+        return const Result.failure(
+          error: RepositoryError.noStoredCredentials(),
+        );
+      }
+
+      final email = await _secureStorageDataSource.getEmail();
+      if (email == null || email.isEmpty) {
+        return const Result.failure(error: RepositoryError.infoNotMatching());
+      }
+
+      return Result.success(email);
+    } catch (e) {
+      return Result.failure(
+        error: RepositoryError.fromDataSourceError(
+          NetworkError.fromException(e),
+        ),
+      );
     }
   }
 }

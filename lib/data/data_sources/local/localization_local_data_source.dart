@@ -1,4 +1,4 @@
-import 'package:qribar_cocina/app/types/preferences_type.dart';
+import 'package:qribar_cocina/app/enums/preferences_type_enum.dart';
 import 'package:qribar_cocina/data/data_sources/local/localization_local_datasource_contract.dart';
 import 'package:qribar_cocina/data/data_sources/local/preferences_local_datasource_contract.dart';
 
@@ -21,14 +21,18 @@ final class LocalizationLocalDataSource
   @override
   /// Caches the provided [localeCode] in local preferences.
   ///
-  /// The locale code is stored using [PreferencesType.localeCode.name] as the key.
-  Future<void> cacheLocalLanguageCode(String localeCode) => _preferences
-      .write<String>(key: PreferencesType.localeCode.name, value: localeCode);
+  /// The locale code is stored using [PreferencesTypeEnum.localeCode.name] as the key.
+  Future<void> cacheLocalLanguageCode(String localeCode) =>
+      _preferences.write<String>(
+        key: PreferencesTypeEnum.localeCode.name,
+        value: localeCode,
+      );
 
   @override
   /// Retrieves the cached local language code from preferences.
   ///
   /// If no locale code is found, it defaults to 'es' (Spanish).
   String getCachedLocalLanguageCode() =>
-      _preferences.read<String>(key: PreferencesType.localeCode.name) ?? 'es';
+      _preferences.read<String>(key: PreferencesTypeEnum.localeCode.name) ??
+      'es';
 }

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:qribar_cocina/app/types/errors/network_error.dart';
+import 'package:qribar_cocina/app/types/repository_error.dart';
 import 'package:qribar_cocina/app/types/result.dart';
 import 'package:qribar_cocina/data/repositories/remote/listener_repository.dart';
 import 'package:qribar_cocina/features/app/bloc/listener_bloc.dart';
@@ -32,41 +34,63 @@ final class EventStreamManager {
     required void Function(ListenerEvent event) onEvent,
     required void Function(Object error, StackTrace stackTrace) onError,
   }) async {
-    final result = await _repository.initializeListeners();
+    try {
+      final result = await _repository.initializeListeners();
 
-    return result.when(
-      success: (_) async {
-        await _eventSubscription?.cancel();
-        _eventSubscription = null;
+      return await result.when(
+        success: (_) async {
+          try {
+            // Defensive cancellation: cancel any existing subscription first
+            await _eventSubscription?.cancel();
+            _eventSubscription = null;
 
-        // Subscribe to the repository's event stream.
-        _eventSubscription = _repository.eventsStream.listen(
-          (event) {
-            // Map the incoming event to the appropriate ListenerEvent type
-            // and pass it to the provided onEvent callback.
-            event.mapOrNull(
-              productos: (e) => onEvent(ListenerEvent.productos(e.productos)),
-              pedidos: (e) => onEvent(ListenerEvent.pedidos(e.pedidos)),
-              categorias: (e) =>
-                  onEvent(ListenerEvent.categorias(e.categorias)),
+            // Subscribe to the repository's event stream
+            _eventSubscription = _repository.eventsStream.listen(
+              (event) {
+                // Map the incoming event to the appropriate ListenerEvent type
+                event.mapOrNull(
+                  productos: (e) =>
+                      onEvent(ListenerEvent.productos(e.productos)),
+                  pedidos: (e) => onEvent(ListenerEvent.pedidos(e.pedidos)),
+                  categorias: (e) =>
+                      onEvent(ListenerEvent.categorias(e.categorias)),
+                );
+              },
+              onError: onError,
+              cancelOnError:
+                  false, // Keep subscription alive even if errors occur
             );
-          },
-          onError: onError,
-          cancelOnError:
-              false, // Keep the subscription active even after an error.
-        );
-        log(
-          '✅ [EventStreamManager] Listeners inicializados y suscripción al stream activa.',
-        );
-        return const Result.success(null);
-      },
-      failure: (error) {
-        log(
-          '❌ [EventStreamManager] Fallo al inicializar listeners del repositorio: $error',
-        );
-        return Result.failure(error: error);
-      },
-    );
+
+            log(
+              '✅ [EventStreamManager] Listeners initialized and stream subscription active.',
+            );
+            return const Result.success(null);
+          } catch (e, st) {
+            final error = RepositoryError.fromDataSourceError(
+              NetworkError.fromException(e),
+            );
+            log(
+              '❌ [EventStreamManager] Error subscribing to stream: $error',
+              stackTrace: st,
+            );
+            return Result.failure(error: error);
+          }
+        },
+        failure: (error) {
+          log('❌ [EventStreamManager] Failed to initialize listeners: $error');
+          return Result.failure(error: error);
+        },
+      );
+    } catch (e, st) {
+      final error = RepositoryError.fromDataSourceError(
+        NetworkError.fromException(e),
+      );
+      log(
+        '❌ [EventStreamManager] Unexpected error initializing listeners: $error',
+        stackTrace: st,
+      );
+      return Result.failure(error: error);
+    }
   }
 
   /// Disposes the event stream manager by canceling the active subscription.
@@ -74,10 +98,18 @@ final class EventStreamManager {
   /// This method should be called when the manager is no longer needed
   /// to prevent memory leaks.
   Future<void> dispose() async {
-    log('🧹 [EventStreamManager] Disposing...');
-    await _eventSubscription?.cancel();
-    _eventSubscription = null;
-    log('✅ [EventStreamManager] Suscripción al stream cancelada.');
+    try {
+      log('🧹 [EventStreamManager] Disposing...');
+      await _eventSubscription?.cancel();
+      _eventSubscription = null;
+      log('✅ [EventStreamManager] Stream subscription canceled.');
+    } catch (e, st) {
+      log(
+        '❌ [EventStreamManager] Error disposing subscription: $e',
+        error: e,
+        stackTrace: st,
+      );
+    }
   }
 }
 
@@ -86,26 +118,23 @@ final class EventStreamManager {
 ///
 /// This utility function is typically used to clean up multiple active
 /// subscriptions to prevent memory leaks.
-/// [listenersMap]: A map where keys are identifiers and values are [StreamSubscription]s.
 Future<void> cancelAndClearListeners(
   Map<String, StreamSubscription> listenersMap,
 ) async {
   log(
-    '🧹 [cancelAndClearListeners] Cancelando y limpiando ${listenersMap.length} listeners...',
+    '🧹 [cancelAndClearListeners] Canceling and clearing ${listenersMap.length} listeners...',
   );
   for (final sub in listenersMap.values) {
     try {
       await sub.cancel();
-    } catch (e, stackTrace) {
+    } catch (e, st) {
       log(
-        '❌ [cancelAndClearListeners] Error cancelando listener: $e',
+        '❌ [cancelAndClearListeners] Error canceling listener: $e',
         error: e,
-        stackTrace: stackTrace,
+        stackTrace: st,
       );
     }
   }
   listenersMap.clear();
-  log(
-    '✅ [cancelAndClearListeners] Todos los listeners cancelados y mapa limpiado.',
-  );
+  log('✅ [cancelAndClearListeners] All listeners canceled and map cleared.');
 }

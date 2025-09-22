@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:qribar_cocina/data/models/complementos/complementos.dart';
+import 'package:qribar_cocina/data/models/complemento/complemento.dart';
 import 'package:qribar_cocina/data/models/modifier/modifier.dart';
 
 class Product {

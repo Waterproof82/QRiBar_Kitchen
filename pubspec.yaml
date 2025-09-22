@@ -12,16 +12,16 @@ dependencies:
     sdk: flutter
 
   # --- Firebase packages ---
-  firebase_core: ^3.13.0          # Core Firebase SDK
-  firebase_auth: ^5.5.2           # Firebase Authentication
-  firebase_database: ^11.3.5      # Firebase Realtime Database
+  firebase_core: ^4.1.0          # Core Firebase SDK
+  firebase_auth: ^6.0.2           # Firebase Authentication
+  firebase_database: ^12.0.1      # Firebase Realtime Database
 
   # --- State Management ---
   flutter_bloc: ^9.1.1            # BLoC pattern for state management
   provider: ^6.1.4                # Provider for dependency injection & state
   
   # --- Routes Management ---
-  go_router: ^16.0.0
+  go_router: ^16.2.1
 
   # --- UI and Fonts ---
   flutter_svg: ^2.1.0             # SVG rendering support
@@ -36,7 +36,7 @@ dependencies:
 
   # --- Permissions ---
   permission_handler: ^12.0.0+1   # Handling permissions (camera, storage, etc.)
-  local_auth: ^2.1.8              # Local authentication (fingerprint, face ID)
+  local_auth: ^2.3.0              # Local authentication (fingerprint, face ID)
   local_auth_android: ^1.0.50
 
   # --- Local Storage ---
@@ -48,6 +48,7 @@ dependencies:
   json_annotation: ^4.9.0         # 
   get_it: ^8.0.3                  # Service locator for dependency injection
   wakelock_plus: ^1.2.10          # Prevent screen from sleeping
+  vector_math: ^2.2.0
 
   # --- Localization support ---
   flutter_localizations:
@@ -83,6 +84,7 @@ flutter:
     - assets/img/
     - assets/svg/
     - assets/sounds/
+    - assets/onboarding/
 
 # flutter_gen configuration for asset generation
 flutter_gen:

@@ -8,6 +8,13 @@ extension RepositoryErrorExtension on RepositoryError {
     final l10n = AppLocalizations.of(context);
 
     return maybeWhen(
+      // Nuevos casos para errores de biometría
+      biometricHardwareUnavailable: () =>
+          l10n.biometricHardwareUnavailableError,
+      noStoredCredentials: () => l10n.noStoredCredentialsError,
+      biometricAuthCancelled: () => l10n.biometricAuthCancelledError,
+      biometricAuthFailed: () => l10n.biometricAuthFailedError,
+      // Casos existentes
       authExpired: () => l10n.authenticationExpired,
       badRequest: () => l10n.badRequest,
       badRequestListErrors: (listErrors) => listErrors.join('\n'),
@@ -24,11 +31,17 @@ extension RepositoryErrorExtension on RepositoryError {
     );
   }
 
-  SnackBarType get snackBarType {
+  SnackBarTypeEnum get snackBarType {
     return maybeWhen(
-      userNotFound: () => SnackBarType.warning,
-      wrongPassword: () => SnackBarType.warning,
-      orElse: () => SnackBarType.error,
+      // Nuevos casos de biometría
+      biometricHardwareUnavailable: () => SnackBarTypeEnum.error,
+      noStoredCredentials: () => SnackBarTypeEnum.warning,
+      biometricAuthCancelled: () => SnackBarTypeEnum.info,
+      biometricAuthFailed: () => SnackBarTypeEnum.error,
+      // Casos existentes
+      userNotFound: () => SnackBarTypeEnum.warning,
+      wrongPassword: () => SnackBarTypeEnum.error,
+      orElse: () => SnackBarTypeEnum.error,
     );
   }
 }
