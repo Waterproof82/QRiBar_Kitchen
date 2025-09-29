@@ -16,12 +16,10 @@ class MockListenerBloc extends Mock implements ListenerBloc {}
 
 void main() {
   late MockLoginUseCase mockLoginUseCase;
-  late MockListenerBloc mockListenerBloc;
   late LoginFormBloc bloc;
 
   setUp(() {
     mockLoginUseCase = MockLoginUseCase();
-    mockListenerBloc = MockListenerBloc();
 
     registerFallbackValue(const ListenerEvent.startListening());
 
@@ -32,19 +30,19 @@ void main() {
     bloc.close();
   });
 
-  test('estado inicial es LoginFormState vacío', () {
-    expect(bloc.state, const LoginFormState());
+  test('estado inicial es LoginFormState.initial', () {
+    expect(bloc.state, const LoginFormState.initial());
   });
 
   blocTest<LoginFormBloc, LoginFormState>(
     'actualiza email cuando se recibe EmailChanged',
     build: () => bloc,
     act: (bloc) => bloc.add(const EmailChanged('test@example.com')),
-    expect: () => [const LoginFormState(email: 'test@example.com')],
+    expect: () => [const LoginFormState.initial(email: 'test@example.com')],
   );
 
   blocTest<LoginFormBloc, LoginFormState>(
-    'emite estados loading y success cuando loginUseCase es exitoso y llama a ListenerBloc',
+    'emite estados loading y authenticated cuando loginUseCase es exitoso',
     build: () {
       when(
         () => mockLoginUseCase(
@@ -52,28 +50,20 @@ void main() {
           password: any(named: 'password'),
         ),
       ).thenAnswer((_) async => const Success<void>(null));
-      when(() => mockListenerBloc.add(any())).thenReturn(null);
       return bloc;
     },
-    seed: () =>
-        const LoginFormState(email: 'test@example.com', password: '123456'),
-    act: (bloc) => bloc.add(const LoginSubmitted()),
+    seed: () => const LoginFormState.initial(email: 'test@example.com'),
+    act: (bloc) => bloc.add(
+      const LoginSubmitted(email: 'test@example.com', password: '123456'),
+    ),
     expect: () => [
-      const LoginFormState(
+      const LoginFormState.loading(),
+      const LoginFormState.authenticated(
         email: 'test@example.com',
-        password: '123456',
-        isLoading: true,
-      ),
-      const LoginFormState(
-        email: 'test@example.com',
-        password: '123456',
-        loginSuccess: true,
+        sessionRestored: false,
       ),
     ],
     verify: (_) {
-      verify(
-        () => mockListenerBloc.add(const ListenerEvent.startListening()),
-      ).called(1);
       verify(
         () => mockLoginUseCase(email: 'test@example.com', password: '123456'),
       ).called(1);
@@ -81,7 +71,7 @@ void main() {
   );
 
   blocTest<LoginFormBloc, LoginFormState>(
-    'emite estados loading y failure cuando loginUseCase falla',
+    'emite estados loading y error cuando loginUseCase falla',
     build: () {
       when(
         () => mockLoginUseCase(
@@ -93,19 +83,15 @@ void main() {
       );
       return bloc;
     },
-    seed: () =>
-        const LoginFormState(email: 'fail@example.com', password: 'wrong'),
-    act: (bloc) => bloc.add(const LoginSubmitted()),
+    seed: () => const LoginFormState.initial(email: 'fail@example.com'),
+    act: (bloc) => bloc.add(
+      const LoginSubmitted(email: 'fail@example.com', password: 'wrong'),
+    ),
     expect: () => [
-      const LoginFormState(
+      const LoginFormState.loading(),
+      const LoginFormState.error(
+        error: RepositoryError.userNotFound(),
         email: 'fail@example.com',
-        password: 'wrong',
-        isLoading: true,
-      ),
-      const LoginFormState(
-        email: 'fail@example.com',
-        password: 'wrong',
-        failure: RepositoryError.userNotFound(),
       ),
     ],
     verify: (_) {

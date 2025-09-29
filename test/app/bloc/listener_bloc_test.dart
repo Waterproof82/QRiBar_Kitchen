@@ -128,7 +128,7 @@ void main() {
     },
     expect: () => [
       isA<ListenerState>().having(
-        (s) => s.maybeMap(failure: (state) => state.error, orElse: () => null),
+        (s) => s.maybeMap(error: (state) => state.error, orElse: () => null),
         'error',
         isNotNull,
       ),
@@ -184,7 +184,7 @@ void main() {
     },
     expect: () => [
       isA<ListenerState>().having(
-        (s) => s.maybeMap(failure: (state) => state.error, orElse: () => null),
+        (s) => s.maybeMap(error: (state) => state.error, orElse: () => null),
         'error',
         isNotNull,
       ),

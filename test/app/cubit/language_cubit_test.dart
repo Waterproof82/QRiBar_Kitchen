@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:qribar_cocina/data/data_sources/local/localization_local_datasource_contract.dart';
-import 'package:qribar_cocina/app/localization/cubit/language_cubit.dart';
 import 'package:qribar_cocina/app/localization/cubit/language_cubit_impl.dart';
+import 'package:qribar_cocina/app/localization/cubit/language_state.dart';
+import 'package:qribar_cocina/data/data_sources/local/localization_local_datasource_contract.dart';
 
 class MockLocalizationLocalDataSource extends Mock
     implements LocalizationLocalDataSourceContract {}
@@ -27,7 +27,7 @@ void main() {
     when(() => mockLocalization.getCachedLocalLanguageCode()).thenReturn('es');
     cubit = LanguageCubitImpl(mockLocalization);
 
-    cubit.emit(const LanguageChangedState(localeCode: 'en'));
+    cubit.emit(const LanguageState(localeCode: 'en'));
 
     cubit.fetchLanguage();
 
@@ -38,7 +38,7 @@ void main() {
     when(() => mockLocalization.getCachedLocalLanguageCode()).thenReturn('en');
     cubit = LanguageCubitImpl(mockLocalization);
 
-    cubit.emit(const LanguageChangedState(localeCode: 'en'));
+    cubit.emit(const LanguageState(localeCode: 'en'));
 
     cubit.fetchLanguage();
 
@@ -57,7 +57,7 @@ void main() {
 
       cubit = LanguageCubitImpl(mockLocalization);
 
-      cubit.emit(const LanguageChangedState(localeCode: 'en'));
+      cubit.emit(const LanguageState(localeCode: 'en'));
 
       await cubit.changeLanguage('de');
 
@@ -71,7 +71,7 @@ void main() {
 
     cubit = LanguageCubitImpl(mockLocalization);
 
-    cubit.emit(const LanguageChangedState(localeCode: 'en'));
+    cubit.emit(const LanguageState(localeCode: 'en'));
 
     await cubit.changeLanguage('en');
 

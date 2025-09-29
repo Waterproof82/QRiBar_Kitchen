@@ -6,43 +6,28 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:qribar_cocina/app/extensions/repository_error_extension.dart';
+import 'package:qribar_cocina/app/l10n/app_localizations.dart';
 import 'package:qribar_cocina/app/types/repository_error.dart';
-import 'package:qribar_cocina/features/login/presentation/bloc/login_form_bloc.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_event.dart';
 import 'package:qribar_cocina/features/login/presentation/bloc/login_form_state.dart';
 import 'package:qribar_cocina/features/login/presentation/widgets/login_form.dart';
 
-import '../../../../helpers/pump_app.dart';
-
-class MockLoginFormBloc extends Mock implements LoginFormBloc {}
-
-// You no longer need FakeLoginFormState! Remove this line:
-// class FakeLoginFormState extends Fake implements LoginFormState {}
-
-// If LoginFormEvent is also sealed (which it should be if it has multiple factory constructors),
-// you'll need a concrete fake for it too.
-// For example, if you have an `EmailChanged` event:
-class _FakeEmailChanged extends Fake implements EmailChanged {}
+/// Mock del Bloc
+class MockLoginFormBloc extends MockBloc<LoginFormEvent, LoginFormState> {}
 
 void main() {
   late MockLoginFormBloc mockBloc;
   late StreamController<LoginFormState> controller;
 
   setUpAll(() {
-    // For LoginFormEvent, you should register a concrete instance of one of its variants
-    // or a Fake of one of its concrete variants if it's also sealed.
-    // Assuming `EmailChanged` is a valid variant of LoginFormEvent:
-    registerFallbackValue(_FakeEmailChanged());
-
-    // This is the key change for LoginFormState:
-    // Register a concrete instance of LoginFormState using its factory constructor.
-    registerFallbackValue(const LoginFormState());
+    registerFallbackValue(const EmailChanged(''));
+    registerFallbackValue(const LoginSubmitted(email: '', password: ''));
+    registerFallbackValue(const LoginFormState.initial());
   });
 
   setUp(() {
     mockBloc = MockLoginFormBloc();
-
-    const initialState = LoginFormState();
+    const initialState = LoginFormState.initial();
 
     controller = StreamController<LoginFormState>();
     controller.add(initialState);
@@ -56,110 +41,85 @@ void main() {
     await controller.close();
   });
 
-  testWidgets('LoginForm renders with 2 TextFormFields and a MaterialButton', (
-    tester,
-  ) async {
-    await tester.pumpApp(
-      const LoginForm(),
-      blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
+  /// Helper para envolver LoginForm con MaterialApp y BlocProvider
+  Future<void> _pumpLoginForm(WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: BlocProvider<Bloc<LoginFormEvent, LoginFormState>>.value(
+          value: mockBloc,
+          child: const Scaffold(body: LoginForm()),
+        ),
+      ),
     );
     await tester.pumpAndSettle();
 
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('renders 2 TextFormFields and 1 MaterialButton', (tester) async {
+    await _pumpLoginForm(tester);
     expect(find.byType(TextFormField), findsNWidgets(2));
     expect(find.byType(MaterialButton), findsOneWidget);
   });
 
-  testWidgets('calls PasswordChanged when password field is modified', (
-    tester,
-  ) async {
-    await tester.pumpApp(
-      const LoginForm(),
-      blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
-    );
-    await tester.pumpAndSettle();
-
-    final passwordField = find.byType(TextFormField).at(1);
-    await tester.enterText(passwordField, '123456');
-
-    verify(() => mockBloc.add(const PasswordChanged('123456'))).called(1);
-  });
-
-  testWidgets('calls EmailChanged when email field is modified', (
-    tester,
-  ) async {
-    await tester.pumpApp(
-      const LoginForm(),
-      blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
-    );
-    await tester.pumpAndSettle();
-
+  testWidgets('dispatches EmailChanged when email is typed', (tester) async {
+    await _pumpLoginForm(tester);
     final emailField = find.byType(TextFormField).at(0);
     await tester.enterText(emailField, 'test@example.com');
-
     verify(
       () => mockBloc.add(const EmailChanged('test@example.com')),
     ).called(1);
   });
 
-  testWidgets('validator returns null if email format is valid', (
-    tester,
-  ) async {
-    await tester.pumpApp(
-      const LoginForm(),
-      blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
-    );
-    await tester.pumpAndSettle();
-
+  testWidgets('valid email does not show error', (tester) async {
+    await _pumpLoginForm(tester);
     final emailField = find.byType(TextFormField).at(0);
-
     await tester.enterText(emailField, 'test@example.com');
     await tester.tap(find.byType(MaterialButton));
     await tester.pump();
-
     expect(find.text('Introduce un correo válido'), findsNothing);
   });
 
-  testWidgets('shows SnackBar when failure is present', (tester) async {
+  testWidgets('shows SnackBar when LoginFormState.error is emitted', (
+    tester,
+  ) async {
+    await _pumpLoginForm(tester);
     const failure = RepositoryError.userNotFound();
-    final failureState = const LoginFormState().copyWith(failure: failure);
-
-    await tester.pumpApp(
-      const LoginForm(),
-      blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
+    const errorState = LoginFormState.error(
+      error: failure,
+      email: 'test@example.com',
     );
 
-    final context = tester.element(find.byType(LoginForm));
-
-    controller.add(failureState);
-
+    controller.add(errorState);
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
+    final context = tester.element(find.byType(LoginForm));
     final translatedError = failure.translateError(context);
 
     expect(find.byType(SnackBar), findsOneWidget);
     expect(find.text(translatedError), findsOneWidget);
   });
 
-  testWidgets(
-    'dispatches LoginSubmitted when form is valid and button tapped',
-    (tester) async {
-      await tester.pumpApp(
-        const LoginForm(),
-        blocs: [BlocProvider<LoginFormBloc>.value(value: mockBloc)],
-      );
-      await tester.pumpAndSettle();
+  testWidgets('dispatches LoginSubmitted when button tapped and form valid', (
+    tester,
+  ) async {
+    await _pumpLoginForm(tester);
+    final emailField = find.byType(TextFormField).at(0);
+    final passwordField = find.byType(TextFormField).at(1);
+    final submitButton = find.byType(MaterialButton);
 
-      final emailField = find.byType(TextFormField).at(0);
-      final passwordField = find.byType(TextFormField).at(1);
-      final submitButton = find.byType(MaterialButton);
+    await tester.enterText(emailField, 'test@example.com');
+    await tester.enterText(passwordField, '12345678');
+    await tester.tap(submitButton);
+    await tester.pump();
 
-      await tester.enterText(emailField, 'test@example.com');
-      await tester.enterText(passwordField, '12345678');
-      await tester.tap(submitButton);
-      await tester.pump();
-
-      verify(() => mockBloc.add(const LoginSubmitted())).called(1);
-    },
-  );
+    verify(
+      () => mockBloc.add(
+        const LoginSubmitted(email: 'test@example.com', password: '12345678'),
+      ),
+    ).called(1);
+  });
 }
